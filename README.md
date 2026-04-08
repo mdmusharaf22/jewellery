@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SriGaneshJewellers - Next.js Website
+
+A modern, responsive jewellery e-commerce website built with Next.js 15, TypeScript, and Tailwind CSS.
+
+## Features
+
+- ✅ Fully responsive design (mobile, tablet, desktop)
+- ✅ Modern Next.js 15 App Router
+- ✅ TypeScript for type safety
+- ✅ Tailwind CSS for styling
+- ✅ Component-based architecture
+- ✅ Static data (ready for backend integration)
+- ✅ SEO optimized
+- ✅ Fast performance
+
+## Project Structure
+
+```
+sriganesh-jewellers/
+├── app/
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Home page
+│   └── globals.css         # Global styles
+├── components/
+│   ├── Header.tsx          # Top navigation
+│   ├── Hero.tsx            # Hero section
+│   ├── CategorySection.tsx # Category grid
+│   ├── PopularPicks.tsx    # Featured products
+│   ├── SavingsScheme.tsx   # Savings plan section
+│   ├── NewArrivals.tsx     # New products with tabs
+│   ├── Craftsmanship.tsx   # Features section
+│   ├── Testimonials.tsx    # Customer reviews
+│   └── Footer.tsx          # Footer
+└── public/                 # Static assets (images)
+```
 
 ## Getting Started
 
-First, run the development server:
-
+### Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd sriganesh-jewellers
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Run Development Server
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Build for Production
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Sections Implemented
 
-To learn more about Next.js, take a look at the following resources:
+1. **Header** - Sticky navigation with mobile menu
+2. **Hero** - Main banner with CTA
+3. **Shop by Category** - 5 category circles
+4. **Popular Picks** - 4 featured products
+5. **Savings Scheme** - 10+1 plan details
+6. **New Arrivals** - Tabbed product grid (All/Gold/Silver/Bridal)
+7. **Craftsmanship** - 4 feature cards
+8. **Testimonials** - 3 customer reviews
+9. **Footer** - Links, newsletter, contact info
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Color Scheme
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Gold Primary: `#D4AF37`
+- Gold Dark: `#B8941E`
+- Gold Light: `#F4E4C1`
+- Brown Dark: `#3E2723`
+- Brown Medium: `#5D4037`
+- Cream: `#FFF8E7`
 
-## Deploy on Vercel
+## Next Steps
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [ ] Add real product images
+- [ ] Integrate backend API
+- [ ] Add product detail pages
+- [ ] Implement shopping cart
+- [ ] Add authentication
+- [ ] Connect payment gateway
+- [ ] Add admin panel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+
+- Next.js 15
+- React 19
+- TypeScript
+- Tailwind CSS
+- ESLint
+
+## License
+
+© 2026 SriGaneshJewellers
