@@ -1,10 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
@@ -24,14 +34,20 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Main Header - Sticky */}
-      <header className="bg-white sticky top-0 z-50 shadow-sm">
+      {/* Main Header */}
+      <header className="bg-white">
         <div className="w-full px-4 lg:px-8">
-          <div className="flex justify-between items-center py-3 md:py-4">
+          <div className="flex justify-between items-center py-2 md:py-3">
             {/* Logo */}
             <Link href="/" className="flex items-center">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#D4AF37] to-[#B8941E] rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg md:text-xl">SG</span>
+              <div className="relative h-12 md:h-16 w-32 md:w-48">
+                <Image
+                  src="/logo.jpg"
+                  alt="SriGanesh Jewellers"
+                  fill
+                  className="object-contain object-left"
+                  priority
+                />
               </div>
             </Link>
 
@@ -59,7 +75,7 @@ export default function Header() {
               </button>
 
               {/* Visit Showroom Button */}
-              <button className="hidden md:block bg-[#8B6914] text-white px-5 py-2 rounded hover:bg-[#6d5210] transition font-medium text-sm">
+              <button className="hidden md:block bg-[#B8941E] text-white px-5 py-2 rounded hover:bg-black transition font-medium text-sm">
                 Visit Showroom
               </button>
 
@@ -75,50 +91,50 @@ export default function Header() {
             </div>
           </div>
         </div>
-
-        {/* Gold Navigation Bar - Part of sticky header */}
-        <div className="bg-[#B8941E]">
-          <div className="w-full px-4 lg:px-8">
-            <nav className="flex items-center justify-center gap-8 lg:gap-12 py-3 overflow-x-auto">
-              <Link href="/" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-                Home
-              </Link>
-              <Link href="/gold" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-                Gold
-              </Link>
-              <Link href="/silver" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-                Silver
-              </Link>
-              <Link href="/savings" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-                Savings Schema
-              </Link>
-              <Link href="/loans" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-                Loans
-              </Link>
-              <Link href="/contact" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-                Contact Us
-              </Link>
-            </nav>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t">
-            <nav className="w-full px-4 py-4 flex flex-col gap-3">
-              <Link href="/" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Home</Link>
-              <Link href="/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Gold</Link>
-              <Link href="/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Silver</Link>
-              <Link href="/savings" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Savings Schema</Link>
-              <Link href="/loans" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Loans</Link>
-              <Link href="/contact" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Contact Us</Link>
-              <button className="bg-[#8B6914] text-white px-6 py-2 rounded w-full mt-2 font-medium">
-                Visit Showroom
-              </button>
-            </nav>
-          </div>
-        )}
       </header>
+
+      {/* Gold Navigation Bar - Sticky on scroll */}
+      <div className={`bg-[#B8941E] transition-all duration-300 ${isScrolled ? 'sticky top-0 z-50 shadow-lg' : ''}`}>
+        <div className="w-full px-4 lg:px-8">
+          <nav className="flex items-center justify-center gap-8 lg:gap-12 py-2 overflow-x-auto">
+            <Link href="/" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Home
+            </Link>
+            <Link href="/gold" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Gold
+            </Link>
+            <Link href="/silver" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Silver
+            </Link>
+            <Link href="/savings" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Savings Schema
+            </Link>
+            <Link href="/loans" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Loans
+            </Link>
+            <Link href="/contact" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Contact Us
+            </Link>
+          </nav>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white border-t">
+          <nav className="w-full px-4 py-4 flex flex-col gap-3">
+            <Link href="/" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Home</Link>
+            <Link href="/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Gold</Link>
+            <Link href="/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Silver</Link>
+            <Link href="/savings" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Savings Schema</Link>
+            <Link href="/loans" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Loans</Link>
+            <Link href="/contact" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Contact Us</Link>
+            <button className="bg-[#B8941E] text-white px-6 py-2 rounded w-full mt-2 font-medium hover:bg-black transition">
+              Visit Showroom
+            </button>
+          </nav>
+        </div>
+      )}
     </>
   );
 }

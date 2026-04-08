@@ -1,4 +1,9 @@
+'use client';
+
 import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
 
 export default function CategorySection() {
   const categories = [
@@ -22,6 +27,10 @@ export default function CategorySection() {
       name: 'Savings Plan', 
       image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=500&h=700&fit=crop&q=80'
     },
+    { 
+      name: 'Rings', 
+      image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&h=700&fit=crop&q=80'
+    },
   ];
 
   return (
@@ -35,30 +44,50 @@ export default function CategorySection() {
         </p>
       </div>
 
-      {/* Full width grid without container padding */}
+      {/* Swiper Carousel */}
       <div className="px-4 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
+        <Swiper
+          modules={[Autoplay]}
+          spaceBetween={24}
+          slidesPerView={2}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+          }}
+          loop={true}
+          breakpoints={{
+            640: {
+              slidesPerView: 3,
+              spaceBetween: 24,
+            },
+            1024: {
+              slidesPerView: 5,
+              spaceBetween: 32,
+            },
+          }}
+          className="category-swiper"
+        >
           {categories.map((category, index) => (
-            <div 
-              key={index}
-              className="cursor-pointer"
-            >
-              {/* Subtle rounded top corners */}
-              <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px]">
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                />
+            <SwiperSlide key={index}>
+              <div className="cursor-pointer group">
+                {/* Subtle rounded top corners with hover effect */}
+                <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl">
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                </div>
+                <h3 className="text-center font-semibold text-[#1a1a1a] text-sm md:text-base group-hover:text-[#B8941E] transition-colors duration-300">
+                  {category.name}
+                </h3>
               </div>
-              <h3 className="text-center font-semibold text-[#1a1a1a] text-sm md:text-base">
-                {category.name}
-              </h3>
-            </div>
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </div>
     </section>
   );

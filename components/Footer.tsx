@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function Footer() {
   return (
     <footer className="bg-black text-white">
@@ -6,9 +8,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_1fr_1.5fr] gap-12 lg:gap-20 xl:gap-32 mb-12">
           {/* Logo and Description */}
           <div>
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 border-2 border-white rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SG</span>
+            <div className="mb-4">
+              <div className="relative h-16 w-40 bg-white rounded-lg p-2">
+                <Image
+                  src="/logo.jpg"
+                  alt="SriGanesh Jewellers"
+                  fill
+                  className="object-contain"
+                />
               </div>
             </div>
             <p className="text-gray-300 text-xs mb-4 leading-relaxed">

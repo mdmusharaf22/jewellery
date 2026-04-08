@@ -1,4 +1,10 @@
+'use client';
+
 import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 export default function PopularPicks() {
   const products = [
@@ -30,6 +36,20 @@ export default function PopularPicks() {
       karat: '24KT Gold',
       image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80'
     },
+    { 
+      id: 5, 
+      name: 'Diamond Pendant Set', 
+      price: '1,45,000', 
+      karat: '18KT Gold',
+      image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop&q=80'
+    },
+    { 
+      id: 6, 
+      name: 'Antique Bangle Set', 
+      price: '95,000', 
+      karat: '22KT Gold',
+      image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&h=600&fit=crop&q=80'
+    },
   ];
 
   return (
@@ -43,42 +63,66 @@ export default function PopularPicks() {
         </p>
       </div>
 
-      {/* Full width grid without container padding */}
+      {/* Swiper Carousel */}
       <div className="px-4 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <Swiper
+          modules={[Autoplay, Pagination]}
+          spaceBetween={24}
+          slidesPerView={1}
+          autoplay={{
+            delay: 4000,
+            disableOnInteraction: false,
+          }}
+          pagination={{
+            clickable: true,
+          }}
+          loop={true}
+          breakpoints={{
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 24,
+            },
+            1024: {
+              slidesPerView: 4,
+              spaceBetween: 32,
+            },
+          }}
+          className="popular-swiper"
+        >
           {products.map((product) => (
-            <div 
-              key={product.id}
-              className="cursor-pointer"
-            >
-              {/* Product Image with Heart Icon - No card wrapper */}
-              <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                />
-                {/* Heart/Wishlist Button */}
-                <button className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition">
-                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </button>
-              </div>
+            <SwiperSlide key={product.id}>
+              <div className="cursor-pointer group">
+                {/* Product Image with Heart Icon */}
+                <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                  
+                  {/* Heart/Wishlist Button */}
+                  <button className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-[#B8941E] hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
 
-              {/* Product Details - Direct on background */}
-              <div>
-                <p className="text-xs text-gray-500 mb-1">{product.karat}</p>
-                <h3 className="font-semibold text-base mb-2 text-[#1a1a1a]">
-                  {product.name}
-                </h3>
-                <p className="text-lg font-bold text-[#1a1a1a]">₹ {product.price}</p>
+                {/* Product Details */}
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">{product.karat}</p>
+                  <h3 className="font-semibold text-base mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition-colors duration-300">
+                    {product.name}
+                  </h3>
+                  <p className="text-lg font-bold text-[#1a1a1a]">₹ {product.price}</p>
+                </div>
               </div>
-            </div>
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </div>
     </section>
   );

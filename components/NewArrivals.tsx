@@ -66,17 +66,19 @@ export default function NewArrivals() {
               className="cursor-pointer group"
             >
               {/* Product Image with Heart Icon */}
-              <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3">
+              <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
                 <Image
                   src={product.image}
                   alt={product.name}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                
                 {/* Heart/Wishlist Button */}
-                <button className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition">
-                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-[#B8941E] hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </button>
@@ -85,7 +87,7 @@ export default function NewArrivals() {
               {/* Product Details */}
               <div>
                 <p className="text-xs text-gray-500 mb-1">{product.karat}</p>
-                <h3 className="font-semibold text-base mb-2 text-[#1a1a1a]">
+                <h3 className="font-semibold text-base mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition-colors duration-300">
                   {product.name}
                 </h3>
                 <p className="text-lg font-bold text-[#1a1a1a]">₹ {product.price}</p>

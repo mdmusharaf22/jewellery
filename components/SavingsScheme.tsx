@@ -1,7 +1,7 @@
 export default function SavingsScheme() {
   return (
     <section className="py-16 md:py-20 bg-white">
-      <div className="container mx-auto px-4 lg:px-8">
+      <div className="w-full px-4 lg:px-8">
         {/* Cream Container Box - Lighter beige background */}
         <div className="bg-[#EFE8D8] rounded-2xl p-8 md:p-12 lg:p-16">
           {/* Top Bar with Scheme Name and Join Link */}
