@@ -10,7 +10,7 @@ export default function Header() {
     <>
       {/* Top Bar */}
       <div className="bg-[#1a1a1a] text-white text-xs py-2">
-        <div className="container mx-auto px-4 lg:px-8">
+        <div className="w-full px-4 lg:px-8">
           <div className="flex flex-wrap justify-between items-center gap-2">
             <div className="flex flex-wrap gap-3 md:gap-6 text-[11px] md:text-xs">
               <span>Gold 22K: ₹7,245/g</span>
@@ -26,7 +26,7 @@ export default function Header() {
 
       {/* Main Header - Sticky */}
       <header className="bg-white sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 lg:px-8">
+        <div className="w-full px-4 lg:px-8">
           <div className="flex justify-between items-center py-3 md:py-4">
             {/* Logo */}
             <Link href="/" className="flex items-center">
@@ -78,7 +78,7 @@ export default function Header() {
 
         {/* Gold Navigation Bar - Part of sticky header */}
         <div className="bg-[#B8941E]">
-          <div className="container mx-auto px-4 lg:px-8">
+          <div className="w-full px-4 lg:px-8">
             <nav className="flex items-center justify-center gap-8 lg:gap-12 py-3 overflow-x-auto">
               <Link href="/" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
                 Home
@@ -105,7 +105,7 @@ export default function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t">
-            <nav className="container mx-auto px-4 py-4 flex flex-col gap-3">
+            <nav className="w-full px-4 py-4 flex flex-col gap-3">
               <Link href="/" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Home</Link>
               <Link href="/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Gold</Link>
               <Link href="/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Silver</Link>

@@ -13,11 +13,21 @@ export default function Home() {
     <main className="min-h-screen">
       <Header />
       <Hero />
-      <CategorySection />
-      <PopularPicks />
-      <SavingsScheme />
-      <NewArrivals />
-      <Craftsmanship />
+      <div className="py-8 md:py-12">
+        <CategorySection />
+      </div>
+      <div className="py-8 md:py-12">
+        <PopularPicks />
+      </div>
+      <div className="py-8 md:py-12">
+        <SavingsScheme />
+      </div>
+      <div className="py-8 md:py-12">
+        <NewArrivals />
+      </div>
+      <div className="py-8 md:py-12">
+        <Craftsmanship />
+      </div>
       <Testimonials />
       <Footer />
     </main>

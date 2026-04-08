@@ -1,9 +1,9 @@
 export default function Footer() {
   return (
     <footer className="bg-black text-white">
-      <div className="w-full px-4 lg:px-8 py-16 md:py-20">
+      <div className="w-full px-4 lg:px-16 xl:px-24 py-16 md:py-20">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_auto_auto_1fr] gap-8 lg:gap-16 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_1fr_1.5fr] gap-12 lg:gap-20 xl:gap-32 mb-12">
           {/* Logo and Description */}
           <div>
             <div className="flex items-center mb-4">
