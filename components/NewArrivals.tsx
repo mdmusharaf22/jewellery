@@ -23,7 +23,7 @@ export default function NewArrivals() {
     : products.filter(p => p.category === activeTab);
 
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section className="bg-white">
       {/* Full width header */}
       <div className="px-4 lg:px-8">
         {/* Header with Tabs on Right */}
@@ -66,7 +66,7 @@ export default function NewArrivals() {
               className="cursor-pointer group"
             >
               {/* Product Image with Heart Icon */}
-              <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+              <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-shadow duration-300 group-hover:shadow-sm">
                 <Image
                   src={product.image}
                   alt={product.name}

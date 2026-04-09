@@ -3,27 +3,26 @@ import Image from 'next/image';
 export default function Footer() {
   return (
     <footer className="bg-black text-white">
-      <div className="w-full px-4 lg:px-16 xl:px-24 py-16 md:py-20">
+      <div className="w-full px-4 lg:px-16 xl:px-24 pt-16 md:pt-20 pb-8">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_1fr_1.5fr] gap-12 lg:gap-20 xl:gap-32 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">
           {/* Logo and Description */}
           <div>
-            <div className="mb-4">
-              <div className="relative h-16 w-40 bg-white rounded-lg p-2">
-                <Image
-                  src="/logo.jpg"
-                  alt="SriGanesh Jewellers"
-                  fill
-                  className="object-contain"
-                />
-              </div>
+            <div className="mb-3">
+              <Image
+                src="/footer-logo.png"
+                alt="SriGanesh Jewellers"
+                width={90}
+                height={36}
+                className="object-contain"
+              />
             </div>
-            <p className="text-gray-300 text-xs mb-4 leading-relaxed">
-              Trusted by families for wedding jewellery, silver gifting, savings plans and transparent gold loan assistance.
+            <p className="text-gray-300 text-xs mb-3 leading-relaxed">
+              Trusted by families for wedding jewellery.
             </p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              <span className="border border-gray-600 px-2.5 py-1 rounded text-[10px] whitespace-nowrap">BIS Hallmarked</span>
-              <span className="border border-gray-600 px-2.5 py-1 rounded text-[10px] whitespace-nowrap">Insured Delivery</span>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="border border-gray-600 px-2 py-0.5 rounded text-[10px] whitespace-nowrap">BIS Hallmarked</span>
+              <span className="border border-gray-600 px-2 py-0.5 rounded text-[10px] whitespace-nowrap">Insured Delivery</span>
             </div>
             <div className="flex gap-3">
               <a href="#" className="text-white hover:text-[#C9A961] transition">
@@ -108,7 +107,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-3 text-[10px] text-gray-400">
+        <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-gray-400">
           <p>© 2026 SriGaneshJewellers. Purity, trust and family service.</p>
           <div className="flex gap-6">
             <a href="/privacy" className="hover:text-white transition">Privacy Policy</a>

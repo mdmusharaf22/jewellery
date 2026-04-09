@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Star, Quote, BadgeCheck, MapPin } from 'lucide-react';
 
 export default function Testimonials() {
   const testimonials = [
@@ -26,7 +27,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <section className="py-16 md:py-20 bg-[#F5F1E8] mb-16 md:mb-20">
+    <section className="py-16 md:py-20 bg-[#F5F1E8]">
       <div className="w-[90%] mx-auto px-4 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-[#1a1a1a]">
           Why families come back to us
@@ -39,32 +40,25 @@ export default function Testimonials() {
           {testimonials.map((testimonial, index) => (
             <div 
               key={index}
-              className="bg-white rounded-2xl p-8 md:p-10 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group"
+              className="bg-white rounded-2xl p-8 md:p-10 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
             >
               {/* Stars and Quote Icon Row - AT THE TOP */}
               <div className="flex items-center justify-between mb-8">
                 {/* Outline Stars */}
                 <div className="flex gap-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <svg 
+                    <Star 
                       key={i} 
-                      className="w-6 h-6 text-[#B8941E]" 
+                      className="w-5 h-5 text-[#B8941E]" 
                       fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                    </svg>
+                      strokeWidth={2}
+                    />
                   ))}
                 </div>
                 
-                {/* Quote Icon in Circle - Rounded "99" Style */}
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[#F5F1E8]">
-                  <svg className="w-10 h-10 text-[#C9A961]" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 48 48">
-                    <path d="M10 18c0-3 1.5-5 4-5s4 2 4 4.5c0 3-2.5 5.5-5 8.5"/>
-                    <path d="M26 18c0-3 1.5-5 4-5s4 2 4 4.5c0 3-2.5 5.5-5 8.5"/>
-                  </svg>
+                {/* Quote Icon in Circle */}
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#F5F1E8]">
+                  <Quote className="w-7 h-7 text-[#C9A961]" strokeWidth={2} />
                 </div>
               </div>
 
@@ -90,23 +84,11 @@ export default function Testimonials() {
                   <div className="flex items-center gap-2">
                     <p className="font-bold text-[#1a1a1a] text-base">{testimonial.name}</p>
                     {/* Gold Verified Badge */}
-                    <svg 
-                      className="w-5 h-5 text-[#B8941E]" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <BadgeCheck className="w-5 h-5 text-[#B8941E]" fill="currentColor" />
                   </div>
                   <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
                     {/* Location Pin Icon */}
-                    <svg 
-                      className="w-4 h-4 text-gray-500" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
+                    <MapPin className="w-4 h-4 text-gray-500" />
                     <span>{testimonial.location}</span>
                   </div>
                 </div>

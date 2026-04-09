@@ -12,7 +12,7 @@ export default function SavingsScheme() {
               <p className="text-gray-700 text-sm font-medium">Gold Mine Savings Scheme</p>
             </div>
             {/* Join Savings Plan with gray border */}
-            <a href="/savings" className="text-[#B8941E] text-sm font-medium hover:text-[#8B6914] transition border-2 border-gray-300 rounded px-6 py-2">
+            <a href="/savings" className="text-[#B8941E] text-sm font-medium hover:bg-black hover:text-white transition border-2 border-gray-300 rounded px-6 py-2">
               Join Savings Plan
             </a>
           </div>
@@ -35,7 +35,7 @@ export default function SavingsScheme() {
                 </p>
               </div>
               
-              <button className="bg-[#B8941E] text-white px-8 py-3 rounded hover:bg-[#8B6914] transition font-medium text-sm w-fit">
+              <button className="bg-[#B8941E] text-white px-8 py-3 rounded hover:bg-black transition font-medium text-sm w-fit">
                 Join Savings Plan
               </button>
             </div>

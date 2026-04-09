@@ -2,9 +2,8 @@
 
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
+import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
-import 'swiper/css/pagination';
 
 export default function PopularPicks() {
   const products = [
@@ -53,7 +52,7 @@ export default function PopularPicks() {
   ];
 
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section className="bg-white">
       <div className="container mx-auto px-4 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
           Popular Picks
@@ -66,15 +65,12 @@ export default function PopularPicks() {
       {/* Swiper Carousel */}
       <div className="px-4 lg:px-8">
         <Swiper
-          modules={[Autoplay, Pagination]}
+          modules={[Autoplay]}
           spaceBetween={24}
           slidesPerView={1}
           autoplay={{
             delay: 4000,
             disableOnInteraction: false,
-          }}
-          pagination={{
-            clickable: true,
           }}
           loop={true}
           breakpoints={{
@@ -93,7 +89,7 @@ export default function PopularPicks() {
             <SwiperSlide key={product.id}>
               <div className="cursor-pointer group">
                 {/* Product Image with Heart Icon */}
-                <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-shadow duration-300 group-hover:shadow-sm">
                   <Image
                     src={product.image}
                     alt={product.name}

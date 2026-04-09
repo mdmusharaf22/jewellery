@@ -34,7 +34,7 @@ export default function CategorySection() {
   ];
 
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section className="bg-white">
       <div className="container mx-auto px-4 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
           Shop by Category
@@ -51,7 +51,7 @@ export default function CategorySection() {
           spaceBetween={24}
           slidesPerView={2}
           autoplay={{
-            delay: 3000,
+            delay: 4000,
             disableOnInteraction: false,
           }}
           loop={true}
@@ -71,7 +71,7 @@ export default function CategorySection() {
             <SwiperSlide key={index}>
               <div className="cursor-pointer group">
                 {/* Subtle rounded top corners with hover effect */}
-                <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl">
+                <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-shadow duration-300 group-hover:shadow-sm">
                   <Image
                     src={category.image}
                     alt={category.name}

@@ -3,18 +3,59 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [goldMenuOpen, setGoldMenuOpen] = useState(false);
+  const [silverMenuOpen, setSilverMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100);
+      // Close dropdowns on scroll
+      setGoldMenuOpen(false);
+      setSilverMenuOpen(false);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const goldCategories = [
+    { name: 'TALI', href: '/gold/tali' },
+    { name: 'Gold Kaapu', href: '/gold/kaapu' },
+    { name: 'TALI CHAIN', href: '/gold/tali-chain' },
+    { name: 'Bracelet', href: '/gold/bracelet' },
+    { name: 'Necklace', href: '/gold/necklace' },
+    { name: 'Gold Jhumkas', href: '/gold/jhumkas' },
+    { name: 'Kalipot', href: '/gold/kalipot' },
+    { name: 'Gold Dollar', href: '/gold/dollar' },
+    { name: 'Dollar chain', href: '/gold/dollar-chain' },
+    { name: 'Gold Ring', href: '/gold/ring' },
+    { name: 'Stud', href: '/gold/stud' },
+    { name: 'All', href: '/gold/all' },
+    { name: 'Bangles', href: '/gold/bangles' },
+    { name: 'Haram', href: '/gold/haram' },
+  ];
+
+  const silverCategories = [
+    { name: 'Anklet', href: '/silver/anklet' },
+    { name: 'Ring', href: '/silver/ring' },
+    { name: 'Bangles', href: '/silver/bangles' },
+    { name: 'Bracelet', href: '/silver/bracelet' },
+    { name: 'Kappu', href: '/silver/kappu' },
+    { name: 'Tattu', href: '/silver/tattu' },
+    { name: 'Key Chain', href: '/silver/key-chain' },
+    { name: 'All', href: '/silver/all' },
+  ];
 
   return (
     <>
@@ -94,29 +135,153 @@ export default function Header() {
       </header>
 
       {/* Gold Navigation Bar - Sticky on scroll */}
-      <div className={`bg-[#B8941E] transition-all duration-300 ${isScrolled ? 'sticky top-0 z-50 shadow-lg' : ''}`}>
+      <div 
+        className={`bg-[#B8941E] transition-all duration-300 ${isScrolled ? 'sticky top-0 z-50 shadow-lg' : ''}`}
+      >
         <div className="w-full px-4 lg:px-8">
-          <nav className="flex items-center justify-center gap-8 lg:gap-12 py-2 overflow-x-auto">
+          <nav className="flex items-center justify-center gap-8 lg:gap-12 py-1.5 relative">
             <Link href="/" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Home
             </Link>
-            <Link href="/gold" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-              Gold
+            
+            {/* Gold Mega Menu */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setGoldMenuOpen(true)}
+              onMouseLeave={() => setGoldMenuOpen(false)}
+            >
+              <button
+                className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4"
+              >
+                Gold
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Silver Mega Menu */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setSilverMenuOpen(true)}
+              onMouseLeave={() => setSilverMenuOpen(false)}
+            >
+              <button
+                className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4"
+              >
+                Silver
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+            <Link href="/mens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Men's Collection
             </Link>
-            <Link href="/silver" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-              Silver
+            <Link href="/womens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Women's Collection
+            </Link>
+            <Link href="/kids-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              Kids Collection
             </Link>
             <Link href="/savings" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Savings Schema
-            </Link>
-            <Link href="/loans" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
-              Loans
             </Link>
             <Link href="/contact" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Contact Us
             </Link>
           </nav>
         </div>
+
+        {/* Gold Dropdown - Inside sticky wrapper */}
+        {goldMenuOpen && (
+          <div 
+            className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
+            onMouseEnter={() => setGoldMenuOpen(true)}
+            onMouseLeave={() => setGoldMenuOpen(false)}
+          >
+            <div className="w-full py-8">
+              <div className="grid grid-cols-[60%_35%] gap-8 px-12">
+                {/* 60% - Categories in 2 columns on LEFT */}
+                <div className="grid grid-cols-2 gap-x-12 gap-y-5">
+                  {goldCategories.map((item) => (
+                    <Link 
+                      key={item.name}
+                      href={item.href}
+                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block py-1"
+                      onClick={() => setGoldMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* 35% - Banner Image on RIGHT */}
+                <div className="relative h-[380px] rounded-lg overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=800&fit=crop&q=80"
+                    alt="Gold Collection"
+                    fill
+                    className="object-cover"
+                    sizes="35vw"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+                    <div className="text-white">
+                      <p className="text-4xl font-bold mb-1">3500+</p>
+                      <p className="text-lg">Designs</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Silver Dropdown - Inside sticky wrapper */}
+        {silverMenuOpen && (
+          <div 
+            className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
+            onMouseEnter={() => setSilverMenuOpen(true)}
+            onMouseLeave={() => setSilverMenuOpen(false)}
+          >
+            <div className="w-full py-8">
+              <div className="grid grid-cols-[60%_35%] gap-8 px-12">
+                {/* 60% - Categories in 2 columns on LEFT */}
+                <div className="grid grid-cols-2 gap-x-12 gap-y-5">
+                  {silverCategories.map((item) => (
+                    <Link 
+                      key={item.name}
+                      href={item.href}
+                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block py-1"
+                      onClick={() => setSilverMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* 35% - Banner Image on RIGHT */}
+                <div className="relative h-[380px] rounded-lg overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=800&fit=crop&q=80"
+                    alt="Silver Collection"
+                    fill
+                    className="object-cover"
+                    sizes="35vw"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+                    <div className="text-white">
+                      <p className="text-4xl font-bold mb-1">2000+</p>
+                      <p className="text-lg">Designs</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Mobile Menu */}
@@ -126,8 +291,10 @@ export default function Header() {
             <Link href="/" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Home</Link>
             <Link href="/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Gold</Link>
             <Link href="/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Silver</Link>
+            <Link href="/mens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Men's Collection</Link>
+            <Link href="/womens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Women's Collection</Link>
+            <Link href="/kids-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Kids Collection</Link>
             <Link href="/savings" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Savings Schema</Link>
-            <Link href="/loans" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Loans</Link>
             <Link href="/contact" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Contact Us</Link>
             <button className="bg-[#B8941E] text-white px-6 py-2 rounded w-full mt-2 font-medium hover:bg-black transition">
               Visit Showroom

@@ -60,8 +60,9 @@ export default function Hero() {
               </div>
 
               {/* Content */}
-              <div className="relative container mx-auto px-4 lg:px-8 py-12 md:py-16 lg:py-24">
-                <div className="max-w-xl lg:max-w-2xl">
+              <div className="absolute inset-0 flex items-center">
+                <div className="container mx-auto px-4 lg:px-8">
+                  <div className="max-w-xl lg:max-w-2xl">
                   {/* Tag */}
                   <div className="inline-block bg-white rounded-full px-5 py-2 mb-6 md:mb-8">
                     <p className="text-[#1a1a1a] text-xs md:text-sm font-medium">
@@ -70,19 +71,20 @@ export default function Hero() {
                   </div>
 
                   {/* Heading */}
-                  <h1 className="text-white text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 md:mb-8 leading-tight whitespace-pre-line">
+                  <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-[1.2] max-w-lg whitespace-pre-line">
                     {slide.title}
                   </h1>
 
                   {/* Description */}
-                  <p className="text-white/90 text-base md:text-lg mb-8 md:mb-10 max-w-lg">
+                  <p className="text-white/90 text-sm md:text-base mb-6 md:mb-8 max-w-md leading-relaxed">
                     {slide.description}
                   </p>
 
                   {/* CTA Button */}
-                  <button className="bg-[#B8941E] text-white px-8 py-3 md:px-10 md:py-4 rounded hover:bg-[#8B6914] transition font-medium text-sm md:text-base shadow-lg">
+                  <a href="/collection" className="inline-block bg-[#B8941E] text-white px-6 py-2.5 md:px-8 md:py-3 rounded hover:bg-black transition font-medium text-sm shadow-lg">
                     Shop Collection
-                  </button>
+                  </a>
+                  </div>
                 </div>
               </div>
             </div>
