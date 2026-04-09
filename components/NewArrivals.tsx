@@ -43,7 +43,7 @@ export default function NewArrivals() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 rounded-full font-medium text-sm transition ${
+                className={`px-5 py-2 rounded-full font-medium text-sm transition cursor-pointer ${
                   activeTab === tab
                     ? 'bg-[#B8941E] text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -86,7 +86,7 @@ export default function NewArrivals() {
 
               {/* Product Details */}
               <div>
-                <p className="text-xs text-gray-500 mb-1">{product.karat}</p>
+                <p className="text-xs text-[#B8941E] mb-1 font-medium">{product.karat}</p>
                 <h3 className="font-semibold text-base mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition-colors duration-300">
                   {product.name}
                 </h3>

@@ -1,6 +1,6 @@
 export default function SavingsScheme() {
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section className="bg-white">
       <div className="w-full px-4 lg:px-8">
         {/* Cream Container Box - Lighter beige background */}
         <div className="bg-[#EFE8D8] rounded-2xl p-8 md:p-12 lg:p-16">
@@ -12,7 +12,7 @@ export default function SavingsScheme() {
               <p className="text-gray-700 text-sm font-medium">Gold Mine Savings Scheme</p>
             </div>
             {/* Join Savings Plan with gray border */}
-            <a href="/savings" className="text-[#B8941E] text-sm font-medium hover:bg-black hover:text-white transition border-2 border-gray-300 rounded px-6 py-2">
+            <a href="/savings" className="text-[#B8941E] text-sm font-medium hover:bg-black hover:text-white transition border-2 border-[#B8941E] rounded px-6 py-2 cursor-pointer">
               Join Savings Plan
             </a>
           </div>
@@ -22,7 +22,7 @@ export default function SavingsScheme() {
             {/* Left Content Box */}
             <div className="bg-white rounded-xl p-8 flex flex-col justify-between">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-[#1a1a1a] leading-tight">
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#1a1a1a] leading-tight">
                   Save smart for<br />
                   your next<br />
                   jewellery<br />
@@ -35,7 +35,7 @@ export default function SavingsScheme() {
                 </p>
               </div>
               
-              <button className="bg-[#B8941E] text-white px-8 py-3 rounded hover:bg-black transition font-medium text-sm w-fit">
+              <button className="bg-[#B8941E] text-white px-8 py-3 rounded hover:bg-black transition font-medium text-sm w-fit cursor-pointer">
                 Join Savings Plan
               </button>
             </div>
@@ -50,7 +50,7 @@ export default function SavingsScheme() {
             </div>
 
             {/* Benefits Card */}
-            <div className="bg-[#3E2723] text-white rounded-xl p-8 flex flex-col">
+            <div className="bg-black text-white rounded-xl p-8 flex flex-col">
               <h4 className="font-bold mb-6 text-sm uppercase tracking-wide">WHY IT FEELS BETTER</h4>
               <ul className="space-y-4 flex-grow">
                 <li className="flex items-start gap-3 text-sm">

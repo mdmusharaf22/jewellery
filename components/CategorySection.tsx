@@ -39,7 +39,7 @@ export default function CategorySection() {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
           Shop by Category
         </h2>
-        <p className="text-center text-gray-600 mb-12 md:mb-16 text-sm md:text-base">
+        <p className="text-center text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
           Traditional favourites and everyday essentials curated for Indian families
         </p>
       </div>
@@ -65,7 +65,7 @@ export default function CategorySection() {
               spaceBetween: 32,
             },
           }}
-          className="category-swiper"
+          className="category-swiper cursor-grab"
         >
           {categories.map((category, index) => (
             <SwiperSlide key={index}>
@@ -78,6 +78,8 @@ export default function CategorySection() {
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    loading="eager"
+                    unoptimized
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
                 </div>

@@ -43,7 +43,7 @@ export default function Hero() {
           bulletActiveClass: 'swiper-pagination-bullet-active !bg-[#B8941E]',
         }}
         loop={true}
-        className="hero-swiper"
+        className="hero-swiper cursor-grab"
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>

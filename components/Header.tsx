@@ -1,16 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,16 +10,40 @@ export default function Header() {
   const [goldMenuOpen, setGoldMenuOpen] = useState(false);
   const [silverMenuOpen, setSilverMenuOpen] = useState(false);
 
+  const goldCloseTimeout = useRef<NodeJS.Timeout | null>(null);
+  const silverCloseTimeout = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100);
-      // Close dropdowns on scroll
       setGoldMenuOpen(false);
       setSilverMenuOpen(false);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Gold hover handlers
+  const handleGoldEnter = () => {
+    if (goldCloseTimeout.current) clearTimeout(goldCloseTimeout.current);
+    setSilverMenuOpen(false);
+    if (silverCloseTimeout.current) clearTimeout(silverCloseTimeout.current);
+    setGoldMenuOpen(true);
+  };
+  const handleGoldLeave = () => {
+    goldCloseTimeout.current = setTimeout(() => setGoldMenuOpen(false), 120);
+  };
+
+  // Silver hover handlers
+  const handleSilverEnter = () => {
+    if (silverCloseTimeout.current) clearTimeout(silverCloseTimeout.current);
+    setGoldMenuOpen(false);
+    if (goldCloseTimeout.current) clearTimeout(goldCloseTimeout.current);
+    setSilverMenuOpen(true);
+  };
+  const handleSilverLeave = () => {
+    silverCloseTimeout.current = setTimeout(() => setSilverMenuOpen(false), 120);
+  };
 
   const goldCategories = [
     { name: 'TALI', href: '/gold/tali' },
@@ -78,7 +94,7 @@ export default function Header() {
       {/* Main Header */}
       <header className="bg-white">
         <div className="w-full px-4 lg:px-8">
-          <div className="flex justify-between items-center py-2 md:py-3">
+          <div className="flex justify-between items-center py-2">
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <div className="relative h-12 md:h-16 w-32 md:w-48">
@@ -116,12 +132,12 @@ export default function Header() {
               </button>
 
               {/* Visit Showroom Button */}
-              <button className="hidden md:block bg-[#B8941E] text-white px-5 py-2 rounded hover:bg-black transition font-medium text-sm">
+              <button className="hidden md:block bg-[#B8941E] text-white px-5 py-2 rounded hover:bg-black transition font-medium text-sm cursor-pointer">
                 Visit Showroom
               </button>
 
               {/* Mobile Menu Button */}
-              <button 
+              <button
                 className="lg:hidden p-2"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
@@ -135,24 +151,22 @@ export default function Header() {
       </header>
 
       {/* Gold Navigation Bar - Sticky on scroll */}
-      <div 
+      <div
         className={`bg-[#B8941E] transition-all duration-300 ${isScrolled ? 'sticky top-0 z-50 shadow-lg' : ''}`}
       >
         <div className="w-full px-4 lg:px-8">
-          <nav className="flex items-center justify-center gap-8 lg:gap-12 py-1.5 relative">
+          <nav className="flex items-center justify-center gap-6 lg:gap-8 py-1.5 relative">
             <Link href="/" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Home
             </Link>
-            
-            {/* Gold Mega Menu */}
-            <div 
+
+            {/* Gold Mega Menu Trigger */}
+            <div
               className="relative"
-              onMouseEnter={() => setGoldMenuOpen(true)}
-              onMouseLeave={() => setGoldMenuOpen(false)}
+              onMouseEnter={handleGoldEnter}
+              onMouseLeave={handleGoldLeave}
             >
-              <button
-                className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4"
-              >
+              <button className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4">
                 Gold
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -160,21 +174,20 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Silver Mega Menu */}
-            <div 
+            {/* Silver Mega Menu Trigger */}
+            <div
               className="relative"
-              onMouseEnter={() => setSilverMenuOpen(true)}
-              onMouseLeave={() => setSilverMenuOpen(false)}
+              onMouseEnter={handleSilverEnter}
+              onMouseLeave={handleSilverLeave}
             >
-              <button
-                className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4"
-              >
+              <button className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4">
                 Silver
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
             </div>
+
             <Link href="/mens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Men's Collection
             </Link>
@@ -193,19 +206,19 @@ export default function Header() {
           </nav>
         </div>
 
-        {/* Gold Dropdown - Inside sticky wrapper */}
+        {/* Gold Dropdown */}
         {goldMenuOpen && (
-          <div 
+          <div
             className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
-            onMouseEnter={() => setGoldMenuOpen(true)}
-            onMouseLeave={() => setGoldMenuOpen(false)}
+            onMouseEnter={handleGoldEnter}
+            onMouseLeave={handleGoldLeave}
           >
-            <div className="w-full py-8">
+            <div className="w-full py-6">
               <div className="grid grid-cols-[60%_35%] gap-8 px-12">
-                {/* 60% - Categories in 2 columns on LEFT */}
-                <div className="grid grid-cols-2 gap-x-12 gap-y-5">
+                {/* Categories */}
+                <div className="grid grid-cols-2 gap-x-12 gap-y-3">
                   {goldCategories.map((item) => (
-                    <Link 
+                    <Link
                       key={item.name}
                       href={item.href}
                       className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block py-1"
@@ -216,8 +229,8 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* 35% - Banner Image on RIGHT */}
-                <div className="relative h-[380px] rounded-lg overflow-hidden">
+                {/* Banner Image */}
+                <div className="relative h-full min-h-[200px] rounded-lg overflow-hidden">
                   <Image
                     src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=800&fit=crop&q=80"
                     alt="Gold Collection"
@@ -238,22 +251,22 @@ export default function Header() {
           </div>
         )}
 
-        {/* Silver Dropdown - Inside sticky wrapper */}
+        {/* Silver Dropdown */}
         {silverMenuOpen && (
-          <div 
+          <div
             className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
-            onMouseEnter={() => setSilverMenuOpen(true)}
-            onMouseLeave={() => setSilverMenuOpen(false)}
+            onMouseEnter={handleSilverEnter}
+            onMouseLeave={handleSilverLeave}
           >
-            <div className="w-full py-8">
+            <div className="w-full py-6">
               <div className="grid grid-cols-[60%_35%] gap-8 px-12">
-                {/* 60% - Categories in 2 columns on LEFT */}
-                <div className="grid grid-cols-2 gap-x-12 gap-y-5">
+                {/* Categories */}
+                <div className="grid grid-cols-2 gap-x-12 gap-y-1">
                   {silverCategories.map((item) => (
-                    <Link 
+                    <Link
                       key={item.name}
                       href={item.href}
-                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block py-1"
+                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block"
                       onClick={() => setSilverMenuOpen(false)}
                     >
                       {item.name}
@@ -261,8 +274,8 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* 35% - Banner Image on RIGHT */}
-                <div className="relative h-[380px] rounded-lg overflow-hidden">
+                {/* Banner Image */}
+                <div className="relative h-full min-h-[200px] rounded-lg overflow-hidden">
                   <Image
                     src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=800&fit=crop&q=80"
                     alt="Silver Collection"

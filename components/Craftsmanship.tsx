@@ -26,7 +26,7 @@ export default function Craftsmanship() {
   ];
 
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section className="pt-8 md:pt-12 pb-4 md:pb-6 bg-white">
       {/* Top Section - Image and Content Side by Side */}
       <div className="grid lg:grid-cols-2">
         {/* Left - Image */}
@@ -47,14 +47,13 @@ export default function Craftsmanship() {
               Craftsmanship & care
             </p>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-[#1a1a1a] leading-tight">
-              Made for weddings, gifting<br />
-              and family milestones
+              Made for weddings, gifting and family milestones
             </h2>
             <p className="text-gray-700 mb-8 text-sm md:text-base leading-relaxed">
               Every piece at SriGaneshJewellers is chosen to feel meaningful, wearable and 
               worthy of being passed from one generation to the next.
             </p>
-            <button className="bg-[#B8941E] text-white px-8 py-3 rounded hover:bg-black transition font-medium text-sm">
+            <button className="bg-[#B8941E] text-white px-8 py-3 rounded hover:bg-black transition font-medium text-sm cursor-pointer">
               Book a Store Visit
             </button>
           </div>
@@ -62,7 +61,7 @@ export default function Craftsmanship() {
       </div>
 
       {/* Bottom Section - Features Grid */}
-      <div className="container mx-auto px-4 lg:px-8 mt-16">
+      <div className="container mx-auto px-4 lg:px-8 mt-16 mb-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;

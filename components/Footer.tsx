@@ -18,13 +18,13 @@ export default function Footer() {
               />
             </div>
             <p className="text-gray-300 text-xs mb-3 leading-relaxed">
-              Trusted by families for wedding jewellery.
+              Trusted by families for wedding jewellery, silver gifting and gold purchases. Quality craftsmanship with transparent pricing and genuine care.
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="border border-gray-600 px-2 py-0.5 rounded text-[10px] whitespace-nowrap">BIS Hallmarked</span>
               <span className="border border-gray-600 px-2 py-0.5 rounded text-[10px] whitespace-nowrap">Insured Delivery</span>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 mt-6">
               <a href="#" className="text-white hover:text-[#C9A961] transition">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </a>
@@ -47,20 +47,31 @@ export default function Footer() {
               <li><a href="/new" className="text-gray-300 hover:text-white transition">New Arrivals</a></li>
               <li><a href="/savings" className="text-gray-300 hover:text-white transition">Savings Schema</a></li>
             </ul>
+            
+            <h3 className="font-semibold text-white mb-3 text-xs mt-6">Collections</h3>
+            <ul className="space-y-2 text-xs">
+              <li><a href="/mens-collection" className="text-gray-300 hover:text-white transition">Men's Collection</a></li>
+              <li><a href="/womens-collection" className="text-gray-300 hover:text-white transition">Women's Collection</a></li>
+              <li><a href="/kids-collection" className="text-gray-300 hover:text-white transition">Kids Collection</a></li>
+              <li><a href="/bridal" className="text-gray-300 hover:text-white transition">Bridal Collection</a></li>
+            </ul>
           </div>
 
           {/* Support Links */}
           <div>
             <h3 className="font-semibold text-white mb-3 text-xs">Support</h3>
             <ul className="space-y-2 text-xs">
-              <li><a href="/loans" className="text-gray-300 hover:text-white transition">Loans</a></li>
+              <li><a href="/loans" className="text-gray-300 hover:text-white transition">Gold Loans</a></li>
               <li><a href="/contact" className="text-gray-300 hover:text-white transition">Contact Us</a></li>
-              <li><a href="/rates" className="text-gray-300 hover:text-white transition">Today Gold Rate</a></li>
+              <li><a href="/rates" className="text-gray-300 hover:text-white transition">Today's Gold Rate</a></li>
               <li><a href="/visit" className="text-gray-300 hover:text-white transition">Book Showroom Visit</a></li>
+              <li><a href="/exchange" className="text-gray-300 hover:text-white transition">Exchange Policy</a></li>
             </ul>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="border border-gray-600 px-2 py-0.5 rounded text-[10px] whitespace-nowrap">916 / 22KT Gold</span>
-              <span className="border border-gray-600 px-2 py-0.5 rounded text-[10px] whitespace-nowrap">92.5 Silver</span>
+            
+            <h3 className="font-semibold text-white mb-3 text-xs mt-6">Quality</h3>
+            <div className="flex flex-col gap-2">
+              <span className="border border-[#B8941E] text-[#B8941E] px-2 py-0.5 rounded text-[10px] whitespace-nowrap w-fit">916 / 22KT Gold</span>
+              <span className="border border-[#B8941E] text-[#B8941E] px-2 py-0.5 rounded text-[10px] whitespace-nowrap w-fit">92.5 Silver</span>
             </div>
           </div>
 
@@ -92,15 +103,29 @@ export default function Footer() {
             {/* Newsletter */}
             <div className="mt-4">
               <h3 className="font-semibold text-white mb-2 text-xs">Get festive updates</h3>
-              <div className="flex gap-2">
+              <div className="flex gap-2 mb-4">
                 <input 
                   type="email" 
                   placeholder="Email address" 
                   className="flex-1 px-3 py-2 rounded bg-[#1a1a1a] border border-gray-700 text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C9A961] placeholder-gray-500"
                 />
-                <button className="bg-[#C9A961] text-black px-4 py-2 rounded font-semibold hover:bg-[#B8941E] transition text-xs whitespace-nowrap">
+                <button className="bg-[#C9A961] text-black px-4 py-2 rounded font-semibold hover:bg-[#B8941E] transition text-xs whitespace-nowrap cursor-pointer">
                   Subscribe
                 </button>
+              </div>
+              
+              {/* Map */}
+              <div className="mt-4">
+                <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.8267165657937!2d80.27054931482213!3d13.047984990806857!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5267b5e0e0e0e1%3A0x0!2zMTPCsDAyJzUyLjciTiA4MMKwMTYnMjMuMCJF!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
+                  width="100%"
+                  height="90"
+                  style={{ border: 0, borderRadius: '8px' }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="grayscale"
+                ></iframe>
               </div>
             </div>
           </div>

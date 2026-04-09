@@ -57,7 +57,7 @@ export default function PopularPicks() {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
           Popular Picks
         </h2>
-        <p className="text-center text-gray-600 mb-12 md:mb-16 text-sm md:text-base">
+        <p className="text-center text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
           Most-loved pieces from our gold and silver collections
         </p>
       </div>
@@ -83,7 +83,7 @@ export default function PopularPicks() {
               spaceBetween: 32,
             },
           }}
-          className="popular-swiper"
+          className="popular-swiper cursor-grab"
         >
           {products.map((product) => (
             <SwiperSlide key={product.id}>
@@ -96,6 +96,8 @@ export default function PopularPicks() {
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    loading="eager"
+                    unoptimized
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                   
@@ -109,7 +111,7 @@ export default function PopularPicks() {
 
                 {/* Product Details */}
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">{product.karat}</p>
+                  <p className="text-xs text-[#B8941E] mb-1 font-medium">{product.karat}</p>
                   <h3 className="font-semibold text-base mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition-colors duration-300">
                     {product.name}
                   </h3>
