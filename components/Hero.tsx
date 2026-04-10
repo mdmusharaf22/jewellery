@@ -1,11 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
 export default function Hero() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const slides = [
     {
       image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=1920',
@@ -27,9 +34,27 @@ export default function Hero() {
     },
   ];
 
+  if (!isClient) {
+    return (
+      <section className="relative bg-[#2a2420]">
+        <div className="relative min-h-[500px] md:min-h-[600px] lg:min-h-[700px] flex items-center">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="max-w-xl lg:max-w-2xl space-y-6">
+              <div className="h-8 w-64 bg-white/20 rounded-full animate-pulse" />
+              <div className="h-16 w-96 bg-white/20 rounded animate-pulse" />
+              <div className="h-6 w-80 bg-white/20 rounded animate-pulse" />
+              <div className="h-12 w-40 bg-white/20 rounded animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative bg-[#2a2420]">
       <Swiper
+        key={Date.now()}
         modules={[Autoplay, Pagination]}
         spaceBetween={0}
         slidesPerView={1}
@@ -48,7 +73,6 @@ export default function Hero() {
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
             <div className="relative min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
-              {/* Background Image */}
               <div className="absolute inset-0">
                 <div className="relative w-full h-full">
                   <div 
@@ -59,31 +83,26 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Content */}
               <div className="absolute inset-0 flex items-center">
                 <div className="container mx-auto px-4 lg:px-8">
                   <div className="max-w-xl lg:max-w-2xl">
-                  {/* Tag */}
-                  <div className="inline-block bg-white rounded-full px-5 py-2 mb-6 md:mb-8">
-                    <p className="text-[#1a1a1a] text-xs md:text-sm font-medium">
-                      {slide.tag}
+                    <div className="inline-block bg-white rounded-full px-5 py-2 mb-6 md:mb-8">
+                      <p className="text-[#1a1a1a] text-xs md:text-sm font-medium">
+                        {slide.tag}
+                      </p>
+                    </div>
+
+                    <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-[1.2] max-w-lg whitespace-pre-line">
+                      {slide.title}
+                    </h1>
+
+                    <p className="text-white/90 text-sm md:text-base mb-6 md:mb-8 max-w-md leading-relaxed">
+                      {slide.description}
                     </p>
-                  </div>
 
-                  {/* Heading */}
-                  <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-[1.2] max-w-lg whitespace-pre-line">
-                    {slide.title}
-                  </h1>
-
-                  {/* Description */}
-                  <p className="text-white/90 text-sm md:text-base mb-6 md:mb-8 max-w-md leading-relaxed">
-                    {slide.description}
-                  </p>
-
-                  {/* CTA Button */}
-                  <a href="/collection" className="inline-block bg-[#B8941E] text-white px-6 py-2.5 md:px-8 md:py-3 rounded hover:bg-black transition font-medium text-sm shadow-lg">
-                    Shop Collection
-                  </a>
+                    <a href="/collection" className="inline-block bg-[#B8941E] text-white px-6 py-2.5 md:px-8 md:py-3 rounded hover:bg-black transition font-medium text-sm shadow-lg">
+                      Shop Collection
+                    </a>
                   </div>
                 </div>
               </div>

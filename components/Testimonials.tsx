@@ -1,12 +1,19 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Star, Quote, BadgeCheck, MapPin } from 'lucide-react';
+import { Star, Quote, MapPin } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
 export default function Testimonials() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const testimonials = [
     {
       name: 'Anitha R.',
@@ -52,6 +59,40 @@ export default function Testimonials() {
     }
   ];
 
+  if (!isClient) {
+    return (
+      <section className="py-16 md:py-20 bg-[#F5F1E8]">
+        <div className="w-[90%] mx-auto px-4 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-[#1a1a1a]">
+            Why families come back to us
+          </h2>
+          <p className="text-center text-gray-600 mb-12 md:mb-16 max-w-3xl mx-auto text-sm md:text-base">
+            A more premium testimonial presentation with subtle gold highlights and stronger visual trust.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-2xl p-8 space-y-6">
+                <div className="h-12 bg-gray-200 rounded animate-pulse" />
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6" />
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 bg-gray-200 rounded-full animate-pulse" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-32" />
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-24" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 md:py-20 bg-[#F5F1E8]">
       <div className="w-[90%] mx-auto px-4 lg:px-8">
@@ -63,6 +104,7 @@ export default function Testimonials() {
         </p>
 
         <Swiper
+          key={Date.now()}
           modules={[Autoplay]}
           spaceBetween={32}
           slidesPerView={1}
@@ -87,9 +129,7 @@ export default function Testimonials() {
           {testimonials.map((testimonial, index) => (
             <SwiperSlide key={index} style={{ height: 'auto', display: 'flex' }}>
               <div className="bg-white rounded-2xl p-8 md:p-10 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group flex flex-col w-full">
-                {/* Stars and Quote Icon Row - FIXED HEIGHT */}
                 <div className="flex items-center justify-between mb-8" style={{ minHeight: '48px' }}>
-                  {/* Outline Stars */}
                   <div className="flex gap-1">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star 
@@ -100,24 +140,16 @@ export default function Testimonials() {
                       />
                     ))}
                   </div>
-                  
-                  {/* Quote Icon in Circle */}
                   <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#F5F1E8]">
                     <Quote className="w-7 h-7 text-[#C9A961]" strokeWidth={2} />
                   </div>
                 </div>
-
-                {/* Quote Text - FLEXIBLE HEIGHT */}
                 <div className="flex-grow mb-8">
                   <p className="text-gray-700 text-sm md:text-base leading-relaxed">
                     "{testimonial.text}"
                   </p>
                 </div>
-
-                {/* Divider Line */}
                 <div className="border-t border-gray-200 mb-6"></div>
-
-                {/* Author with photo - FIXED HEIGHT */}
                 <div className="flex items-center gap-3" style={{ minHeight: '56px' }}>
                   <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
                     <Image
@@ -125,19 +157,18 @@ export default function Testimonials() {
                       alt={testimonial.name}
                       fill
                       className="object-cover"
+                      sizes="56px"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-bold text-[#1a1a1a] text-base truncate">{testimonial.name}</p>
-                      {/* Gold Verified Badge with Checkmark */}
                       <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="10" fill="#B8941E"/>
                         <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
-                      {/* Location Pin Icon */}
                       <MapPin className="w-4 h-4 text-gray-500 flex-shrink-0" />
                       <span className="truncate">{testimonial.location}</span>
                     </div>

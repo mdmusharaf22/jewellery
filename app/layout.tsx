@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { DM_Sans, Geist } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const dmSans = DM_Sans({ subsets: ["latin"] });
+const dmSans = DM_Sans({ subsets: ["latin"], variable: '--font-dm-sans' });
 
 export const metadata: Metadata = {
   title: "SriGaneshJewellers - Trusted Family Jeweller",
@@ -18,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en" className={`font-sans ${geist.variable} ${dmSans.variable}`}>
       <body className={dmSans.className}>{children}</body>
     </html>
   );

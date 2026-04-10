@@ -1,11 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
 export default function CategorySection() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const categories = [
     { 
       name: 'Gold Necklaces', 
@@ -33,6 +40,31 @@ export default function CategorySection() {
     },
   ];
 
+  if (!isClient) {
+    return (
+      <section className="bg-white">
+        <div className="container mx-auto px-4 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
+            Shop by Category
+          </h2>
+          <p className="text-center text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
+            Traditional favourites and everyday essentials curated for Indian families
+          </p>
+        </div>
+        <div className="px-4 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="space-y-4">
+                <div className="aspect-[3/4] bg-gray-200 rounded-t-[170px] animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse mx-auto w-24" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-white">
       <div className="container mx-auto px-4 lg:px-8">
@@ -44,9 +76,9 @@ export default function CategorySection() {
         </p>
       </div>
 
-      {/* Swiper Carousel */}
       <div className="px-4 lg:px-8">
         <Swiper
+          key={Date.now()}
           modules={[Autoplay]}
           spaceBetween={24}
           slidesPerView={2}
@@ -70,7 +102,6 @@ export default function CategorySection() {
           {categories.map((category, index) => (
             <SwiperSlide key={index}>
               <div className="cursor-pointer group">
-                {/* Subtle rounded top corners with hover effect */}
                 <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-shadow duration-300 group-hover:shadow-sm">
                   <Image
                     src={category.image}
