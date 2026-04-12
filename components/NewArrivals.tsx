@@ -1,21 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import ProductCard from './ProductCard';
+import Toast from './Toast';
 
 export default function NewArrivals() {
   const [activeTab, setActiveTab] = useState('All');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const tabs = ['All', 'Gold', 'Silver', 'Bridal'];
 
+  const handleToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
+
   const products = [
-    { id: 1, name: 'Lakshmi Bridal Choker', price: '2,18,000', karat: '22KT Gold', category: 'Bridal', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
-    { id: 2, name: 'Temple Jhumka Pair', price: '86,500', karat: '22KT Gold', category: 'Gold', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80' },
-    { id: 3, name: 'Silver Pooja Gift Set', price: '14,800', karat: '999 Silver', category: 'Silver', image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80' },
-    { id: 4, name: 'Festival Gold Coin', price: '39,950', karat: '24KT Gold', category: 'Gold', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80' },
-    { id: 5, name: 'Bridal Necklace Set', price: '2,18,000', karat: '22KT Gold', category: 'Bridal', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop&q=80' },
-    { id: 6, name: 'Gold Jhumka', price: '86,500', karat: '22KT Gold', category: 'Gold', image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600&h=600&fit=crop&q=80' },
-    { id: 7, name: 'Silver Bowl Set', price: '14,800', karat: '999 Silver', category: 'Silver', image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=600&fit=crop&q=80' },
-    { id: 8, name: 'Gold Bangle', price: '39,950', karat: '24KT Gold', category: 'Gold', image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=600&h=600&fit=crop&q=80' },
+    { id: 1, name: 'Lakshmi Bridal Choker', price: '2,18,000', karat: '22KT Gold', category: 'Bridal', slug: 'lakshmi-bridal-choker', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
+    { id: 2, name: 'Temple Jhumka Pair', price: '86,500', karat: '22KT Gold', category: 'Gold', slug: 'temple-jhumka-pair', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80' },
+    { id: 3, name: 'Silver Pooja Gift Set', price: '14,800', karat: '999 Silver', category: 'Silver', slug: 'silver-pooja-gift-set', image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80' },
+    { id: 4, name: 'Festival Gold Coin', price: '39,950', karat: '24KT Gold', category: 'Gold', slug: 'festival-gold-coin', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80' },
+    { id: 5, name: 'Bridal Necklace Set', price: '2,18,000', karat: '22KT Gold', category: 'Bridal', slug: 'bridal-necklace-set', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop&q=80' },
+    { id: 6, name: 'Gold Jhumka', price: '86,500', karat: '22KT Gold', category: 'Gold', slug: 'gold-jhumka', image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600&h=600&fit=crop&q=80' },
+    { id: 7, name: 'Silver Bowl Set', price: '14,800', karat: '999 Silver', category: 'Silver', slug: 'silver-bowl-set', image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=600&fit=crop&q=80' },
+    { id: 8, name: 'Gold Bangle', price: '39,950', karat: '24KT Gold', category: 'Gold', slug: 'gold-bangle', image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=600&h=600&fit=crop&q=80' },
   ];
 
   const filteredProducts = activeTab === 'All' 
@@ -24,6 +30,14 @@ export default function NewArrivals() {
 
   return (
     <section className="bg-white">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       {/* Full width header */}
       <div className="px-4 lg:px-8">
         {/* Header with Tabs on Right */}
@@ -61,41 +75,24 @@ export default function NewArrivals() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {filteredProducts.map((product) => (
-            <div 
+            <ProductCard
               key={product.id}
-              className="cursor-pointer group"
-            >
-              {/* Product Image with Heart Icon */}
-              <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-shadow duration-300 group-hover:shadow-sm">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
-                
-                {/* Heart/Wishlist Button */}
-                <button className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-[#B8941E] hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Product Details */}
-              <div>
-                <p className="text-xs text-[#B8941E] mb-1 font-medium">{product.karat}</p>
-                <h3 className="font-semibold text-base mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition-colors duration-300">
-                  {product.name}
-                </h3>
-                <p className="text-lg font-bold text-[#1a1a1a]">₹ {product.price}</p>
-              </div>
-            </div>
+              product={{
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                karat: product.karat,
+                image: product.image,
+                slug: product.slug,
+                category: product.category,
+              }}
+              viewMode="grid"
+              onToast={handleToast}
+            />
           ))}
         </div>
       </div>
     </section>
   );
 }
+

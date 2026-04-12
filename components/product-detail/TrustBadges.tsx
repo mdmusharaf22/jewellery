@@ -26,7 +26,7 @@ export default function TrustBadges() {
 
   return (
     <div className="bg-white">
-      <div className="container mx-auto px-4">
+      <div className="px-4 lg:px-8">
         {/* Top horizontal line */}
         <div className="border-t border-gray-200 mb-12"></div>
         

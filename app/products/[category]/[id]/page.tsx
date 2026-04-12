@@ -68,9 +68,9 @@ export default function ProductDetailPage() {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <a href="/" className="hover:text-[#B8941E] transition">Home</a>
             <span>{'>'}</span>
-            <a href="/products/all" className="hover:text-[#B8941E] transition">Gold</a>
+            <a href="/all" className="hover:text-[#B8941E] transition">Gold</a>
             <span>{'>'}</span>
-            <a href="/products/necklace" className="hover:text-[#B8941E] transition">Necklaces</a>
+            <a href="/necklace" className="hover:text-[#B8941E] transition">Necklaces</a>
             <span>{'>'}</span>
             <span className="text-gray-900">{product.name}</span>
           </div>

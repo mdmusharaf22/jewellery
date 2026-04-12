@@ -50,31 +50,31 @@ export default function Header() {
   };
 
   const goldCategories = [
-    { name: 'TALI', href: '/products/tali' },
-    { name: 'Gold Kaapu', href: '/products/gold-kaapu' },
-    { name: 'TALI CHAIN', href: '/products/tali-chain' },
-    { name: 'Bracelet', href: '/products/bracelet' },
-    { name: 'Necklace', href: '/products/necklace' },
-    { name: 'Gold Jhumkas', href: '/products/gold-jhumkas' },
-    { name: 'Kalipot', href: '/products/kalipot' },
-    { name: 'Gold Dollar', href: '/products/gold-dollar' },
-    { name: 'Dollar chain', href: '/products/dollar-chain' },
-    { name: 'Gold Ring', href: '/products/gold-ring' },
-    { name: 'Stud', href: '/products/stud' },
-    { name: 'All', href: '/products/all' },
-    { name: 'Bangles', href: '/products/bangles' },
-    { name: 'Haram', href: '/products/haram' },
+    { name: 'TALI', href: '/tali' },
+    { name: 'Gold Kaapu', href: '/gold-kaapu' },
+    { name: 'TALI CHAIN', href: '/tali-chain' },
+    { name: 'Bracelet', href: '/bracelet' },
+    { name: 'Necklace', href: '/necklace' },
+    { name: 'Gold Jhumkas', href: '/gold-jhumkas' },
+    { name: 'Kalipot', href: '/kalipot' },
+    { name: 'Gold Dollar', href: '/gold-dollar' },
+    { name: 'Dollar chain', href: '/dollar-chain' },
+    { name: 'Gold Ring', href: '/gold-ring' },
+    { name: 'Stud', href: '/stud' },
+    { name: 'All', href: '/all' },
+    { name: 'Bangles', href: '/bangles' },
+    { name: 'Haram', href: '/haram' },
   ];
 
   const silverCategories = [
-    { name: 'Anklet', href: '/products/anklet' },
-    { name: 'Ring', href: '/products/ring' },
-    { name: 'Bangles', href: '/products/bangles' },
-    { name: 'Bracelet', href: '/products/bracelet' },
-    { name: 'Kappu', href: '/products/kappu' },
-    { name: 'Tattu', href: '/products/tattu' },
-    { name: 'Key Chain', href: '/products/key-chain' },
-    { name: 'All', href: '/products/all' },
+    { name: 'Anklet', href: '/anklet' },
+    { name: 'Ring', href: '/ring' },
+    { name: 'Bangles', href: '/bangles' },
+    { name: 'Bracelet', href: '/bracelet' },
+    { name: 'Kappu', href: '/kappu' },
+    { name: 'Tattu', href: '/tattu' },
+    { name: 'Key Chain', href: '/key-chain' },
+    { name: 'All', href: '/all' },
   ];
 
   return (
@@ -210,6 +210,9 @@ export default function Header() {
             </Link>
             <Link href="/kids-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Kids Collection
+            </Link>
+            <Link href="/about" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+              About
             </Link>
             <Link href="/savings" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Savings Schema

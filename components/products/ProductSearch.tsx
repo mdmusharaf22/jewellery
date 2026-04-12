@@ -20,21 +20,9 @@ export default function ProductSearch({
   onSortChange,
 }: ProductSearchProps) {
   return (
-    <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-      {/* Search Bar */}
-      <div className="relative flex-1 w-full md:max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8941E] focus:border-transparent"
-        />
-      </div>
-
+    <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
       {/* Controls */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 w-full md:w-auto">
         {/* Sort Dropdown */}
         <select
           value={sortBy}
@@ -49,7 +37,7 @@ export default function ProductSearch({
         </select>
 
         {/* View Toggle */}
-        <div className="flex gap-2 border border-gray-300 rounded-lg p-1">
+        <div className="flex gap-2 border border-gray-300 rounded-lg p-1 ml-auto">
           <button
             onClick={() => onViewModeChange('grid')}
             className={`p-2 rounded transition ${

@@ -26,7 +26,7 @@ export default function SimilarProducts({ currentProductSlug, category }: Simila
         {similarProducts.map((product) => (
           <Link 
             key={product.id} 
-            href={`/products/${category}/${product.slug}`}
+            href={`/${category}/${product.slug}`}
             className="group"
           >
             <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-3">

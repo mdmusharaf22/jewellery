@@ -35,14 +35,15 @@ export default function CategoryPage() {
       
       {/* Hero Banner */}
       <section 
-        className="relative h-[200px] bg-gradient-to-r from-[#2a2420] to-[#3E2723] flex items-center justify-center"
+        className="relative h-[200px] flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=1920&q=80)',
+          backgroundImage: 'url(https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1920&h=400&fit=crop&q=80)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-[#2a2420]/70 to-[#3E2723]/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40" />
         <div className="relative z-10 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold">All Products</h1>
         </div>
@@ -92,11 +93,11 @@ export default function CategoryPage() {
       </div>
 
       {/* Sections with same spacing as home page */}
-      <div className="py-12 md:py-16">
+      <div className="py-12 md:py-16 bg-white">
         <div className="w-[98%] mx-auto mb-14 md:mb-18">
           <TrustBadges />
         </div>
-        <div className="w-[100%] mx-auto">
+        <div className="w-[100%] mx-auto mb-14 md:mb-18">
           <Testimonials />
         </div>
       </div>

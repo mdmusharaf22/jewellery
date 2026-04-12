@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
+import CategoryCarousel from '@/components/CategoryCarousel';
 import ProductCarousel from '@/components/ProductCarousel';
 import SavingsScheme from '@/components/SavingsScheme';
 import NewArrivals from '@/components/NewArrivals';
@@ -20,12 +21,12 @@ export default function Home() {
 
   // Popular products data
   const popularProducts = [
-    { id: 1, name: 'Lakshmi Bridal Choker', price: '2,18,000', karat: '22KT Gold', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
-    { id: 2, name: 'Temple Jhumka Pair', price: '86,500', karat: '22KT Gold', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80' },
-    { id: 3, name: 'Silver Pooja Gift Set', price: '14,800', karat: '999 Silver', image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80' },
-    { id: 4, name: 'Festival Gold Coin', price: '39,950', karat: '24KT Gold', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80' },
-    { id: 5, name: 'Diamond Pendant Set', price: '1,45,000', karat: '18KT Gold', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop&q=80' },
-    { id: 6, name: 'Antique Bangle Set', price: '95,000', karat: '22KT Gold', image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&h=600&fit=crop&q=80' },
+    { id: 1, name: 'Lakshmi Bridal Choker', price: '2,18,000', karat: '22KT Gold', slug: 'lakshmi-bridal-choker', category: 'necklace', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
+    { id: 2, name: 'Temple Jhumka Pair', price: '86,500', karat: '22KT Gold', slug: 'temple-jhumka-pair', category: 'gold-jhumkas', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80' },
+    { id: 3, name: 'Silver Pooja Gift Set', price: '14,800', karat: '999 Silver', slug: 'silver-pooja-gift-set', category: 'all', image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80' },
+    { id: 4, name: 'Festival Gold Coin', price: '39,950', karat: '24KT Gold', slug: 'festival-gold-coin', category: 'all', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80' },
+    { id: 5, name: 'Diamond Pendant Set', price: '1,45,000', karat: '18KT Gold', slug: 'diamond-pendant-set', category: 'necklace', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop&q=80' },
+    { id: 6, name: 'Antique Bangle Set', price: '95,000', karat: '22KT Gold', slug: 'antique-bangle-set', category: 'bangles', image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&h=600&fit=crop&q=80' },
   ];
 
   return (
@@ -34,11 +35,10 @@ export default function Home() {
       <Hero />
       <div className="py-12 md:py-16">
         <div className="w-[98%] mx-auto mb-14 md:mb-18">
-          <ProductCarousel
+          <CategoryCarousel
             title="Shop by Category"
             subtitle="Traditional favourites and everyday essentials curated for Indian families"
-            items={categories}
-            type="category"
+            categories={categories}
             autoplayDelay={4000}
           />
         </div>
@@ -47,7 +47,6 @@ export default function Home() {
             title="Popular Picks"
             subtitle="Most-loved pieces from our gold and silver collections"
             items={popularProducts}
-            type="product"
             autoplayDelay={4000}
           />
         </div>

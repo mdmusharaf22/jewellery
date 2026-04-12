@@ -6,49 +6,40 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
-export default function CategorySection() {
+interface Category {
+  id: number;
+  name: string;
+  image: string;
+}
+
+interface CategoryCarouselProps {
+  title: string;
+  subtitle: string;
+  categories: Category[];
+  autoplayDelay?: number;
+}
+
+export default function CategoryCarousel({
+  title,
+  subtitle,
+  categories,
+  autoplayDelay = 4000,
+}: CategoryCarouselProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const categories = [
-    { 
-      name: 'Gold Necklaces', 
-      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=500&h=700&fit=crop&q=80'
-    },
-    { 
-      name: 'Earrings', 
-      image: 'https://images.unsplash.com/photo-1535556116002-6281ff3e9f36?w=500&h=700&fit=crop&q=80'
-    },
-    { 
-      name: 'Bangles', 
-      image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=500&h=700&fit=crop&q=80'
-    },
-    { 
-      name: 'Silver', 
-      image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=500&h=700&fit=crop&q=80'
-    },
-    { 
-      name: 'Savings Plan', 
-      image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=500&h=700&fit=crop&q=80'
-    },
-    { 
-      name: 'Rings', 
-      image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&h=700&fit=crop&q=80'
-    },
-  ];
-
   if (!isClient) {
     return (
       <section className="bg-white">
         <div className="container mx-auto px-4 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
-            Shop by Category
+            {title}
           </h2>
           <p className="text-center text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
-            Traditional favourites and everyday essentials curated for Indian families
+            {subtitle}
           </p>
         </div>
         <div className="px-4 lg:px-8">
@@ -69,10 +60,10 @@ export default function CategorySection() {
     <section className="bg-white">
       <div className="container mx-auto px-4 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
-          Shop by Category
+          {title}
         </h2>
         <p className="text-center text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
-          Traditional favourites and everyday essentials curated for Indian families
+          {subtitle}
         </p>
       </div>
 
@@ -83,7 +74,7 @@ export default function CategorySection() {
           spaceBetween={24}
           slidesPerView={2}
           autoplay={{
-            delay: 4000,
+            delay: autoplayDelay,
             disableOnInteraction: false,
           }}
           loop={true}
@@ -99,8 +90,8 @@ export default function CategorySection() {
           }}
           className="category-swiper cursor-grab"
         >
-          {categories.map((category, index) => (
-            <SwiperSlide key={index}>
+          {categories.map((category) => (
+            <SwiperSlide key={category.id}>
               <div className="cursor-pointer group">
                 <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-shadow duration-300 group-hover:shadow-sm">
                   <Image

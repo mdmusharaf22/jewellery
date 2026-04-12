@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { Heart, Eye, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
 
 interface ProductGridProps {
@@ -14,6 +12,8 @@ interface ProductGridProps {
   sortBy: string;
   currentPage: number;
   onPageChange: (page: number) => void;
+  priceRange: { min: number; max: number };
+  selectedCarat: string;
 }
 
 export default function ProductGrid({
@@ -23,11 +23,15 @@ export default function ProductGrid({
   sortBy,
   currentPage,
   onPageChange,
+  priceRange,
+  selectedCarat,
 }: ProductGridProps) {
   const gridTopRef = useRef<HTMLDivElement>(null);
-  const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const handleToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
 
   // Scroll to top when page changes
   useEffect(() => {
@@ -80,190 +84,26 @@ export default function ProductGrid({
     ? allProducts
     : allProducts.filter(product => product.category === selectedCategory);
 
+  // Apply price filter
+  const priceFilteredProducts = filteredProducts.filter(product => {
+    return product.price >= priceRange.min && product.price <= priceRange.max;
+  });
+
+  // Apply carat filter
+  const caratFilteredProducts = selectedCarat === 'all' 
+    ? priceFilteredProducts 
+    : priceFilteredProducts.filter(product => {
+        if (selectedCarat === '18k') return product.karat.includes('18KT') || product.karat.includes('18K');
+        if (selectedCarat === '22k') return product.karat.includes('22KT') || product.karat.includes('22K');
+        if (selectedCarat === '24k') return product.karat.includes('24KT') || product.karat.includes('24K');
+        return true;
+      });
+
   const itemsPerPage = 9;
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const totalPages = Math.ceil(caratFilteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
-
-  const ProductCard = ({ product }: { product: typeof allProducts[0] }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const inWishlist = isInWishlist(product.id);
-
-    const handleAddToCart = (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        karat: product.karat,
-        image: product.image,
-      });
-      setToast({ message: 'Added to cart!', type: 'success' });
-    };
-
-    const handleToggleWishlist = (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (inWishlist) {
-        removeFromWishlist(product.id);
-        setToast({ message: 'Removed from wishlist', type: 'info' });
-      } else {
-        addToWishlist({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          karat: product.karat,
-          image: product.image,
-        });
-        setToast({ message: 'Added to wishlist!', type: 'success' });
-      }
-    };
-
-    if (viewMode === 'list') {
-      return (
-        <a
-          href={`/products/${product.category}/${product.slug}`}
-          className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 group flex flex-col sm:flex-row gap-6 p-4"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {/* Image */}
-          <div className="relative w-full sm:w-80 h-80 flex-shrink-0 overflow-hidden bg-gray-100">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              unoptimized
-            />
-            
-            {/* Hover Actions - Positioned at bottom left */}
-            <div className={`absolute bottom-4 left-4 flex gap-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
-              <button 
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#B8941E] hover:text-white transition shadow-lg"
-                onClick={(e) => e.stopPropagation()}
-                title="Quick View"
-              >
-                <Eye className="w-4 h-4" />
-              </button>
-              <button 
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition shadow-lg ${
-                  inWishlist 
-                    ? 'bg-[#B8941E] text-white' 
-                    : 'bg-white text-gray-700 hover:bg-[#B8941E] hover:text-white'
-                }`}
-                onClick={handleToggleWishlist}
-                title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-              >
-                <Heart className="w-4 h-4" fill={inWishlist ? 'currentColor' : 'none'} />
-              </button>
-              <button 
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#B8941E] hover:text-white transition shadow-lg"
-                onClick={handleAddToCart}
-                title="Add to Cart"
-              >
-                <ShoppingCart className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 flex flex-col justify-center py-4">
-            <h3 className="text-2xl font-normal text-[#D4A574] mb-4 group-hover:text-[#B8941E] transition">
-              {product.name}
-            </h3>
-            <p className="text-3xl font-normal text-gray-800 mb-6">
-              ${product.price.toLocaleString('en-IN')}
-            </p>
-            
-            {/* Size Options */}
-            <div className="flex gap-2 mb-6">
-              <button className="w-12 h-12 border-2 border-gray-300 hover:border-[#B8941E] rounded flex items-center justify-center text-sm font-medium transition">
-                S
-              </button>
-              <button className="w-12 h-12 border-2 border-gray-300 hover:border-[#B8941E] rounded flex items-center justify-center text-sm font-medium transition">
-                L
-              </button>
-              <button className="w-12 h-12 border-2 border-gray-300 hover:border-[#B8941E] rounded flex items-center justify-center text-sm font-medium transition">
-                M
-              </button>
-            </div>
-          </div>
-        </a>
-      );
-    }
-
-    // Grid View
-    return (
-      <a
-        href={`/products/${product.category}/${product.slug}`}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-xs transition-all duration-300 group cursor-pointer block"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* Image Container */}
-        <div className="relative aspect-square overflow-hidden bg-gray-100">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-110 transition-transform duration-500"
-            unoptimized
-          />
-          
-          {/* Hover Overlay with Actions */}
-          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-            <button 
-              className="w-11 h-11 bg-white rounded-full flex items-center justify-center hover:bg-[#B8941E] hover:text-white transition transform hover:scale-110"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              title="Quick View"
-            >
-              <Eye className="w-5 h-5" />
-            </button>
-            <button 
-              className={`w-11 h-11 rounded-full flex items-center justify-center transition transform hover:scale-110 ${
-                inWishlist 
-                  ? 'bg-[#B8941E] text-white' 
-                  : 'bg-white text-gray-700 hover:bg-[#B8941E] hover:text-white'
-              }`}
-              onClick={handleToggleWishlist}
-              title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-            >
-              <Heart className="w-5 h-5" fill={inWishlist ? 'currentColor' : 'none'} />
-            </button>
-            <button 
-              className="w-11 h-11 bg-white rounded-full flex items-center justify-center hover:bg-[#B8941E] hover:text-white transition transform hover:scale-110"
-              onClick={handleAddToCart}
-              title="Add to Cart"
-            >
-              <ShoppingCart className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Badge */}
-          <div className="absolute top-3 left-3 bg-[#B8941E] text-white text-xs font-bold px-3 py-1 rounded-full">
-            NEW
-          </div>
-        </div>
-
-        {/* Product Info */}
-        <div className="p-4">
-          <p className="text-xs text-[#B8941E] font-medium mb-1">{product.karat}</p>
-          <h3 className="font-bold text-base mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition line-clamp-2">
-            {product.name}
-          </h3>
-          <p className="text-lg font-bold text-[#1a1a1a]">
-            ₹ {product.price.toLocaleString('en-IN')}
-          </p>
-        </div>
-      </a>
-    );
-  };
+  const currentProducts = caratFilteredProducts.slice(startIndex, endIndex);
 
   return (
     <div>
@@ -279,11 +119,58 @@ export default function ProductGrid({
         />
       )}
 
-      {/* Results Count */}
-      <div className="mb-6">
+      {/* Results Count and Controls in One Line */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        {/* Results Count */}
         <p className="text-gray-600">
-          Showing <span className="font-semibold">{startIndex + 1}-{Math.min(endIndex, filteredProducts.length)}</span> of <span className="font-semibold">{filteredProducts.length}</span> Results
+          Showing <span className="font-semibold">{startIndex + 1}-{Math.min(endIndex, caratFilteredProducts.length)}</span> of <span className="font-semibold">{caratFilteredProducts.length}</span> Results
         </p>
+
+        {/* Sort and View Controls */}
+        <div className="flex items-center gap-3">
+          {/* Sort Dropdown */}
+          <select
+            value={sortBy}
+            onChange={(e) => {}}
+            className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#B8941E] cursor-pointer"
+          >
+            <option value="featured">Sort By: Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="newest">Newest First</option>
+            <option value="popular">Most Popular</option>
+          </select>
+
+          {/* View Toggle */}
+          <div className="flex gap-2 border border-gray-300 rounded-lg p-1">
+            <button
+              onClick={() => {}}
+              className={`p-2 rounded transition ${
+                viewMode === 'grid'
+                  ? 'bg-[#B8941E] text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              title="Grid View"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => {}}
+              className={`p-2 rounded transition ${
+                viewMode === 'list'
+                  ? 'bg-[#B8941E] text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              title="List View"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Products Grid/List */}
@@ -292,44 +179,51 @@ export default function ProductGrid({
         : 'flex flex-col gap-6 mb-12'
       }>
         {currentProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            viewMode={viewMode}
+            onToast={handleToast}
+          />
         ))}
       </div>
 
-      {/* Pagination - Footer Style */}
-      <div className="border-t border-gray-200 pt-8 pb-4">
-        <div className="flex items-center justify-center gap-2">
-          <button
-            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded hover:bg-[#B8941E] hover:text-white hover:border-[#B8941E] transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          {[...Array(totalPages)].map((_, index) => (
+      {/* Pagination - Footer Style - Only show if more than 9 products */}
+      {caratFilteredProducts.length > 9 && (
+        <div className="border-t border-gray-200 pt-8 pb-4">
+          <div className="flex items-center justify-center gap-2">
             <button
-              key={index + 1}
-              onClick={() => onPageChange(index + 1)}
-              className={`w-10 h-10 flex items-center justify-center border rounded transition ${
-                currentPage === index + 1
-                  ? 'bg-[#B8941E] text-white border-[#B8941E]'
-                  : 'border-gray-300 hover:bg-[#B8941E] hover:text-white hover:border-[#B8941E]'
-              }`}
+              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded hover:bg-[#B8941E] hover:text-white hover:border-[#B8941E] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {index + 1}
+              <ChevronLeft className="w-5 h-5" />
             </button>
-          ))}
 
-          <button
-            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded hover:bg-[#B8941E] hover:text-white hover:border-[#B8941E] transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => onPageChange(index + 1)}
+                className={`w-10 h-10 flex items-center justify-center border rounded transition ${
+                  currentPage === index + 1
+                    ? 'bg-[#B8941E] text-white border-[#B8941E]'
+                    : 'border-gray-300 hover:bg-[#B8941E] hover:text-white hover:border-[#B8941E]'
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded hover:bg-[#B8941E] hover:text-white hover:border-[#B8941E] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
