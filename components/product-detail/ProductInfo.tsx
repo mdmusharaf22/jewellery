@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { Shield, Truck, RefreshCw, Repeat } from 'lucide-react';
 
 interface ProductInfoProps {
   product: {
@@ -32,6 +33,29 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       image: product.images[0],
     });
   };
+
+  const trustBadges = [
+    {
+      icon: Shield,
+      title: '100% Certified',
+      description: 'BIS Hallmarked Gold',
+    },
+    {
+      icon: Truck,
+      title: 'Free Shipping',
+      description: 'Fully insured across India',
+    },
+    {
+      icon: RefreshCw,
+      title: 'Easy Returns',
+      description: '15-day return policy',
+    },
+    {
+      icon: Repeat,
+      title: 'Lifetime Exchange',
+      description: 'Upgrade anytime',
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -110,6 +134,23 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         <button className="flex-1 border-2 border-[#B8941E] text-[#B8941E] py-3 rounded-lg font-semibold hover:bg-[#FFF8E7] transition">
           Book Store Visit
         </button>
+      </div>
+
+      {/* Trust Badges */}
+      <div className="border-t border-gray-200 pt-6">
+        <div className="grid grid-cols-2 gap-4">
+          {trustBadges.map((badge, index) => (
+            <div key={index} className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <badge.icon className="w-5 h-5 text-[#B8941E]" strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">{badge.title}</p>
+                <p className="text-xs text-gray-600">{badge.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
