@@ -1,0 +1,116 @@
+'use client';
+
+import { useState } from 'react';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
+
+interface ProductInfoProps {
+  product: {
+    id: number;
+    name: string;
+    category: string;
+    price: number;
+    karat: string;
+    description: string;
+    purityOptions: string[];
+    lengthOptions: string[];
+    images: string[];
+  };
+}
+
+export default function ProductInfo({ product }: ProductInfoProps) {
+  const [selectedPurity, setSelectedPurity] = useState(product.purityOptions[0]);
+  const [selectedLength, setSelectedLength] = useState(product.lengthOptions[0]);
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      karat: product.karat,
+      image: product.images[0],
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Category */}
+      <p className="text-sm text-[#B8941E] font-medium tracking-wide">{product.category}</p>
+
+      {/* Product Name */}
+      <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>
+
+      {/* Price */}
+      <div>
+        <p className="text-3xl font-bold text-gray-900">₹ {product.price.toLocaleString('en-IN')}</p>
+        <p className="text-sm text-gray-600 mt-1">Inclusive of all taxes & making charges</p>
+      </div>
+
+      {/* Description */}
+      <p className="text-gray-700 leading-relaxed">{product.description}</p>
+
+      {/* Gold Purity */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-3">GOLD PURITY</label>
+        <div className="flex gap-3">
+          {product.purityOptions.map((option) => (
+            <button
+              key={option}
+              onClick={() => setSelectedPurity(option)}
+              className={`px-6 py-2 border-2 rounded transition ${
+                selectedPurity === option
+                  ? 'border-[#B8941E] bg-[#FFF8E7] text-[#B8941E]'
+                  : 'border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Length */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-3">LENGTH</label>
+        <div className="flex gap-3">
+          {product.lengthOptions.map((option) => (
+            <button
+              key={option}
+              onClick={() => setSelectedLength(option)}
+              className={`px-6 py-2 border-2 rounded transition ${
+                selectedLength === option
+                  ? 'border-[#B8941E] bg-[#FFF8E7] text-[#B8941E]'
+                  : 'border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Customization */}
+      <div className="bg-[#FFF8E7] p-4 rounded-lg">
+        <p className="font-semibold text-gray-900 mb-1">Want to customize this piece?</p>
+        <p className="text-sm text-gray-700 mb-3">
+          Change gemstones, size or weight according to your preference.
+        </p>
+        <button className="text-[#B8941E] font-medium hover:underline">Enquire</button>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-4">
+        <button 
+          onClick={handleAddToCart}
+          className="flex-1 bg-[#B8941E] text-white py-3 rounded-lg font-semibold hover:bg-[#9a7a19] transition"
+        >
+          Add to Cart
+        </button>
+        <button className="flex-1 border-2 border-[#B8941E] text-[#B8941E] py-3 rounded-lg font-semibold hover:bg-[#FFF8E7] transition">
+          Book Store Visit
+        </button>
+      </div>
+    </div>
+  );
+}

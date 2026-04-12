@@ -3,8 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 export default function Header() {
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [goldMenuOpen, setGoldMenuOpen] = useState(false);
@@ -46,31 +50,31 @@ export default function Header() {
   };
 
   const goldCategories = [
-    { name: 'TALI', href: '/gold/tali' },
-    { name: 'Gold Kaapu', href: '/gold/kaapu' },
-    { name: 'TALI CHAIN', href: '/gold/tali-chain' },
-    { name: 'Bracelet', href: '/gold/bracelet' },
-    { name: 'Necklace', href: '/gold/necklace' },
-    { name: 'Gold Jhumkas', href: '/gold/jhumkas' },
-    { name: 'Kalipot', href: '/gold/kalipot' },
-    { name: 'Gold Dollar', href: '/gold/dollar' },
-    { name: 'Dollar chain', href: '/gold/dollar-chain' },
-    { name: 'Gold Ring', href: '/gold/ring' },
-    { name: 'Stud', href: '/gold/stud' },
-    { name: 'All', href: '/gold/all' },
-    { name: 'Bangles', href: '/gold/bangles' },
-    { name: 'Haram', href: '/gold/haram' },
+    { name: 'TALI', href: '/products/tali' },
+    { name: 'Gold Kaapu', href: '/products/gold-kaapu' },
+    { name: 'TALI CHAIN', href: '/products/tali-chain' },
+    { name: 'Bracelet', href: '/products/bracelet' },
+    { name: 'Necklace', href: '/products/necklace' },
+    { name: 'Gold Jhumkas', href: '/products/gold-jhumkas' },
+    { name: 'Kalipot', href: '/products/kalipot' },
+    { name: 'Gold Dollar', href: '/products/gold-dollar' },
+    { name: 'Dollar chain', href: '/products/dollar-chain' },
+    { name: 'Gold Ring', href: '/products/gold-ring' },
+    { name: 'Stud', href: '/products/stud' },
+    { name: 'All', href: '/products/all' },
+    { name: 'Bangles', href: '/products/bangles' },
+    { name: 'Haram', href: '/products/haram' },
   ];
 
   const silverCategories = [
-    { name: 'Anklet', href: '/silver/anklet' },
-    { name: 'Ring', href: '/silver/ring' },
-    { name: 'Bangles', href: '/silver/bangles' },
-    { name: 'Bracelet', href: '/silver/bracelet' },
-    { name: 'Kappu', href: '/silver/kappu' },
-    { name: 'Tattu', href: '/silver/tattu' },
-    { name: 'Key Chain', href: '/silver/key-chain' },
-    { name: 'All', href: '/silver/all' },
+    { name: 'Anklet', href: '/products/anklet' },
+    { name: 'Ring', href: '/products/ring' },
+    { name: 'Bangles', href: '/products/bangles' },
+    { name: 'Bracelet', href: '/products/bracelet' },
+    { name: 'Kappu', href: '/products/kappu' },
+    { name: 'Tattu', href: '/products/tattu' },
+    { name: 'Key Chain', href: '/products/key-chain' },
+    { name: 'All', href: '/products/all' },
   ];
 
   return (
@@ -118,17 +122,27 @@ export default function Header() {
               </button>
 
               {/* Wishlist Icon */}
-              <button className="p-2 hover:bg-gray-100 rounded-full transition">
+              <button className="p-2 hover:bg-gray-100 rounded-full transition relative">
                 <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#B8941E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
               </button>
 
               {/* Cart Icon */}
-              <button className="p-2 hover:bg-gray-100 rounded-full transition">
+              <button className="p-2 hover:bg-gray-100 rounded-full transition relative">
                 <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#B8941E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </button>
 
               {/* Visit Showroom Button */}
@@ -216,12 +230,12 @@ export default function Header() {
             <div className="w-full py-6">
               <div className="grid grid-cols-[60%_35%] gap-8 px-12">
                 {/* Categories */}
-                <div className="grid grid-cols-2 gap-x-12 gap-y-3">
+                <div className="grid grid-cols-2 gap-x-12">
                   {goldCategories.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block py-1"
+                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block leading-tight py-0.5"
                       onClick={() => setGoldMenuOpen(false)}
                     >
                       {item.name}
@@ -229,20 +243,39 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* Banner Image */}
-                <div className="relative h-full min-h-[200px] rounded-lg overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=800&fit=crop&q=80"
-                    alt="Gold Collection"
-                    fill
-                    className="object-cover"
-                    sizes="35vw"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                    <div className="text-white">
-                      <p className="text-4xl font-bold mb-1">3500+</p>
-                      <p className="text-lg">Designs</p>
+                {/* Two Banner Images */}
+                <div className="flex flex-col gap-4">
+                  <div className="relative h-[200px] rounded-lg overflow-hidden group">
+                    <Image
+                      src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=400&fit=crop&q=80"
+                      alt="Gold Necklaces"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      sizes="35vw"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                      <div className="text-white">
+                        <p className="text-2xl font-bold">Necklaces</p>
+                        <p className="text-sm">Premium Collection</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative h-[200px] rounded-lg overflow-hidden group">
+                    <Image
+                      src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&h=400&fit=crop&q=80"
+                      alt="Gold Bangles"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      sizes="35vw"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                      <div className="text-white">
+                        <p className="text-2xl font-bold">Bangles</p>
+                        <p className="text-sm">Traditional Designs</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -258,15 +291,15 @@ export default function Header() {
             onMouseEnter={handleSilverEnter}
             onMouseLeave={handleSilverLeave}
           >
-            <div className="w-full py-6">
+            <div className="w-full py-8">
               <div className="grid grid-cols-[60%_35%] gap-8 px-12">
                 {/* Categories */}
-                <div className="grid grid-cols-2 gap-x-12 gap-y-1">
+                <div className="grid grid-cols-2 gap-x-12">
                   {silverCategories.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block"
+                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block leading-tight py-0.5"
                       onClick={() => setSilverMenuOpen(false)}
                     >
                       {item.name}
@@ -274,7 +307,7 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* Banner Image */}
+                {/* Single Banner Image */}
                 <div className="relative h-full min-h-[200px] rounded-lg overflow-hidden">
                   <Image
                     src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=800&fit=crop&q=80"

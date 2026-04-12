@@ -1,17 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
 export default function Hero() {
-  const [isClient, setIsClient] = useState(false);
+  const pathname = usePathname();
+  const swiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    // Reinitialize Swiper when pathname changes
+    if (swiperRef.current) {
+      swiperRef.current.update();
+      swiperRef.current.autoplay?.start();
+    }
+  }, [pathname]);
 
   const slides = [
     {
@@ -34,27 +41,10 @@ export default function Hero() {
     },
   ];
 
-  if (!isClient) {
-    return (
-      <section className="relative bg-[#2a2420]">
-        <div className="relative min-h-[500px] md:min-h-[600px] lg:min-h-[700px] flex items-center">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="max-w-xl lg:max-w-2xl space-y-6">
-              <div className="h-8 w-64 bg-white/20 rounded-full animate-pulse" />
-              <div className="h-16 w-96 bg-white/20 rounded animate-pulse" />
-              <div className="h-6 w-80 bg-white/20 rounded animate-pulse" />
-              <div className="h-12 w-40 bg-white/20 rounded animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="relative bg-[#2a2420]">
       <Swiper
-        key={Date.now()}
+        onSwiper={(swiper) => { swiperRef.current = swiper; }}
         modules={[Autoplay, Pagination]}
         spaceBetween={0}
         slidesPerView={1}
