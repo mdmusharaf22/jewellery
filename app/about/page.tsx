@@ -238,7 +238,7 @@ export default function AboutPage() {
         <div className="w-[98%] mx-auto mb-14 md:mb-18">
           <TrustBadges />
         </div>
-        <div className="w-[100%] mx-auto mb-14 md:mb-18">
+        <div className="w-[100%] mx-auto">
           <Testimonials />
         </div>
       </div>

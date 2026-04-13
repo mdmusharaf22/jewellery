@@ -14,10 +14,10 @@ export default function NewArrivals() {
   };
 
   const products = [
-    { id: 1, name: 'Lakshmi Bridal Choker', price: '2,18,000', karat: '22KT Gold', category: 'Bridal', slug: 'lakshmi-bridal-choker', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
-    { id: 2, name: 'Temple Jhumka Pair', price: '86,500', karat: '22KT Gold', category: 'Gold', slug: 'temple-jhumka-pair', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80' },
-    { id: 3, name: 'Silver Pooja Gift Set', price: '14,800', karat: '999 Silver', category: 'Silver', slug: 'silver-pooja-gift-set', image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80' },
-    { id: 4, name: 'Festival Gold Coin', price: '39,950', karat: '24KT Gold', category: 'Gold', slug: 'festival-gold-coin', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80' },
+    { id: 1, name: 'Lakshmi Bridal Choker', price: '2,18,000', karat: '22KT Gold', category: 'necklace', slug: 'lakshmi-bridal-choker', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
+    { id: 2, name: 'Temple Jhumka Pair', price: '86,500', karat: '22KT Gold', category: 'gold-jhumkas', slug: 'temple-jhumka-pair', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80' },
+    { id: 3, name: 'Silver Pooja Gift Set', price: '14,800', karat: '999 Silver', category: 'all', slug: 'silver-pooja-gift-set', image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80' },
+    { id: 4, name: 'Festival Gold Coin', price: '39,950', karat: '24KT Gold', category: 'all', slug: 'festival-gold-coin', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80' },
     { id: 5, name: 'Bridal Necklace Set', price: '2,18,000', karat: '22KT Gold', category: 'Bridal', slug: 'bridal-necklace-set', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop&q=80' },
     { id: 6, name: 'Gold Jhumka', price: '86,500', karat: '22KT Gold', category: 'Gold', slug: 'gold-jhumka', image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600&h=600&fit=crop&q=80' },
     { id: 7, name: 'Silver Bowl Set', price: '14,800', karat: '999 Silver', category: 'Silver', slug: 'silver-bowl-set', image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=600&fit=crop&q=80' },

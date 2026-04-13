@@ -24,6 +24,13 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const [selectedLength, setSelectedLength] = useState(product.lengthOptions[0]);
   const { addToCart } = useCart();
 
+  // Format category for display
+  const displayCategory = product.category
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+    .toUpperCase();
+
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
@@ -60,7 +67,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   return (
     <div className="space-y-6">
       {/* Category */}
-      <p className="text-sm text-[#B8941E] font-medium tracking-wide">{product.category}</p>
+      <p className="text-sm text-[#B8941E] font-medium tracking-wide">{displayCategory}</p>
 
       {/* Product Name */}
       <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>

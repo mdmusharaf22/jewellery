@@ -67,8 +67,12 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
     }
   };
 
+  const price = typeof product.price === 'string' 
+    ? parseFloat(product.price.replace(/,/g, ''))
+    : product.price;
+
   const productUrl = product.slug && product.category 
-    ? `/${product.category}/${product.slug}`
+    ? `/${product.category}/${product.slug}?name=${encodeURIComponent(product.name)}&price=${price}&karat=${encodeURIComponent(product.karat)}`
     : '#';
 
   // List View
@@ -145,7 +149,7 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
   return (
     <a
       href={productUrl}
-      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-xs transition-all duration-300 group cursor-pointer block"
+      className="bg-white rounded-lg overflow-hidden hover:shadow-xs transition-all duration-300 group cursor-pointer block"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
