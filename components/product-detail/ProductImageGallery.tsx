@@ -3,21 +3,49 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { addToWishlist, removeFromWishlist } from '@/store/slices/wishlistSlice';
+import Toast from '@/components/Toast';
 
 interface ProductImageGalleryProps {
   images: string[];
   productName: string;
+  productId?: number;
+  productPrice?: number;
+  productKarat?: string;
   onZoomChange?: (isZoomed: boolean, position: { x: number; y: number }, imageUrl: string) => void;
 }
 
-export default function ProductImageGallery({ images, productName, onZoomChange }: ProductImageGalleryProps) {
+export default function ProductImageGallery({ images, productName, productId, productPrice, productKarat, onZoomChange }: ProductImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [showZoom, setShowZoom] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [isPaused, setIsPaused] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
-  const { isInWishlist } = useWishlist();
+  const dispatch = useAppDispatch();
+  
+  // Check if product is in wishlist
+  const { items = [] } = useAppSelector((state) => state.wishlist || { items: [] });
+  const isInWishlist = productId ? items.some(item => item.id === productId) : false;
+
+  const handleToggleWishlist = () => {
+    if (productId && productPrice && productKarat) {
+      if (isInWishlist) {
+        dispatch(removeFromWishlist(productId));
+        setToast({ message: 'Removed from wishlist', type: 'info' });
+      } else {
+        dispatch(addToWishlist({
+          id: productId,
+          name: productName,
+          price: productPrice,
+          karat: productKarat,
+          image: images[0],
+        }));
+        setToast({ message: 'Added to wishlist!', type: 'success' });
+      }
+    }
+  };
 
   // Auto-swipe functionality - pauses when hovering
   useEffect(() => {
@@ -63,6 +91,14 @@ export default function ProductImageGallery({ images, productName, onZoomChange 
 
   return (
     <div className="flex gap-4">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      
       {/* Thumbnail Column */}
       <div className="flex flex-col gap-3 w-20">
         {images.map((image, index) => (
@@ -107,21 +143,38 @@ export default function ProductImageGallery({ images, productName, onZoomChange 
           {/* Navigation Arrows */}
           <button 
             onClick={handlePrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10 cursor-pointer"
           >
             <ChevronLeft className="w-6 h-6 text-gray-700" />
           </button>
           
           <button 
             onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10 cursor-pointer"
           >
             <ChevronRight className="w-6 h-6 text-gray-700" />
           </button>
 
           {/* Wishlist Button */}
-          <button className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 transition z-10">
-            <Heart className="w-5 h-5 text-gray-700" />
+          <button 
+            onClick={handleToggleWishlist}
+            className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition z-10 cursor-pointer ${
+              isInWishlist 
+                ? 'bg-red-500 hover:bg-red-600' 
+                : 'bg-white hover:bg-gray-50'
+            }`}
+          >
+            {isInWishlist ? (
+              // Filled solid heart
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            ) : (
+              // Outline heart
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            )}
           </button>
 
           {/* Image Indicator Dots */}

@@ -279,11 +279,16 @@ export default function ContactPage() {
       </section>
 
       {/* Common Sections */}
-      <div className="py-12 md:py-16 bg-white">
-        <div className="w-[98%] mx-auto mb-14 md:mb-18">
-          <TrustBadges />
+      <div className="bg-white">
+        {/* Trust Badges Section */}
+        <div className="py-12 md:py-16">
+          <div className="w-[90%] mx-auto">
+            <TrustBadges />
+          </div>
         </div>
-        <div className="w-[100%] mx-auto">
+        
+        {/* Testimonials Section */}
+        <div className="pb-12 md:pb-16">
           <Testimonials />
         </div>
       </div>

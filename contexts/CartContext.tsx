@@ -30,13 +30,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-      setCart(JSON.parse(savedCart));
+      try {
+        const parsed = JSON.parse(savedCart);
+        // Ensure it's an array
+        setCart(Array.isArray(parsed) ? parsed : []);
+      } catch (error) {
+        console.error('Error loading cart:', error);
+        setCart([]);
+      }
     }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    if (Array.isArray(cart)) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
   }, [cart]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'>) => {
@@ -73,8 +82,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart([]);
   };
 
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const cartCount = Array.isArray(cart) ? cart.reduce((total, item) => total + item.quantity, 0) : 0;
+  const cartTotal = Array.isArray(cart) ? cart.reduce((total, item) => total + item.price * item.quantity, 0) : 0;
 
   return (
     <CartContext.Provider

@@ -110,6 +110,9 @@ export default function ProductDetailPage() {
             <ProductImageGallery 
               images={product.images} 
               productName={product.name}
+              productId={product.id}
+              productPrice={product.price}
+              productKarat={product.karat}
               onZoomChange={handleZoomChange}
             />
           </div>

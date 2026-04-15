@@ -3,12 +3,44 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { Search, Heart, ShoppingBag, User, Store } from 'lucide-react';
+import SearchPopup from './SearchPopup';
 
 export default function Header() {
-  const { cartCount } = useCart();
-  const { wishlistCount } = useWishlist();
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Subscribe to Redux store updates
+    if (typeof window !== 'undefined') {
+      try {
+        const { store } = require('@/store/store');
+        
+        const updateCounts = () => {
+          const state = store.getState();
+          const items = state.cart?.items || [];
+          const wishlist = state.wishlist?.items || [];
+          const auth = state.auth || { isAuthenticated: false, user: null };
+          
+          setCartCount(items.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0));
+          setWishlistCount(wishlist.length);
+          setIsAuthenticated(auth.isAuthenticated);
+          setUser(auth.user);
+        };
+        
+        updateCounts();
+        const unsubscribe = store.subscribe(updateCounts);
+        
+        return () => unsubscribe();
+      } catch (e) {
+        console.error('Redux store not available');
+      }
+    }
+  }, []);
+  
+  const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [goldMenuOpen, setGoldMenuOpen] = useState(false);
@@ -115,39 +147,54 @@ export default function Header() {
             {/* Right Side Icons & CTA */}
             <div className="flex items-center gap-3 md:gap-4">
               {/* Search Icon */}
-              <button className="p-2 hover:bg-gray-100 rounded-full transition">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+              <button 
+                onClick={() => setSearchOpen(true)}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5 text-gray-700" />
               </button>
+
+              {/* User Icon */}
+              <Link 
+                href={isAuthenticated ? "/dashboard" : "/login"}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+                aria-label="Account"
+              >
+                <User className="w-5 h-5 text-gray-700" />
+              </Link>
 
               {/* Wishlist Icon */}
-              <button className="p-2 hover:bg-gray-100 rounded-full transition relative">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#B8941E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
-              </button>
+              <Link 
+                href="/wishlist"
+                className="p-2 hover:bg-gray-100 rounded-full transition relative"
+                aria-label="Wishlist"
+              >
+                <Heart className="w-5 h-5 text-gray-700" />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              </Link>
 
               {/* Cart Icon */}
-              <button className="p-2 hover:bg-gray-100 rounded-full transition relative">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#B8941E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
+              <Link 
+                href="/cart"
+                className="p-2 hover:bg-gray-100 rounded-full transition relative"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingBag className="w-5 h-5 text-gray-700" />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              </Link>
 
-              {/* Visit Showroom Button */}
-              <button className="hidden md:block bg-[#B8941E] text-white px-5 py-2 rounded hover:bg-black transition font-medium text-sm cursor-pointer">
-                Visit Showroom
+              {/* Store Location Icon */}
+              <button 
+                className="hidden md:flex items-center gap-2 p-2 hover:bg-gray-100 rounded-full transition"
+                aria-label="Store Location"
+                title="Visit our showroom"
+              >
+                <Store className="w-5 h-5 text-gray-700" />
               </button>
 
               {/* Mobile Menu Button */}
@@ -214,7 +261,7 @@ export default function Header() {
             <Link href="/about" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               About
             </Link>
-            <Link href="/savings" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+            <Link href="/savings-scheme" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Savings Schema
             </Link>
             <Link href="/contact" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
@@ -343,14 +390,14 @@ export default function Header() {
             <Link href="/mens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Men's Collection</Link>
             <Link href="/womens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Women's Collection</Link>
             <Link href="/kids-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Kids Collection</Link>
-            <Link href="/savings" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Savings Schema</Link>
+            <Link href="/savings-scheme" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Savings Schema</Link>
             <Link href="/contact" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Contact Us</Link>
-            <button className="bg-[#B8941E] text-white px-6 py-2 rounded w-full mt-2 font-medium hover:bg-black transition">
-              Visit Showroom
-            </button>
           </nav>
         </div>
       )}
+
+      {/* Search Popup */}
+      <SearchPopup isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

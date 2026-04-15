@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Heart, ShoppingCart } from 'lucide-react';
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { addToCart } from '@/store/slices/cartSlice';
+import { addToWishlist, removeFromWishlist } from '@/store/slices/wishlistSlice';
 
 interface Product {
   id: number;
@@ -24,9 +25,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, viewMode = 'grid', onToast }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  const inWishlist = isInWishlist(product.id);
+  const dispatch = useAppDispatch();
+  
+  // Check if product is in wishlist
+  const { items = [] } = useAppSelector((state) => state.wishlist || { items: [] });
+  const isInWishlist = items.some(item => item.id === product.id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -35,13 +38,13 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
       ? parseFloat(product.price.replace(/,/g, ''))
       : product.price;
     
-    addToCart({
+    dispatch(addToCart({
       id: product.id,
       name: product.name,
       price,
       karat: product.karat,
       image: product.image,
-    });
+    }));
     onToast?.('Added to cart!', 'success');
   };
 
@@ -52,17 +55,17 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
       ? parseFloat(product.price.replace(/,/g, ''))
       : product.price;
     
-    if (inWishlist) {
-      removeFromWishlist(product.id);
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(product.id));
       onToast?.('Removed from wishlist', 'info');
     } else {
-      addToWishlist({
+      dispatch(addToWishlist({
         id: product.id,
         name: product.name,
         price,
         karat: product.karat,
         image: product.image,
-      });
+      }));
       onToast?.('Added to wishlist!', 'success');
     }
   };
@@ -97,14 +100,22 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
           {/* Heart Icon - Always Visible in Top Right */}
           <button 
             className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition shadow-lg ${
-              inWishlist 
-                ? 'bg-[#B8941E] text-white' 
-                : 'bg-white text-gray-700 hover:bg-[#B8941E] hover:text-white'
+              isInWishlist 
+                ? 'bg-red-500 hover:bg-red-600' 
+                : 'bg-white hover:bg-gray-50'
             }`}
             onClick={handleToggleWishlist}
-            title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+            title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
           >
-            <Heart className="w-4 h-4" fill={inWishlist ? 'currentColor' : 'none'} />
+            {isInWishlist ? (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            )}
           </button>
 
           {/* Cart Button - Shows on Hover at Bottom */}
@@ -166,14 +177,22 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
         {/* Heart Icon - Always Visible in Top Right */}
         <button 
           className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-10 ${
-            inWishlist 
-              ? 'bg-[#B8941E] text-white' 
-              : 'bg-white text-gray-700 hover:bg-[#B8941E] hover:text-white'
+            isInWishlist 
+              ? 'bg-red-500 hover:bg-red-600' 
+              : 'bg-white hover:bg-gray-50'
           }`}
           onClick={handleToggleWishlist}
-          title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
         >
-          <Heart className="w-5 h-5" fill={inWishlist ? 'currentColor' : 'none'} />
+          {isInWishlist ? (
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          )}
         </button>
 
         {/* Cart Button - Shows on Hover at Bottom */}

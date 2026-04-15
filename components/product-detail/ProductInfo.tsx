@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { useAppDispatch } from '@/store/hooks';
+import { addToCart } from '@/store/slices/cartSlice';
 import { Shield, Truck, RefreshCw, Repeat } from 'lucide-react';
+import Toast from '@/components/Toast';
 
 interface ProductInfoProps {
   product: {
@@ -22,7 +23,8 @@ interface ProductInfoProps {
 export default function ProductInfo({ product }: ProductInfoProps) {
   const [selectedPurity, setSelectedPurity] = useState(product.purityOptions[0]);
   const [selectedLength, setSelectedLength] = useState(product.lengthOptions[0]);
-  const { addToCart } = useCart();
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const dispatch = useAppDispatch();
 
   // Format category for display
   const displayCategory = product.category
@@ -32,13 +34,14 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     .toUpperCase();
 
   const handleAddToCart = () => {
-    addToCart({
+    dispatch(addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       karat: product.karat,
       image: product.images[0],
-    });
+    }));
+    setToast({ message: 'Added to cart!', type: 'success' });
   };
 
   const trustBadges = [
@@ -66,6 +69,14 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      
       {/* Category */}
       <p className="text-sm text-[#B8941E] font-medium tracking-wide">{displayCategory}</p>
 

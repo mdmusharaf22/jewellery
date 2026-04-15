@@ -27,13 +27,22 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
-      setWishlist(JSON.parse(savedWishlist));
+      try {
+        const parsed = JSON.parse(savedWishlist);
+        // Ensure it's an array
+        setWishlist(Array.isArray(parsed) ? parsed : []);
+      } catch (error) {
+        console.error('Error loading wishlist:', error);
+        setWishlist([]);
+      }
     }
   }, []);
 
   // Save wishlist to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    if (Array.isArray(wishlist)) {
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    }
   }, [wishlist]);
 
   const addToWishlist = (item: WishlistItem) => {
@@ -51,10 +60,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   };
 
   const isInWishlist = (id: number) => {
-    return wishlist.some((item) => item.id === id);
+    return Array.isArray(wishlist) ? wishlist.some((item) => item.id === id) : false;
   };
 
-  const wishlistCount = wishlist.length;
+  const wishlistCount = Array.isArray(wishlist) ? wishlist.length : 0;
 
   return (
     <WishlistContext.Provider
