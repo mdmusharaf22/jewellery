@@ -254,11 +254,7 @@ export default function DataTable({
       )}
 
       {/* Items per page info - Part of footer */}
-      {paginatedData.length > 0 && (
-        <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-500">
-          Displaying {itemsPerPage} items per page
-        </div>
-      )}
+
     </div>
   );
 }
