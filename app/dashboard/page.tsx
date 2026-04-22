@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -41,8 +41,15 @@ export default function DashboardPage() {
     },
   ];
 
+  // Redirect if not authenticated - use useEffect to avoid setState during render
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
+  // Show nothing while redirecting
   if (!isAuthenticated) {
-    router.push('/login');
     return null;
   }
 

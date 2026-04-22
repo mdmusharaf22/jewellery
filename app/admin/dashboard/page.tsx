@@ -18,12 +18,16 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [adminUser, setAdminUser] = useState<any>(null);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     
     // Check authentication
-    if (!isAuthenticated()) {
+    const authenticated = isAuthenticated();
+    setIsAuthChecked(true);
+    
+    if (!authenticated) {
       router.push('/admin/login');
       return;
     }
@@ -38,11 +42,8 @@ export default function AdminDashboard() {
     router.push('/admin/login');
   };
 
-  if (!mounted) {
-    return null;
-  }
-
-  if (!isAuthenticated()) {
+  // Show nothing while checking auth or not mounted
+  if (!mounted || !isAuthChecked) {
     return null;
   }
 
