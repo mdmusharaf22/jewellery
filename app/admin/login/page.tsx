@@ -180,14 +180,7 @@ export default function AdminLogin() {
           </div>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="mt-6 text-center">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800 font-medium mb-2">Demo Credentials:</p>
-            <p className="text-xs text-blue-700">Email: super@admin.com</p>
-            <p className="text-xs text-blue-700">Password: secret</p>
-          </div>
-        </div>
+
       </div>
     </div>
   );

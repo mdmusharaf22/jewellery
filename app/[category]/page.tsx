@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductGrid from '@/components/products/ProductGrid';
@@ -9,9 +9,23 @@ import ProductFilters from '@/components/products/ProductFilters';
 import TrustBadges from '@/components/product-detail/TrustBadges';
 import Testimonials from '@/components/Testimonials';
 
+// All valid top-level category slugs
+const VALID_CATEGORIES = new Set([
+  'all',
+  'tali', 'gold-kaapu', 'tali-chain', 'bracelet', 'necklace',
+  'gold-jhumkas', 'kalipot', 'gold-dollar', 'dollar-chain',
+  'gold-ring', 'stud', 'bangles', 'haram',
+  'anklet', 'ring', 'kappu', 'tattu', 'key-chain',
+  'mens-collection', 'womens-collection', 'kids-collection',
+]);
+
 export default function CategoryPage() {
   const params = useParams();
   const category = params.category as string;
+
+  if (!VALID_CATEGORIES.has(category)) {
+    notFound();
+  }
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>(category);

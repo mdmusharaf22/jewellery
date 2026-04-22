@@ -8,6 +8,7 @@ interface CategoryModalProps {
   onSubmit: (data: { name: string }) => Promise<void>;
   category?: { id: string; name: string } | null;
   mode: 'create' | 'edit';
+  label?: string; // e.g. 'Subcategory'
 }
 
 export default function CategoryModal({
@@ -16,6 +17,7 @@ export default function CategoryModal({
   onSubmit,
   category,
   mode,
+  label = 'Category',
 }: CategoryModalProps) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -75,7 +77,7 @@ export default function CategoryModal({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b">
             <h3 className="text-xl font-semibold text-gray-900">
-              {mode === 'create' ? 'Create New Category' : 'Edit Category'}
+              {mode === 'create' ? `Create New ${label}` : `Edit ${label}`}
             </h3>
             <button
               onClick={handleClose}
@@ -117,20 +119,20 @@ export default function CategoryModal({
               {/* Category Name Field */}
               <div>
                 <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Category Name <span className="text-red-500">*</span>
+                  {label} Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="categoryName"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Gold Jewellery"
+                  placeholder={`e.g., Gold Jewellery`}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
                   disabled={loading}
                   autoFocus
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Enter a descriptive name for the category
+                  Enter a descriptive name for the {label.toLowerCase()}
                 </p>
               </div>
             </div>
@@ -175,7 +177,7 @@ export default function CategoryModal({
                     <span>{mode === 'create' ? 'Creating...' : 'Updating...'}</span>
                   </>
                 ) : (
-                  <span>{mode === 'create' ? 'Create Category' : 'Update Category'}</span>
+                  <span>{mode === 'create' ? `Create ${label}` : `Update ${label}`}</span>
                 )}
               </button>
             </div>
