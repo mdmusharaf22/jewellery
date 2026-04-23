@@ -93,6 +93,7 @@ export default function CategoryPage() {
               {/* Product Grid/List */}
               <ProductGrid 
                 viewMode={viewMode}
+                onViewModeChange={setViewMode}
                 selectedCategory={category}
                 searchQuery={searchQuery}
                 sortBy={sortBy}

@@ -16,34 +16,34 @@ export default function SimilarProducts({ currentProductSlug, category }: Simila
   ];
 
   return (
-    <div className="mb-12">
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">Similar Designs</h2>
-      <p className="text-gray-600 mb-8">
+    <div className="mb-8 sm:mb-10 md:mb-12 overflow-hidden">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 sm:mb-2">Similar Designs</h2>
+      <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">
         Discover complementary pieces and similar styles to complete your look.
       </p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
         {similarProducts.map((product) => (
           <Link 
             key={product.id} 
             href={`/${category}/${product.slug}`}
             className="group"
           >
-            <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-3">
+            <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2 sm:mb-3">
               <Image
                 src={product.image}
                 alt={product.name}
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-500"
-                sizes="(max-width: 768px) 50vw, 25vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                 unoptimized
               />
             </div>
-            <p className="text-xs text-[#B8941E] font-medium mb-1">{product.karat}</p>
-            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-[#B8941E] transition">
+            <p className="text-[10px] xs:text-xs text-[#B8941E] font-medium mb-0.5 sm:mb-1">{product.karat}</p>
+            <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 group-hover:text-[#B8941E] transition text-xs sm:text-sm md:text-base line-clamp-2">
               {product.name}
             </h3>
-            <p className="text-lg font-bold text-gray-900">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
               ₹ {product.price.toLocaleString('en-IN')}
             </p>
           </Link>

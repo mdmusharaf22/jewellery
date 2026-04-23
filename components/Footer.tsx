@@ -2,10 +2,10 @@ import Image from 'next/image';
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white">
-      <div className="w-full px-4 lg:px-16 xl:px-24 pt-16 md:pt-20 pb-8">
+    <footer className="bg-black text-white overflow-hidden">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-24 pt-10 sm:pt-12 md:pt-16 lg:pt-20 pb-6 sm:pb-8 max-w-[100vw]">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-8 mb-8 sm:mb-10 md:mb-12">
           {/* Logo and Description */}
           <div>
             <div className="mb-3">
@@ -132,9 +132,9 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-gray-400">
-          <p>© 2026 SriGaneshJewellers. Purity, trust and family service.</p>
-          <div className="flex gap-6">
+        <div className="pt-6 sm:pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-3 text-[10px] sm:text-xs text-gray-400">
+          <p className="text-center md:text-left">© 2026 SriGaneshJewellers. Purity, trust and family service.</p>
+          <div className="flex gap-4 sm:gap-6">
             <a href="/privacy" className="hover:text-white transition">Privacy Policy</a>
             <a href="/terms" className="hover:text-white transition">Terms & Conditions</a>
           </div>

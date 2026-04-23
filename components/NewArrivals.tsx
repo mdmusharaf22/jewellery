@@ -29,7 +29,7 @@ export default function NewArrivals() {
     : products.filter(p => p.category === activeTab);
 
   return (
-    <section className="bg-white">
+    <section className="bg-white overflow-hidden">
       {toast && (
         <Toast
           message={toast.message}
@@ -39,25 +39,25 @@ export default function NewArrivals() {
       )}
 
       {/* Full width header */}
-      <div className="px-4 lg:px-8">
+      <div className="px-2 xs:px-3 sm:px-4 lg:px-8 max-w-[100vw]">
         {/* Header with Tabs on Right */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 xs:mb-8 sm:mb-10 md:mb-12 gap-3 xs:gap-4 sm:gap-6">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-[#1a1a1a]">
+            <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold mb-1.5 xs:mb-2 sm:mb-3 text-[#1a1a1a]">
               New Arrivals
             </h2>
-            <p className="text-gray-600 text-sm md:text-base">
+            <p className="text-gray-600 text-[11px] xs:text-xs sm:text-sm md:text-base">
               Fresh additions in gold and silver, selected for festive shopping and gifting
             </p>
           </div>
 
           {/* Tabs on Right */}
-          <div className="flex gap-3">
+          <div className="flex gap-1.5 xs:gap-2 sm:gap-3 flex-wrap">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 rounded-full font-medium text-sm transition cursor-pointer ${
+                className={`px-2.5 xs:px-3 sm:px-4 md:px-5 py-1 xs:py-1.5 sm:py-2 rounded-full font-medium text-[10px] xs:text-xs sm:text-sm transition cursor-pointer ${
                   activeTab === tab
                     ? 'bg-[#B8941E] text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -71,7 +71,7 @@ export default function NewArrivals() {
       </div>
 
       {/* Full width grid */}
-      <div className="px-4 lg:px-8">
+      <div className="px-2 xs:px-3 sm:px-4 lg:px-8 max-w-[100vw]">
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {filteredProducts.map((product) => (

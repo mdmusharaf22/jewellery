@@ -112,28 +112,27 @@ export default function Header() {
   return (
     <>
       {/* Top Bar */}
-      <div className="bg-[#1a1a1a] text-white text-xs py-2">
-        <div className="w-full px-4 lg:px-8">
-          <div className="flex flex-wrap justify-between items-center gap-2">
-            <div className="flex flex-wrap gap-3 md:gap-6 text-[11px] md:text-xs">
-              <span>Gold 22K: ₹7,245/g</span>
-              <span>Silver: ₹94/g</span>
-              <span className="hidden md:inline">Gold Loan in 30 min</span>
+      <div className="bg-[#1a1a1a] text-white text-xs py-2 overflow-hidden">
+        <div className="w-full px-2 sm:px-4 lg:px-8 max-w-[100vw]">
+          <div className="flex flex-wrap justify-between items-center gap-1 sm:gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-6 text-[10px] sm:text-[11px] md:text-xs">
+              <span className="whitespace-nowrap">Gold: ₹7,245/g</span>
+              <span className="whitespace-nowrap">Silver: ₹94/g</span>
             </div>
-            <div className="text-[11px] md:text-xs">
-              <span>Free insured shipping across India above ₹50,000</span>
+            <div className="text-[9px] sm:text-[11px] md:text-xs hidden md:block">
+              <span className="whitespace-nowrap">Free shipping above ₹50,000</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Header */}
-      <header className="bg-white">
-        <div className="w-full px-4 lg:px-8">
+      <header className="bg-white overflow-hidden">
+        <div className="w-full px-2 sm:px-4 lg:px-8 max-w-[100vw]">
           <div className="flex justify-between items-center py-2">
             {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <div className="relative h-12 md:h-16 w-32 md:w-48">
+            <Link href="/" className="flex items-center flex-shrink-0">
+              <div className="relative h-10 sm:h-12 md:h-16 w-24 sm:w-32 md:w-48">
                 <Image
                   src="/logo.jpg"
                   alt="SriGanesh Jewellers"
@@ -145,50 +144,54 @@ export default function Header() {
             </Link>
 
             {/* Right Side Icons & CTA */}
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
               {/* Search Icon */}
               <button 
                 onClick={() => setSearchOpen(true)}
-                className="p-2 hover:bg-gray-100 rounded-full transition"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition"
                 aria-label="Search"
               >
-                <Search className="w-5 h-5 text-gray-700" />
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </button>
 
               {/* User Icon */}
               <Link 
                 href={isAuthenticated ? "/dashboard" : "/login"}
-                className="p-2 hover:bg-gray-100 rounded-full transition"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition"
                 aria-label="Account"
               >
-                <User className="w-5 h-5 text-gray-700" />
+                <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </Link>
 
               {/* Wishlist Icon */}
               <Link 
                 href="/wishlist"
-                className="p-2 hover:bg-gray-100 rounded-full transition relative"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition relative"
                 aria-label="Wishlist"
               >
-                <Heart className="w-5 h-5 text-gray-700" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {wishlistCount}
-                </span>
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-red-500 text-white text-[9px] sm:text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
               </Link>
 
               {/* Cart Icon */}
               <Link 
                 href="/cart"
-                className="p-2 hover:bg-gray-100 rounded-full transition relative"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition relative"
                 aria-label="Shopping Cart"
               >
-                <ShoppingBag className="w-5 h-5 text-gray-700" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-red-500 text-white text-[9px] sm:text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </Link>
 
-              {/* Store Location Icon */}
+              {/* Store Location Icon - Hidden on small screens */}
               <button 
                 className="hidden md:flex items-center gap-2 p-2 hover:bg-gray-100 rounded-full transition"
                 aria-label="Store Location"
@@ -199,10 +202,10 @@ export default function Header() {
 
               {/* Mobile Menu Button */}
               <button
-                className="lg:hidden p-2"
+                className="lg:hidden p-1.5 sm:p-2"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
@@ -211,11 +214,11 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Gold Navigation Bar - Sticky on scroll */}
+      {/* Gold Navigation Bar - Sticky on scroll - Hidden on mobile */}
       <div
-        className={`bg-[#B8941E] transition-all duration-300 ${isScrolled ? 'sticky top-0 z-50 shadow-lg' : ''}`}
+        className={`bg-[#B8941E] transition-all duration-300 hidden lg:block overflow-hidden ${isScrolled ? 'sticky top-0 z-50 shadow-lg' : ''}`}
       >
-        <div className="w-full px-4 lg:px-8">
+        <div className="w-full px-4 lg:px-8 max-w-[100vw]">
           <nav className="flex items-center justify-center gap-6 lg:gap-8 py-1.5 relative">
             <Link href="/" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Home
@@ -270,10 +273,10 @@ export default function Header() {
           </nav>
         </div>
 
-        {/* Gold Dropdown */}
+        {/* Gold Dropdown - Hidden on mobile/tablet */}
         {goldMenuOpen && (
           <div
-            className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
+            className="hidden lg:block absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
             onMouseEnter={handleGoldEnter}
             onMouseLeave={handleGoldLeave}
           >
@@ -334,10 +337,10 @@ export default function Header() {
           </div>
         )}
 
-        {/* Silver Dropdown */}
+        {/* Silver Dropdown - Hidden on mobile/tablet */}
         {silverMenuOpen && (
           <div
-            className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
+            className="hidden lg:block absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
             onMouseEnter={handleSilverEnter}
             onMouseLeave={handleSilverLeave}
           >
@@ -382,16 +385,17 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t">
-          <nav className="w-full px-4 py-4 flex flex-col gap-3">
-            <Link href="/" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Home</Link>
-            <Link href="/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Gold</Link>
-            <Link href="/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Silver</Link>
-            <Link href="/mens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Men's Collection</Link>
-            <Link href="/womens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Women's Collection</Link>
-            <Link href="/kids-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Kids Collection</Link>
-            <Link href="/savings-scheme" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Savings Schema</Link>
-            <Link href="/contact" className="text-[#1a1a1a] hover:text-[#D4AF37] py-2 font-medium">Contact Us</Link>
+        <div className="lg:hidden bg-white border-t shadow-lg">
+          <nav className="w-full px-4 py-4 flex flex-col gap-1 max-h-[70vh] overflow-y-auto">
+            <Link href="/" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link href="/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Gold</Link>
+            <Link href="/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Silver</Link>
+            <Link href="/mens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Men's Collection</Link>
+            <Link href="/womens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Women's Collection</Link>
+            <Link href="/kids-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Kids Collection</Link>
+            <Link href="/about" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>About</Link>
+            <Link href="/savings-scheme" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Savings Schema</Link>
+            <Link href="/contact" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Contact Us</Link>
           </nav>
         </div>
       )}

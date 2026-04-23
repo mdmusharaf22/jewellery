@@ -16,6 +16,11 @@
 body {
   color: #3E2723;
   background: white;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 @theme inline {

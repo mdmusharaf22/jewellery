@@ -7,6 +7,7 @@ import Toast from '@/components/Toast';
 
 interface ProductGridProps {
   viewMode: 'grid' | 'list';
+  onViewModeChange?: (mode: 'grid' | 'list') => void;
   selectedCategory: string;
   searchQuery: string;
   sortBy: string;
@@ -18,6 +19,7 @@ interface ProductGridProps {
 
 export default function ProductGrid({
   viewMode,
+  onViewModeChange,
   selectedCategory,
   searchQuery,
   sortBy,
@@ -144,8 +146,8 @@ export default function ProductGrid({
           {/* View Toggle */}
           <div className="flex gap-2 border border-gray-300 rounded-lg p-1">
             <button
-              onClick={() => {}}
-              className={`p-2 rounded transition ${
+              onClick={() => onViewModeChange?.('grid')}
+              className={`p-2 rounded transition cursor-pointer ${
                 viewMode === 'grid'
                   ? 'bg-[#B8941E] text-white'
                   : 'text-gray-600 hover:bg-gray-100'
@@ -157,8 +159,8 @@ export default function ProductGrid({
               </svg>
             </button>
             <button
-              onClick={() => {}}
-              className={`p-2 rounded transition ${
+              onClick={() => onViewModeChange?.('list')}
+              className={`p-2 rounded transition cursor-pointer ${
                 viewMode === 'list'
                   ? 'bg-[#B8941E] text-white'
                   : 'text-gray-600 hover:bg-gray-100'

@@ -68,7 +68,7 @@ export default function ProductCarousel({
   };
 
   return (
-    <section className="bg-white">
+    <section className="bg-white overflow-hidden">
       {toast && (
         <Toast
           message={toast.message}
@@ -77,16 +77,16 @@ export default function ProductCarousel({
         />
       )}
 
-      <div className="container mx-auto px-4 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
+      <div className="container mx-auto px-2 xs:px-3 sm:px-4 lg:px-8 max-w-[100vw]">
+        <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2 xs:mb-3 text-[#1a1a1a]">
           {title}
         </h2>
-        <p className="text-center text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
+        <p className="text-center text-gray-600 mb-6 xs:mb-8 md:mb-10 text-[11px] xs:text-xs sm:text-sm md:text-base px-2">
           {subtitle}
         </p>
       </div>
 
-      <div className="px-4 lg:px-8">
+      <div className="px-2 xs:px-3 sm:px-4 lg:px-8 max-w-[100vw] overflow-hidden">
         <Swiper
           key={Date.now()}
           modules={[Autoplay]}

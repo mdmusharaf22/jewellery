@@ -42,7 +42,7 @@ export default function Hero() {
   ];
 
   return (
-    <section className="relative bg-[#2a2420]">
+    <section className="relative bg-[#2a2420] overflow-hidden">
       <Swiper
         onSwiper={(swiper) => { swiperRef.current = swiper; }}
         modules={[Autoplay, Pagination]}
@@ -62,35 +62,35 @@ export default function Hero() {
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
-            <div className="relative min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
+            <div className="relative min-h-[400px] xs:min-h-[450px] sm:min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
               <div className="absolute inset-0">
                 <div className="relative w-full h-full">
                   <div 
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                     style={{ backgroundImage: `url('${slide.image}')` }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent sm:from-black/80 sm:via-black/50 md:from-black/70 md:via-black/40" />
                 </div>
               </div>
 
               <div className="absolute inset-0 flex items-center">
-                <div className="container mx-auto px-4 lg:px-8">
+                <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 max-w-[100vw]">
                   <div className="max-w-xl lg:max-w-2xl">
-                    <div className="inline-block bg-white rounded-full px-5 py-2 mb-6 md:mb-8">
-                      <p className="text-[#1a1a1a] text-xs md:text-sm font-medium">
+                    <div className="inline-block bg-white rounded-full px-3 py-1 xs:px-4 xs:py-1.5 sm:px-5 sm:py-2 mb-3 xs:mb-4 sm:mb-6 md:mb-8">
+                      <p className="text-[#1a1a1a] text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-medium">
                         {slide.tag}
                       </p>
                     </div>
 
-                    <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-[1.2] max-w-lg whitespace-pre-line">
+                    <h1 className="text-white text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 xs:mb-3 sm:mb-4 md:mb-6 leading-[1.2] max-w-lg whitespace-pre-line">
                       {slide.title}
                     </h1>
 
-                    <p className="text-white/90 text-sm md:text-base mb-6 md:mb-8 max-w-md leading-relaxed">
+                    <p className="text-white/90 text-[11px] xs:text-xs sm:text-sm md:text-base mb-3 xs:mb-4 sm:mb-6 md:mb-8 max-w-md leading-relaxed">
                       {slide.description}
                     </p>
 
-                    <a href="/collection" className="inline-block bg-[#B8941E] text-white px-6 py-2.5 md:px-8 md:py-3 rounded hover:bg-black transition font-medium text-sm shadow-lg">
+                    <a href="/collection" className="inline-block bg-[#B8941E] text-white px-4 py-1.5 xs:px-5 xs:py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 rounded hover:bg-black transition font-medium text-[11px] xs:text-xs sm:text-sm shadow-lg">
                       Shop Collection
                     </a>
                   </div>

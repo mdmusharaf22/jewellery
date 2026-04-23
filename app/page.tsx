@@ -30,11 +30,11 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen overflow-x-hidden w-full max-w-[100vw]">
       <Header />
       <Hero />
-      <div className="py-12 md:py-16">
-        <div className="w-[98%] mx-auto mb-14 md:mb-18">
+      <div className="py-6 xs:py-8 sm:py-10 md:py-12 lg:py-16 overflow-x-hidden w-full">
+        <div className="w-[98%] mx-auto mb-8 xs:mb-10 sm:mb-12 md:mb-14 lg:mb-18">
           <CategoryCarousel
             title="Shop by Category"
             subtitle="Traditional favourites and everyday essentials curated for Indian families"
@@ -42,7 +42,7 @@ export default function Home() {
             autoplayDelay={4000}
           />
         </div>
-        <div className="w-[98%] mx-auto mb-14 md:mb-18">
+        <div className="w-[98%] mx-auto mb-8 xs:mb-10 sm:mb-12 md:mb-14 lg:mb-18">
           <ProductCarousel
             title="Popular Picks"
             subtitle="Most-loved pieces from our gold and silver collections"
@@ -50,13 +50,13 @@ export default function Home() {
             autoplayDelay={4000}
           />
         </div>
-        <div className="w-[88%] mx-auto mb-14 md:mb-18">
+        <div className="w-[98%] xs:w-[95%] sm:w-[92%] md:w-[88%] mx-auto mb-8 xs:mb-10 sm:mb-12 md:mb-14 lg:mb-18">
           <SavingsScheme />
         </div>
-        <div className="w-[98%] mx-auto mb-14 md:mb-18">
+        <div className="w-[98%] mx-auto mb-8 xs:mb-10 sm:mb-12 md:mb-14 lg:mb-18">
           <NewArrivals />
         </div>
-        <div className="mb-14 md:mb-18">
+        <div className="mb-8 xs:mb-10 sm:mb-12 md:mb-14 lg:mb-18">
           <Craftsmanship />
         </div>
         <div className="w-[100%] mx-auto">

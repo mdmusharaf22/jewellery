@@ -90,7 +90,7 @@ export default function ProductImageGallery({ images, productName, productId, pr
   };
 
   return (
-    <div className="flex gap-4">
+    <div className="flex flex-col sm:flex-row gap-2 xs:gap-3 sm:gap-4 overflow-hidden">
       {toast && (
         <Toast
           message={toast.message}
@@ -100,12 +100,12 @@ export default function ProductImageGallery({ images, productName, productId, pr
       )}
       
       {/* Thumbnail Column */}
-      <div className="flex flex-col gap-3 w-20">
+      <div className="flex sm:flex-col gap-2 sm:gap-3 w-full sm:w-16 md:w-20 overflow-x-auto sm:overflow-x-visible">
         {images.map((image, index) => (
           <button
             key={index}
             onClick={() => setSelectedImage(index)}
-            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
+            className={`relative aspect-square rounded-md sm:rounded-lg overflow-hidden border-2 transition flex-shrink-0 w-16 sm:w-full ${
               selectedImage === index ? 'border-[#B8941E]' : 'border-gray-200 hover:border-gray-300'
             }`}
           >
@@ -114,7 +114,7 @@ export default function ProductImageGallery({ images, productName, productId, pr
               alt={`${productName} view ${index + 1}`}
               fill
               className="object-cover"
-              sizes="80px"
+              sizes="(max-width: 640px) 64px, 80px"
               unoptimized
             />
           </button>
@@ -122,7 +122,7 @@ export default function ProductImageGallery({ images, productName, productId, pr
       </div>
 
       {/* Main Image - 1:1 Ratio */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-w-0">
         <div 
           ref={imageRef}
           className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-crosshair"
@@ -135,7 +135,7 @@ export default function ProductImageGallery({ images, productName, productId, pr
             alt={productName}
             fill
             className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 50vw"
             priority
             unoptimized
           />
@@ -143,22 +143,22 @@ export default function ProductImageGallery({ images, productName, productId, pr
           {/* Navigation Arrows */}
           <button 
             onClick={handlePrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10 cursor-pointer"
+            className="absolute left-2 xs:left-3 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10 cursor-pointer"
           >
-            <ChevronLeft className="w-6 h-6 text-gray-700" />
+            <ChevronLeft className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-gray-700" />
           </button>
           
           <button 
             onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10 cursor-pointer"
+            className="absolute right-2 xs:right-3 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition z-10 cursor-pointer"
           >
-            <ChevronRight className="w-6 h-6 text-gray-700" />
+            <ChevronRight className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-gray-700" />
           </button>
 
           {/* Wishlist Button */}
           <button 
             onClick={handleToggleWishlist}
-            className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition z-10 cursor-pointer ${
+            className={`absolute top-2 xs:top-3 sm:top-4 right-2 xs:right-3 sm:right-4 w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition z-10 cursor-pointer ${
               isInWishlist 
                 ? 'bg-red-500 hover:bg-red-600' 
                 : 'bg-white hover:bg-gray-50'
@@ -166,33 +166,33 @@ export default function ProductImageGallery({ images, productName, productId, pr
           >
             {isInWishlist ? (
               // Filled solid heart
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2">
+              <svg className="w-4 h-4 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             ) : (
               // Outline heart
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-4 h-4 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             )}
           </button>
 
           {/* Image Indicator Dots */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          <div className="absolute bottom-2 xs:bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2 z-10">
             {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
-                className={`w-2 h-2 rounded-full transition ${
-                  selectedImage === index ? 'bg-[#B8941E] w-6' : 'bg-white/70'
+                className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition ${
+                  selectedImage === index ? 'bg-[#B8941E] w-4 sm:w-6' : 'bg-white/70'
                 }`}
               />
             ))}
           </div>
 
-          {/* Hover text */}
+          {/* Hover text - Hidden on mobile */}
           {!showZoom && (
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded pointer-events-none">
+            <div className="hidden sm:block absolute bottom-10 sm:bottom-12 left-1/2 -translate-x-1/2 bg-black/70 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded pointer-events-none">
               Hover to zoom
             </div>
           )}

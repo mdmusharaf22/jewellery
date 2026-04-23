@@ -94,12 +94,12 @@ export default function Testimonials() {
   }
 
   return (
-    <section className="py-16 md:py-20 bg-[#F5F1E8]">
-      <div className="w-[90%] mx-auto px-4 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-[#1a1a1a]">
+    <section className="py-10 sm:py-12 md:py-16 lg:py-20 bg-[#F5F1E8] overflow-hidden">
+      <div className="w-[95%] sm:w-[90%] mx-auto px-4 lg:px-8 max-w-[100vw]">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 text-[#1a1a1a]">
           Why families come back to us
         </h2>
-        <p className="text-center text-gray-600 mb-12 md:mb-16 max-w-3xl mx-auto text-sm md:text-base">
+        <p className="text-center text-gray-600 mb-8 sm:mb-10 md:mb-12 lg:mb-16 max-w-3xl mx-auto text-xs sm:text-sm md:text-base">
           A more premium testimonial presentation with subtle gold highlights and stronger visual trust.
         </p>
 
@@ -179,7 +179,7 @@ export default function Testimonials() {
           ))}
         </Swiper>
 
-        <p className="text-center text-gray-700 mt-12 md:mt-16 max-w-3xl mx-auto text-sm md:text-base">
+        <p className="text-center text-gray-700 mt-8 sm:mt-10 md:mt-12 lg:mt-16 max-w-3xl mx-auto text-xs sm:text-sm md:text-base">
           Trusted by families for wedding jewellery, silver gifting, savings plans and 
           transparent gold loan assistance.
         </p>

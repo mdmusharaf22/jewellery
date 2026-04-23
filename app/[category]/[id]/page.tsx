@@ -90,21 +90,21 @@ export default function ProductDetailPage() {
       <Header />
       
       {/* Breadcrumb */}
-      <div className="bg-gray-50 py-4">
-        <div className="w-[90%] mx-auto px-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <a href="/" className="hover:text-[#B8941E] transition">Home</a>
-            <span>•</span>
-            <a href={`/${product.category}`} className="hover:text-[#B8941E] transition">{categoryName}</a>
-            <span>•</span>
-            <span className="text-gray-900">{product.name}</span>
+      <div className="bg-gray-50 py-3 sm:py-4 overflow-hidden">
+        <div className="w-[95%] sm:w-[90%] mx-auto px-2 xs:px-3 sm:px-4 max-w-[100vw]">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 overflow-x-auto whitespace-nowrap">
+            <a href="/" className="hover:text-[#B8941E] transition flex-shrink-0">Home</a>
+            <span className="flex-shrink-0">•</span>
+            <a href={`/${product.category}`} className="hover:text-[#B8941E] transition flex-shrink-0">{categoryName}</a>
+            <span className="flex-shrink-0">•</span>
+            <span className="text-gray-900 truncate">{product.name}</span>
           </div>
         </div>
       </div>
 
       {/* Product Section */}
-      <div className="w-[90%] mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div className="w-[95%] sm:w-[90%] mx-auto px-2 xs:px-3 sm:px-4 py-4 xs:py-6 sm:py-8 max-w-[100vw] overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 xs:gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Left: Image Gallery - Sticky */}
           <div className="lg:sticky lg:top-4 lg:self-start">
             <ProductImageGallery 
@@ -140,10 +140,10 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Horizontal Line */}
-        <div className="border-t border-gray-200 mb-8"></div>
+        <div className="border-t border-gray-200 mb-6 sm:mb-8"></div>
 
         {/* Product Details */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <ProductDetails 
             productInfo={product.productInfo}
             metalDimensions={product.metalDimensions}
@@ -151,15 +151,15 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Horizontal Line */}
-        <div className="border-t border-gray-200 mb-8"></div>
+        <div className="border-t border-gray-200 mb-6 sm:mb-8"></div>
 
         {/* Price Breakup */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <PriceBreakup priceBreakup={product.priceBreakup} />
         </div>
 
         {/* Delivery & Returns */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <DeliveryReturns />
         </div>
 
