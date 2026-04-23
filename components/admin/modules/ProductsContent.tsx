@@ -7,6 +7,7 @@ import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 import Toast from '@/components/admin/Toast';
 import {
   getProducts,
+  getProduct,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -38,6 +39,7 @@ export default function ProductsContent() {
     setLoading(true);
     try {
       const data = await getProducts();
+      console.log('Fetched products:', data);
       setProducts(data);
     } catch {
       showToast('Failed to load products', 'error');
@@ -57,10 +59,17 @@ export default function ProductsContent() {
     setModalOpen(true);
   };
 
-  const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-    setModalMode('edit');
-    setModalOpen(true);
+  const handleEdit = async (product: Product) => {
+    try {
+      // Fetch full product details using slug
+      const slug = product.slug || product.id;
+      const fullProduct = await getProduct(slug);
+      setSelectedProduct(fullProduct);
+      setModalMode('edit');
+      setModalOpen(true);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to load product details', 'error');
+    }
   };
 
   const handleDeleteClick = (product: Product) => {
@@ -68,17 +77,14 @@ export default function ProductsContent() {
     setDeleteModalOpen(true);
   };
 
-  const handleModalSubmit = async (data: {
-    name: string;
-    base_weight?: number;
-    is_featured: boolean;
-    is_customizable: boolean;
-  }) => {
+  const handleModalSubmit = async (data: any) => {
     if (modalMode === 'create') {
-      await createProduct(data);
+      const result = await createProduct(data);
+      console.log('Created product result:', result);
       showToast('Product created successfully', 'success');
     } else if (selectedProduct) {
-      await updateProduct(selectedProduct.id, data);
+      const result = await updateProduct(selectedProduct.id, data);
+      console.log('Updated product result:', result);
       showToast('Product updated successfully', 'success');
     }
     await fetchProducts();
@@ -123,29 +129,43 @@ export default function ProductsContent() {
       key: 'is_featured',
       label: 'Featured',
       sortable: false,
-      render: (value: boolean) => (
-        <span
-          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            value ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          {value ? 'Yes' : 'No'}
-        </span>
-      ),
+      render: (value: any) => {
+        const isTrue = value === true || value === 1 || value === '1';
+        return (
+          <span
+            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+              isTrue ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            {isTrue ? 'Yes' : 'No'}
+          </span>
+        );
+      },
     },
     {
       key: 'is_customizable',
       label: 'Customizable',
       sortable: false,
-      render: (value: boolean) => (
-        <span
-          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            value ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          {value ? 'Yes' : 'No'}
-        </span>
-      ),
+      render: (value: any, row: any) => {
+        // Check if the field exists in the response
+        if (value === undefined || value === null) {
+          return (
+            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-500">
+              N/A
+            </span>
+          );
+        }
+        const isTrue = value === true || value === 1 || value === '1';
+        return (
+          <span
+            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+              isTrue ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            {isTrue ? 'Yes' : 'No'}
+          </span>
+        );
+      },
     },
   ];
 

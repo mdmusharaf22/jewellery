@@ -8,6 +8,24 @@ interface RequestOptions extends RequestInit {
   requiresAuth?: boolean;
 }
 
+// Helper function to handle 401 responses
+export function handleUnauthorized() {
+  if (typeof window !== 'undefined') {
+    const adminToken = sessionStorage.getItem('admin_access_token');
+    const customerToken = localStorage.getItem('customer_token');
+    
+    if (adminToken) {
+      // Admin session expired
+      sessionStorage.removeItem('admin_access_token');
+      window.location.href = '/admin/login';
+    } else if (customerToken) {
+      // Customer session expired
+      localStorage.removeItem('customer_token');
+      window.location.href = '/login';
+    }
+  }
+}
+
 export async function apiRequest(
   endpoint: string,
   options: RequestOptions = {}
@@ -34,6 +52,12 @@ export async function apiRequest(
       ...restOptions,
       headers: requestHeaders,
     });
+
+    // Handle 401 Unauthorized - session expired
+    if (response.status === 401) {
+      handleUnauthorized();
+      throw new Error('Session expired. Please login again.');
+    }
 
     const data = await response.json();
 

@@ -5,6 +5,7 @@ import DataTable from '@/components/admin/DataTable';
 import CategoryModal from '@/components/admin/CategoryModal';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 import AdminToast from '@/components/admin/Toast';
+import { handleUnauthorized } from '@/lib/api';
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL;
 const getToken = () =>
@@ -41,6 +42,12 @@ export default function CategoriesContent() {
       const res = await fetch(`${API}/categories?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      
       const data = await res.json();
       if (data.success && data.data) {
         // API returns nested: parent_id === null are top-level
@@ -64,6 +71,12 @@ export default function CategoriesContent() {
       const res = await fetch(`${API}/categories?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      
       const data = await res.json();
       if (data.success && data.data) {
         const allChildren: any[] = [];
@@ -93,6 +106,12 @@ export default function CategoriesContent() {
       const res = await fetch(`${API}/categories?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      
       const data = await res.json();
       if (data.success && data.data) {
         // Collect all children across the flat+nested response
@@ -134,6 +153,12 @@ export default function CategoriesContent() {
       },
       body: JSON.stringify(payload),
     });
+    
+    if (res.status === 401) {
+      handleUnauthorized();
+      return;
+    }
+    
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to create');
 
@@ -158,6 +183,12 @@ export default function CategoriesContent() {
       },
       body: JSON.stringify(payload),
     });
+    
+    if (res.status === 401) {
+      handleUnauthorized();
+      return;
+    }
+    
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to update');
 
@@ -180,6 +211,12 @@ export default function CategoriesContent() {
         const res = await fetch(`${API}/categories?t=${Date.now()}`, {
           headers: { Authorization: `Bearer ${getToken()}` },
         });
+        
+        if (res.status === 401) {
+          handleUnauthorized();
+          return;
+        }
+        
         const data = await res.json();
         
         if (data.success && data.data) {
@@ -205,6 +242,12 @@ export default function CategoriesContent() {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to delete');
 

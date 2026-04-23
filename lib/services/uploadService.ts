@@ -1,6 +1,7 @@
 // Upload Service - API calls for image upload/remove
 
 import { getAccessToken } from '../auth';
+import { handleUnauthorized } from '../api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -24,6 +25,11 @@ export const uploadImage = async (file: File): Promise<UploadResponse> => {
     body: formData,
   });
 
+  if (response.status === 401) {
+    handleUnauthorized();
+    throw new Error('Session expired. Please login again.');
+  }
+
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Upload failed');
   return data.data ?? data;
@@ -41,6 +47,11 @@ export const removeImage = async (url: string): Promise<void> => {
     },
     body: JSON.stringify({ url }),
   });
+
+  if (response.status === 401) {
+    handleUnauthorized();
+    throw new Error('Session expired. Please login again.');
+  }
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Remove failed');
