@@ -114,6 +114,10 @@ export default function Testimonials() {
           }}
           loop={true}
           breakpoints={{
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 24,
+            },
             768: {
               slidesPerView: 2,
               spaceBetween: 32,
@@ -128,48 +132,48 @@ export default function Testimonials() {
         >
           {testimonials.map((testimonial, index) => (
             <SwiperSlide key={index} style={{ height: 'auto', display: 'flex' }}>
-              <div className="bg-white rounded-2xl p-8 md:p-10 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group flex flex-col w-full">
-                <div className="flex items-center justify-between mb-8" style={{ minHeight: '48px' }}>
-                  <div className="flex gap-1">
+              <div className="bg-white rounded-xl sm:rounded-2xl p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group flex flex-col w-full">
+                <div className="flex items-center justify-between mb-4 xs:mb-5 sm:mb-6 md:mb-8" style={{ minHeight: '32px' }}>
+                  <div className="flex gap-0.5 xs:gap-1">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star 
                         key={i} 
-                        className="w-5 h-5 text-[#B8941E]" 
+                        className="w-4 h-4 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5 text-[#B8941E]" 
                         fill="none"
                         strokeWidth={2}
                       />
                     ))}
                   </div>
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#F5F1E8]">
-                    <Quote className="w-7 h-7 text-[#C9A961]" strokeWidth={2} />
+                  <div className="flex items-center justify-center w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-[#F5F1E8]">
+                    <Quote className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 text-[#C9A961]" strokeWidth={2} />
                   </div>
                 </div>
-                <div className="flex-grow mb-8">
-                  <p className="text-gray-700 text-sm md:text-base leading-relaxed">
+                <div className="flex-grow mb-4 xs:mb-5 sm:mb-6 md:mb-8">
+                  <p className="text-gray-700 text-xs xs:text-sm sm:text-base leading-relaxed">
                     "{testimonial.text}"
                   </p>
                 </div>
-                <div className="border-t border-gray-200 mb-6"></div>
-                <div className="flex items-center gap-3" style={{ minHeight: '56px' }}>
-                  <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
+                <div className="border-t border-gray-200 mb-3 xs:mb-4 sm:mb-5 md:mb-6"></div>
+                <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3" style={{ minHeight: '48px' }}>
+                  <div className="relative w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden flex-shrink-0">
                     <Image
                       src={testimonial.avatar}
                       alt={testimonial.name}
                       fill
                       className="object-cover"
-                      sizes="56px"
+                      sizes="(max-width: 640px) 40px, 56px"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-[#1a1a1a] text-base truncate">{testimonial.name}</p>
-                      <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none">
+                    <div className="flex items-center gap-1.5 xs:gap-2">
+                      <p className="font-bold text-[#1a1a1a] text-xs xs:text-sm sm:text-base truncate">{testimonial.name}</p>
+                      <svg className="w-4 h-4 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="10" fill="#B8941E"/>
                         <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
-                      <MapPin className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
+                      <MapPin className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
                       <span className="truncate">{testimonial.location}</span>
                     </div>
                   </div>

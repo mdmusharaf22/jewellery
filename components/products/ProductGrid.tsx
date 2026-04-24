@@ -122,19 +122,19 @@ export default function ProductGrid({
       )}
 
       {/* Results Count and Controls in One Line */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         {/* Results Count */}
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-xs sm:text-sm">
           Showing <span className="font-semibold">{startIndex + 1}-{Math.min(endIndex, caratFilteredProducts.length)}</span> of <span className="font-semibold">{caratFilteredProducts.length}</span> Results
         </p>
 
         {/* Sort and View Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
           {/* Sort Dropdown */}
           <select
             value={sortBy}
             onChange={(e) => {}}
-            className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#B8941E] cursor-pointer"
+            className="flex-1 sm:flex-none px-2 xs:px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#B8941E] cursor-pointer"
           >
             <option value="featured">Sort By: Featured</option>
             <option value="price-low">Price: Low to High</option>
@@ -144,30 +144,30 @@ export default function ProductGrid({
           </select>
 
           {/* View Toggle */}
-          <div className="flex gap-2 border border-gray-300 rounded-lg p-1">
+          <div className="flex gap-1 sm:gap-2 border border-gray-300 rounded-lg p-0.5 sm:p-1">
             <button
               onClick={() => onViewModeChange?.('grid')}
-              className={`p-2 rounded transition cursor-pointer ${
+              className={`p-1.5 sm:p-2 rounded transition cursor-pointer ${
                 viewMode === 'grid'
                   ? 'bg-[#B8941E] text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
               title="Grid View"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
             </button>
             <button
               onClick={() => onViewModeChange?.('list')}
-              className={`p-2 rounded transition cursor-pointer ${
+              className={`p-1.5 sm:p-2 rounded transition cursor-pointer ${
                 viewMode === 'list'
                   ? 'bg-[#B8941E] text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
               title="List View"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -177,8 +177,8 @@ export default function ProductGrid({
 
       {/* Products Grid/List */}
       <div className={viewMode === 'grid' 
-        ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12'
-        : 'flex flex-col gap-6 mb-12'
+        ? 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6 mb-8 sm:mb-12'
+        : 'flex flex-col gap-4 sm:gap-6 mb-8 sm:mb-12'
       }>
         {currentProducts.map((product) => (
           <ProductCard

@@ -148,7 +148,7 @@ export default function Header() {
               {/* Search Icon */}
               <button 
                 onClick={() => setSearchOpen(true)}
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition"
+                className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition"
                 aria-label="Search"
               >
                 <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
@@ -157,7 +157,7 @@ export default function Header() {
               {/* User Icon */}
               <Link 
                 href={isAuthenticated ? "/dashboard" : "/login"}
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition"
+                className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition"
                 aria-label="Account"
               >
                 <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
@@ -166,29 +166,25 @@ export default function Header() {
               {/* Wishlist Icon */}
               <Link 
                 href="/wishlist"
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition relative"
+                className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition relative"
                 aria-label="Wishlist"
               >
                 <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-red-500 text-white text-[9px] sm:text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
+                <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-red-500 text-white text-[8px] sm:text-[10px] md:text-xs font-bold rounded-full w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
               </Link>
 
               {/* Cart Icon */}
               <Link 
                 href="/cart"
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition relative"
+                className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition relative"
                 aria-label="Shopping Cart"
               >
                 <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-red-500 text-white text-[9px] sm:text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
+                <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 bg-red-500 text-white text-[8px] sm:text-[10px] md:text-xs font-bold rounded-full w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
               </Link>
 
               {/* Store Location Icon - Hidden on small screens */}
@@ -202,7 +198,7 @@ export default function Header() {
 
               {/* Mobile Menu Button */}
               <button
-                className="lg:hidden p-1.5 sm:p-2"
+                className="lg:hidden p-1 sm:p-1.5 md:p-2"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">

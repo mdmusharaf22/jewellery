@@ -46,10 +46,10 @@ export default function WishlistPage() {
         />
       )}
 
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className={`bg-gray-50 py-6 xs:py-8 sm:py-10 md:py-12 ${items.length === 0 ? 'pb-12 xs:pb-16 sm:pb-20' : 'min-h-screen'}`}>
         <div className="w-[90%] mx-auto">
           {/* Breadcrumb */}
-          <div className="mb-6">
+          <div className="mb-4 xs:mb-5 sm:mb-6">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <a href="/" className="hover:text-[#B8941E] transition">Home</a>
               <span>•</span>
@@ -57,19 +57,19 @@ export default function WishlistPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>
-            <p className="text-gray-600">{items.length} items</p>
+          <div className="flex items-center justify-between mb-4 xs:mb-6 sm:mb-8">
+            <h1 className="text-2xl xs:text-2xl sm:text-3xl font-bold text-gray-900">My Wishlist</h1>
+            <p className="text-sm xs:text-base text-gray-600">{items.length} items</p>
           </div>
 
           {items.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-              <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Your wishlist is empty</h2>
-              <p className="text-gray-600 mb-6">Save your favorite items here!</p>
+            <div className="bg-white rounded-lg shadow-sm p-6 xs:p-8 sm:p-10 md:p-12 text-center">
+              <Heart className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 xs:mb-4" />
+              <h2 className="text-xl xs:text-2xl font-bold text-gray-900 mb-2">Your wishlist is empty</h2>
+              <p className="text-sm xs:text-base text-gray-600 mb-4 xs:mb-6">Save your favorite items here!</p>
               <a
                 href="/products"
-                className="inline-block bg-[#B8941E] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#9a7a19] transition"
+                className="inline-block bg-[#B8941E] text-white px-6 xs:px-8 py-2.5 xs:py-3 rounded-lg text-sm xs:text-base font-semibold hover:bg-[#9a7a19] transition"
               >
                 Explore Products
               </a>

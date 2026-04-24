@@ -90,27 +90,27 @@ export default function ProductFilters({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {/* Categories Section */}
         <div className="border-b border-gray-200">
           <button
             onClick={() => toggleSection('categories')}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition"
+            className="w-full px-3 xs:px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-gray-50 transition"
           >
-            <h3 className="text-lg font-bold text-[#1a1a1a]">Categories</h3>
+            <h3 className="text-base sm:text-lg font-bold text-[#1a1a1a]">Categories</h3>
             {expandedSections.categories ? (
-              <ChevronUp className="w-5 h-5 text-gray-600" />
+              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-600" />
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             )}
           </button>
           
           {expandedSections.categories && (
-            <div className="px-6 pb-4">
+            <div className="px-3 xs:px-4 sm:px-6 pb-3 sm:pb-4">
               {/* Gold Section */}
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-gray-900 mb-2">Gold Jewels</h4>
-                <div className="space-y-2">
+              <div className="mb-3 sm:mb-4">
+                <h4 className="text-xs sm:text-sm font-semibold text-gray-900 mb-1.5 sm:mb-2">Gold Jewels</h4>
+                <div className="space-y-1.5 sm:space-y-2">
                   {goldCategories.map((category) => (
                     <label key={category.value} className="flex items-center cursor-pointer group">
                       <input
@@ -119,9 +119,9 @@ export default function ProductFilters({
                         value={category.value}
                         checked={selectedCategory === category.value}
                         onChange={() => handleCategoryChange(category.value)}
-                        className="w-4 h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
+                        className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
                       />
-                      <span className="ml-3 text-sm text-gray-700 group-hover:text-[#B8941E] transition">
+                      <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 group-hover:text-[#B8941E] transition">
                         {category.label}
                       </span>
                     </label>
@@ -131,8 +131,8 @@ export default function ProductFilters({
 
               {/* Silver Section */}
               <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-2">Silver Jewels</h4>
-                <div className="space-y-2">
+                <h4 className="text-xs sm:text-sm font-semibold text-gray-900 mb-1.5 sm:mb-2">Silver Jewels</h4>
+                <div className="space-y-1.5 sm:space-y-2">
                   {silverCategories.map((category) => (
                     <label key={category.value} className="flex items-center cursor-pointer group">
                       <input
@@ -141,9 +141,9 @@ export default function ProductFilters({
                         value={category.value}
                         checked={selectedCategory === category.value}
                         onChange={() => handleCategoryChange(category.value)}
-                        className="w-4 h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
+                        className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
                       />
-                      <span className="ml-3 text-sm text-gray-700 group-hover:text-[#B8941E] transition">
+                      <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 group-hover:text-[#B8941E] transition">
                         {category.label}
                       </span>
                     </label>
@@ -158,20 +158,20 @@ export default function ProductFilters({
         <div className="border-b border-gray-200">
           <button
             onClick={() => toggleSection('priceRange')}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition"
+            className="w-full px-3 xs:px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-gray-50 transition"
           >
-            <h3 className="text-lg font-bold text-[#1a1a1a]">Price</h3>
+            <h3 className="text-base sm:text-lg font-bold text-[#1a1a1a]">Price</h3>
             {expandedSections.priceRange ? (
-              <ChevronUp className="w-5 h-5 text-gray-600" />
+              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-600" />
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             )}
           </button>
           
           {expandedSections.priceRange && (
-            <div className="px-6 pb-6">
+            <div className="px-3 xs:px-4 sm:px-6 pb-4 sm:pb-6">
               {/* Range Slider Container */}
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <div className="relative h-2">
                   {/* Background track */}
                   <div className="absolute w-full h-2 bg-gray-200 rounded-full" />
@@ -196,7 +196,7 @@ export default function ProductFilters({
                       ...prev, 
                       min: Math.min(Number(e.target.value), prev.max - 5000) 
                     }))}
-                    className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#B8941E] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-3 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#B8941E] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-3 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md"
+                    className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 sm:[&::-webkit-slider-thumb]:w-5 sm:[&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#B8941E] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-3 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 sm:[&::-moz-range-thumb]:w-5 sm:[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#B8941E] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-3 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md"
                     style={{ zIndex: tempPriceRange.min > 500000 - 100000 ? 5 : 3 }}
                   />
                   
@@ -211,7 +211,7 @@ export default function ProductFilters({
                       ...prev, 
                       max: Math.max(Number(e.target.value), prev.min + 5000) 
                     }))}
-                    className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#B8941E] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-3 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#B8941E] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-3 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md"
+                    className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 sm:[&::-webkit-slider-thumb]:w-5 sm:[&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#B8941E] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-3 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 sm:[&::-moz-range-thumb]:w-5 sm:[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#B8941E] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-3 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md"
                     style={{ zIndex: 4 }}
                   />
                 </div>
@@ -219,7 +219,7 @@ export default function ProductFilters({
 
               {/* Price Display */}
               <div className="text-center">
-                <p className="text-sm text-gray-700">
+                <p className="text-xs sm:text-sm text-gray-700">
                   Price: <span className="text-[#B8941E] font-semibold">{formatPrice(tempPriceRange.min)} — {formatPrice(tempPriceRange.max)}</span>
                 </p>
               </div>
@@ -231,18 +231,18 @@ export default function ProductFilters({
         <div className="border-b border-gray-200">
           <button
             onClick={() => toggleSection('carat')}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition"
+            className="w-full px-3 xs:px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-gray-50 transition"
           >
-            <h3 className="text-lg font-bold text-[#1a1a1a]">Carat</h3>
+            <h3 className="text-base sm:text-lg font-bold text-[#1a1a1a]">Carat</h3>
             {expandedSections.carat ? (
-              <ChevronUp className="w-5 h-5 text-gray-600" />
+              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-600" />
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             )}
           </button>
           
           {expandedSections.carat && (
-            <div className="px-6 pb-4 space-y-2">
+            <div className="px-3 xs:px-4 sm:px-6 pb-3 sm:pb-4 space-y-1.5 sm:space-y-2">
               {caratOptions.map((carat) => (
                 <label key={carat.value} className="flex items-center cursor-pointer group">
                   <input
@@ -251,9 +251,9 @@ export default function ProductFilters({
                     value={carat.value}
                     checked={selectedCarat === carat.value}
                     onChange={() => onCaratChange(carat.value)}
-                    className="w-4 h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
                   />
-                  <span className="ml-3 text-sm text-gray-700 group-hover:text-[#B8941E] transition">
+                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 group-hover:text-[#B8941E] transition">
                     {carat.label}
                   </span>
                 </label>

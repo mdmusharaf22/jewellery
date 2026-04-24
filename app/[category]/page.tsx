@@ -49,7 +49,7 @@ export default function CategoryPage() {
       
       {/* Hero Banner */}
       <section 
-        className="relative h-[200px] flex items-center justify-center overflow-hidden"
+        className="relative h-[150px] xs:h-[180px] sm:h-[200px] flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: 'url(https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1920&h=400&fit=crop&q=80)',
           backgroundSize: 'cover',
@@ -58,22 +58,22 @@ export default function CategoryPage() {
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40" />
-        <div className="relative z-10 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-bold">All Products</h1>
+        <div className="relative z-10 text-center text-white px-4">
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold">All Products</h1>
         </div>
       </section>
 
       {/* Main Content */}
-      <div className="bg-white">
-        <div className="container mx-auto px-4 py-12">
-          <div className="flex flex-col lg:flex-row gap-8">
+      <div className="bg-white overflow-hidden">
+        <div className="container mx-auto px-2 xs:px-3 sm:px-4 py-4 sm:py-6 md:py-8 max-w-[100vw]">
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8">
             {/* Sidebar Filters */}
             <aside className="lg:w-1/4">
               {/* Breadcrumb */}
-              <div className="mb-6">
-                <p className="text-sm text-gray-600">
+              <div className="mb-4 sm:mb-6">
+                <p className="text-xs sm:text-sm text-gray-600">
                   <a href="/" className="hover:text-[#B8941E] transition cursor-pointer">Home</a>
-                  <span className="mx-2">•</span>
+                  <span className="mx-1.5 sm:mx-2">•</span>
                   <span className="text-gray-900">Products</span>
                 </p>
               </div>
@@ -108,8 +108,8 @@ export default function CategoryPage() {
       </div>
 
       {/* Sections with same spacing as home page */}
-      <div className="py-12 md:py-16 bg-white">
-        <div className="w-[98%] mx-auto mb-14 md:mb-18">
+      <div className="py-2 sm:py-2 md:py-6 bg-white">
+        <div className="w-[98%] mx-auto mb-4 sm:mb-4 md:mb-10">
           <TrustBadges />
         </div>
         <div className="w-[100%] mx-auto">

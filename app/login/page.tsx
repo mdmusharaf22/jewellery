@@ -62,7 +62,7 @@ export default function LoginPage() {
         phone: customer.phone || customer.phone_number || '',
       }));
 
-      router.push('/');
+      router.push('/my-account');
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
@@ -74,27 +74,27 @@ export default function LoginPage() {
     <>
       <Header />
 
-      <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
-        <div className="w-[90%] max-w-md">
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Login</h1>
-              <p className="text-gray-600">Enter your credentials to access your account</p>
+      <div className="min-h-screen bg-gray-50 py-6 xs:py-8 sm:py-10 md:py-12 flex items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-5 xs:p-6 sm:p-8 md:p-12">
+            <div className="mb-5 xs:mb-6 sm:mb-8">
+              <h1 className="text-2xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-1.5 xs:mb-2">Login</h1>
+              <p className="text-gray-600 text-sm xs:text-base">Enter your credentials to access your account</p>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              <div className="mb-4 xs:mb-5 sm:mb-6 p-3 xs:p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs xs:text-sm">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 xs:space-y-5 sm:space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1.5 xs:mb-2">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Mail className="absolute left-2.5 xs:left-3 top-1/2 -translate-y-1/2 w-4 h-4 xs:w-5 xs:h-5 text-gray-400" />
                   <input
                     type="email"
                     name="email"
@@ -102,17 +102,17 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     required
                     placeholder="your@email.com"
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none"
+                    className="w-full pl-9 xs:pl-10 pr-3 xs:pr-4 py-2.5 xs:py-3 text-sm xs:text-base border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1.5 xs:mb-2">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="absolute left-2.5 xs:left-3 top-1/2 -translate-y-1/2 w-4 h-4 xs:w-5 xs:h-5 text-gray-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
@@ -120,14 +120,14 @@ export default function LoginPage() {
                     onChange={handleInputChange}
                     required
                     placeholder="Enter your password"
-                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none"
+                    className="w-full pl-9 xs:pl-10 pr-10 xs:pr-12 py-2.5 xs:py-3 text-sm xs:text-base border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2.5 xs:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <EyeOff className="w-4 h-4 xs:w-5 xs:h-5" /> : <Eye className="w-4 h-4 xs:w-5 xs:h-5" />}
                   </button>
                 </div>
               </div>
@@ -135,10 +135,10 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#B8941E] text-white py-3 rounded-lg font-semibold hover:bg-[#9a7a19] transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-[#B8941E] text-white py-2.5 xs:py-3 rounded-lg text-sm xs:text-base font-semibold hover:bg-[#9a7a19] transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading && (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-4 w-4 xs:h-5 xs:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
@@ -147,7 +147,7 @@ export default function LoginPage() {
               </button>
 
               <div className="text-center">
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-xs xs:text-sm sm:text-base">
                   Don't have an account?{' '}
                   <a href="/register" className="text-[#B8941E] font-semibold hover:underline">
                     Register here
