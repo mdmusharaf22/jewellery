@@ -48,9 +48,9 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 flex flex-col`}>
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 flex flex-col flex-shrink-0`}>
         {/* Logo/Brand */}
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center justify-between">
@@ -188,7 +188,7 @@ export default function AdminDashboard() {
           
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-600 transition mt-2 ${!sidebarOpen && 'justify-center'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition mt-2 ${!sidebarOpen && 'justify-center'}`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
           </button>
 
           {sidebarOpen && adminUser && (
-            <div className="flex items-center space-x-3 px-4 py-3 mt-2">
+            <div className="flex items-center space-x-3 px-4 py-3 mt-2 bg-gray-800 rounded-lg">
               <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-semibold">
                   {adminUser.email?.[0]?.toUpperCase() || 'A'}
@@ -213,9 +213,9 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+        <header className="bg-white shadow-sm border-b flex-shrink-0 z-10">
           <div className="px-8 py-4">
             <div className="flex justify-between items-center">
               <div>
@@ -249,15 +249,17 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* Content */}
-        <div className="p-8">
-          {activeSection === 'dashboard' && <DashboardContent />}
-          {activeSection === 'categories' && <CategoriesContent />}
-          {activeSection === 'products' && <ProductsContent />}
-          {activeSection === 'orders' && <OrdersContent />}
-          {activeSection === 'customers' && <CustomersContent />}
-          {activeSection === 'settings' && <SettingsContent />}
-          {activeSection === 'uploads' && <UploadsContent />}
+        {/* Content - Single scroll area */}
+        <div className="flex-1 overflow-y-auto bg-gray-100">
+          <div className="p-8 min-h-full">
+            {activeSection === 'dashboard' && <DashboardContent />}
+            {activeSection === 'categories' && <CategoriesContent />}
+            {activeSection === 'products' && <ProductsContent />}
+            {activeSection === 'orders' && <OrdersContent />}
+            {activeSection === 'customers' && <CustomersContent />}
+            {activeSection === 'settings' && <SettingsContent />}
+            {activeSection === 'uploads' && <UploadsContent />}
+          </div>
         </div>
       </main>
     </div>

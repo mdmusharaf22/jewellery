@@ -318,6 +318,8 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Only validate name and base weight
     if (!name.trim()) {
       setError('Product name is required');
       return;
@@ -326,81 +328,66 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
       setError('Base weight is required and must be greater than 0');
       return;
     }
+    
     setLoading(true);
     try {
-      // Build JSON payload
+      // Auto-upload any pending images before submitting
+      if (images.length > 0) {
+        console.log('Auto-uploading images...');
+        await handleUploadImages();
+      }
+      
+      // Auto-upload any pending videos before submitting
+      if (videos.length > 0) {
+        console.log('Auto-uploading videos...');
+        await handleUploadVideos();
+      }
+      // Build JSON payload to match your API structure exactly
       const payload: any = {
         name: name.trim(),
+        description: description || "",
+        short_description: shortDescription || "",
+        base_weight: parseFloat(baseWeight),
+        category_id: categoryId || "",
+        is_customizable: isCustomizable,
+        is_featured: isFeatured,
+        length_metric: lengthMetric || "",
+        seo_title: seoTitle || "",
+        seo_description: seoDescription || "",
+        metal_type: metalType || "gold", // Default to "gold" since API expects 'gold' | 'silver'
+        making_charges: makingCharges ? parseFloat(makingCharges) : 0,
+        wastage: wastage ? parseFloat(wastage) : 0,
+        gst_percentage: gst ? parseFloat(gst) : 0,
+        gemstone_value: gemstoneValue ? parseFloat(gemstoneValue) : 0,
+        // Images array with is_primary flag
+        images: imageUrls.length > 0 ? imageUrls.map((img, index) => ({
+          url: img.url,
+          is_primary: index === 0 // First image is primary
+        })) : [],
+        // Videos array
+        videos: videoUrls.length > 0 ? videoUrls : [],
+        // Length array - convert comma-separated string to array of numbers
+        length: lengths.trim() ? lengths.split(',')
+          .map(l => parseFloat(l.trim()))
+          .filter(n => !isNaN(n)) : [],
+        // Features array - convert to key-value format as per your API
+        features: features.filter(f => f.key.trim() && f.value.trim()).map(f => ({
+          key: f.key.trim(),
+          value: f.value.trim()
+        })),
+        // Information array - keep as key-value pairs
+        information: information.filter(i => i.key.trim() && i.value.trim()),
+        // Dimensions array - keep as key-value pairs
+        dimensions: dimensions.filter(d => d.key.trim() && d.value.trim())
       };
-
-      if (description) payload.description = description;
-      if (shortDescription) payload.short_description = shortDescription;
-      if (categoryId) payload.category_id = categoryId;
-      if (baseWeight) payload.base_weight = parseFloat(baseWeight);
-      if (lengthMetric) payload.length_metric = lengthMetric;
-      if (seoTitle) payload.seo_title = seoTitle;
-      if (seoDescription) payload.seo_description = seoDescription;
-      if (cachedPrice) payload.cached_price = parseFloat(cachedPrice);
       
-      // Price calculator fields
-      if (metalType) payload.metal_type = metalType;
-      if (makingCharges) payload.making_charges = parseFloat(makingCharges) || 0;
-      if (gemstoneValue) payload.gemstone_value = parseFloat(gemstoneValue) || 0;
-      if (wastage) payload.wastage = parseFloat(wastage) || 0;
-      if (gst) payload.gst = parseFloat(gst) || 0;
-      
-      // Calculate and send dynamic_price and price_breakup
-      if (metalType && totalPrice > 0) {
-        payload.dynamic_price = parseFloat(totalPrice.toFixed(2));
-        payload.price_breakup = {
-          gold_value: metalType === 'gold' ? parseFloat(metalValue.toFixed(2)) : 0,
-          silver_value: metalType === 'silver' ? parseFloat(metalValue.toFixed(2)) : 0,
-          making_charges: parseFloat(makingCharges) || 0,
-          gemstone_value: parseFloat(gemstoneValue) || 0,
-          wastage: parseFloat(wastage) || 0,
-          gst: parseFloat(gst) || 0,
-          total: parseFloat(totalPrice.toFixed(2))
-        };
-      }
-      
-      if (mode === 'create') {
-        payload.is_featured = isFeatured;
-        payload.is_customizable = isCustomizable;
-        console.log('Toggle states:', { isFeatured, isCustomizable });
-      } else {
-        // Also send in edit mode
-        payload.is_featured = isFeatured;
-        payload.is_customizable = isCustomizable;
-        console.log('Toggle states (edit):', { isFeatured, isCustomizable });
-      }
-      
-      // Images and videos - send the uploaded URLs
-      payload.images = imageUrls;
-      payload.videos = videoUrls;
-      
-      // Length - convert to array of numbers
-      if (lengths) {
-        const lengthArray = lengths.split(',').map((l) => parseFloat(l.trim())).filter((n) => !isNaN(n));
-        payload.length = lengthArray;
-      }
-      
-      // Features - convert to array of strings
-      const validFeatures = features.filter((f) => f.value.trim());
-      if (validFeatures.length) {
-        payload.features = validFeatures.map((f) => f.value.trim());
-      }
-      
-      // Information - keep as key-value array
-      const validInfo = information.filter((i) => i.key.trim() && i.value.trim());
-      if (validInfo.length) {
-        payload.information = validInfo;
-      }
-      
-      // Dimensions - keep as key-value array
-      const validDims = dimensions.filter((d) => d.key.trim() && d.value.trim());
-      if (validDims.length) {
-        payload.dimensions = validDims;
-      }
+      // Debug: Log current state
+      console.log('Current state before payload:', {
+        imageUrls: imageUrls,
+        videoUrls: videoUrls,
+        imageUrlsLength: imageUrls.length,
+        videoUrlsLength: videoUrls.length
+      });
       
       // Debug: Log JSON payload
       console.log('JSON Payload:', JSON.stringify(payload, null, 2));
@@ -619,12 +606,13 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700">Features (e.g., "22K Gold", "Handcrafted Design")</label>
+                    <label className="block text-sm font-medium text-gray-700">Features (Key-Value pairs)</label>
                     <button type="button" onClick={() => addKeyValue('features')} className="text-sm text-amber-600 hover:text-amber-700 font-medium">+ Add Feature</button>
                   </div>
                   {features.map((item, idx) => (
                     <div key={idx} className="flex gap-2 mb-2">
-                      <input type="text" placeholder="Feature description" value={item.value} onChange={(e) => updateKeyValue('features', idx, 'value', e.target.value)} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                      <input type="text" placeholder="Key (e.g., colors)" value={item.key} onChange={(e) => updateKeyValue('features', idx, 'key', e.target.value)} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                      <input type="text" placeholder="Value (e.g., red,white)" value={item.value} onChange={(e) => updateKeyValue('features', idx, 'value', e.target.value)} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
                       {features.length > 1 && <button type="button" onClick={() => removeKeyValue('features', idx)} className="text-red-600 hover:text-red-700 px-2 text-xl">×</button>}
                     </div>
                   ))}
@@ -736,10 +724,10 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">GST</label>
-                        <input type="number" step="0.01" value={gst} onChange={(e) => setGst(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="0" />
-                      </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">GST Percentage (%)</label>
+                          <input type="number" step="0.01" value={gst} onChange={(e) => setGst(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="3" />
+                        </div>
 
                       <div className="border-t pt-3">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Total Price</label>
@@ -757,7 +745,7 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
           </div>
           <div className="flex items-center justify-end space-x-3 p-6 border-t bg-gray-50 flex-shrink-0">
             <button type="button" onClick={handleClose} disabled={loading} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition disabled:opacity-50">Cancel</button>
-            <button type="submit" disabled={loading || !name.trim() || !baseWeight} className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition disabled:opacity-50 flex items-center gap-2">
+            <button type="submit" disabled={loading} className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition disabled:opacity-50 flex items-center gap-2">
               {loading ? (
                 <>
                   <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">

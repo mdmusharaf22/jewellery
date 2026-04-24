@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { removeFromCart, updateQuantity } from '@/store/slices/cartSlice';
+import { removeFromCart, updateQuantity, fetchCart, updateCartItemAsync, removeFromCartAsync } from '@/store/slices/cartSlice';
 import Image from 'next/image';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -12,17 +12,50 @@ import { useRouter } from 'next/navigation';
 export default function CartPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { items = [], total = 0 } = useAppSelector((state) => state.cart || { items: [], total: 0 });
+  const { items = [], total = 0, loading = false } = useAppSelector((state) => state.cart || { items: [], total: 0, loading: false });
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
   const [couponCode, setCouponCode] = useState('');
+  const [initialized, setInitialized] = useState(false);
 
-  const handleQuantityChange = (id: number, newQuantity: number) => {
+  // Fetch cart from API on mount if authenticated
+  useEffect(() => {
+    if (isAuthenticated && !initialized) {
+      dispatch(fetchCart());
+      setInitialized(true);
+    }
+  }, [isAuthenticated, initialized, dispatch]);
+
+  const handleQuantityChange = async (item: any, newQuantity: number) => {
     if (newQuantity >= 1) {
-      dispatch(updateQuantity({ id, quantity: newQuantity }));
+      if (isAuthenticated && item.cart_item_id) {
+        // Use API for authenticated users
+        try {
+          await dispatch(updateCartItemAsync({ 
+            cartItemId: item.cart_item_id, 
+            quantity: newQuantity 
+          })).unwrap();
+        } catch (error) {
+          console.error('Failed to update quantity:', error);
+        }
+      } else {
+        // Use local storage for guest users
+        dispatch(updateQuantity({ id: item.id, quantity: newQuantity }));
+      }
     }
   };
 
-  const handleRemove = (id: number) => {
-    dispatch(removeFromCart(id));
+  const handleRemove = async (item: any) => {
+    if (isAuthenticated && item.cart_item_id) {
+      // Use API for authenticated users
+      try {
+        await dispatch(removeFromCartAsync(item.cart_item_id)).unwrap();
+      } catch (error) {
+        console.error('Failed to remove item:', error);
+      }
+    } else {
+      // Use local storage for guest users
+      dispatch(removeFromCart(item.id));
+    }
   };
 
   const handleCheckout = () => {
@@ -51,7 +84,12 @@ export default function CartPage() {
 
           <h1 className="text-2xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-4 xs:mb-6 sm:mb-8">Shopping Cart</h1>
 
-          {items.length === 0 ? (
+          {loading ? (
+            <div className="bg-white rounded-lg shadow-sm p-6 xs:p-8 sm:p-10 md:p-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8941E] mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading cart...</p>
+            </div>
+          ) : items.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-6 xs:p-8 sm:p-10 md:p-12 text-center">
               <ShoppingBag className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 xs:mb-4" />
               <h2 className="text-xl xs:text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
@@ -89,7 +127,7 @@ export default function CartPage() {
                             <h3 className="font-bold text-sm xs:text-base sm:text-lg text-gray-900 line-clamp-2">{item.name}</h3>
                           </div>
                           <button
-                            onClick={() => handleRemove(item.id)}
+                            onClick={() => handleRemove(item)}
                             className="text-red-500 hover:text-red-700 transition flex-shrink-0"
                           >
                             <Trash2 className="w-4 h-4 xs:w-5 xs:h-5" />
@@ -100,14 +138,14 @@ export default function CartPage() {
                           {/* Quantity Controls */}
                           <div className="flex items-center gap-2 xs:gap-3">
                             <button
-                              onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                              onClick={() => handleQuantityChange(item, item.quantity - 1)}
                               className="w-7 h-7 xs:w-8 xs:h-8 border-2 border-gray-300 rounded flex items-center justify-center hover:border-[#B8941E] transition"
                             >
                               <Minus className="w-3 h-3 xs:w-4 xs:h-4" />
                             </button>
                             <span className="w-8 xs:w-12 text-center font-semibold text-sm xs:text-base">{item.quantity}</span>
                             <button
-                              onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                              onClick={() => handleQuantityChange(item, item.quantity + 1)}
                               className="w-7 h-7 xs:w-8 xs:h-8 border-2 border-gray-300 rounded flex items-center justify-center hover:border-[#B8941E] transition"
                             >
                               <Plus className="w-3 h-3 xs:w-4 xs:h-4" />

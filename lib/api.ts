@@ -4,6 +4,14 @@ import { getAccessToken } from './auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// Log API configuration on startup
+if (typeof window !== 'undefined') {
+  console.log('[API Config] Base URL:', API_BASE_URL || 'NOT SET');
+  if (!API_BASE_URL) {
+    console.error('[API Config] ERROR: NEXT_PUBLIC_API_BASE_URL is not set!');
+  }
+}
+
 interface RequestOptions extends RequestInit {
   requiresAuth?: boolean;
 }
@@ -12,7 +20,7 @@ interface RequestOptions extends RequestInit {
 export function handleUnauthorized() {
   if (typeof window !== 'undefined') {
     const adminToken = sessionStorage.getItem('admin_access_token');
-    const customerToken = localStorage.getItem('customer_token');
+    const customerToken = sessionStorage.getItem('customer_token');
     
     if (adminToken) {
       // Admin session expired
@@ -20,7 +28,7 @@ export function handleUnauthorized() {
       window.location.href = '/admin/login';
     } else if (customerToken) {
       // Customer session expired
-      localStorage.removeItem('customer_token');
+      sessionStorage.removeItem('customer_token');
       window.location.href = '/login';
     }
   }
@@ -47,27 +55,56 @@ export async function apiRequest(
 
   const url = `${API_BASE_URL}${endpoint}`;
 
+  // Log the request
+  console.log(`[API Request] ${restOptions.method || 'GET'} ${url}`);
+  if (restOptions.body) {
+    console.log('[API Request Body]', restOptions.body);
+  }
+
   try {
     const response = await fetch(url, {
       ...restOptions,
       headers: requestHeaders,
     });
 
+    // Log response status
+    console.log(`[API Response] ${response.status} ${response.statusText} - ${url}`);
+
     // Handle 401 Unauthorized - session expired
     if (response.status === 401) {
+      console.error('[API Error] 401 Unauthorized - Session expired');
       handleUnauthorized();
       throw new Error('Session expired. Please login again.');
     }
 
     const data = await response.json();
 
+    // For 404 errors, return the error data instead of throwing
+    // This allows graceful fallback handling
+    if (response.status === 404) {
+      console.warn('[API Warning] 404 Not Found:', data.message);
+      return {
+        success: false,
+        message: data.message || 'Not found',
+        status: 404,
+        data: null
+      };
+    }
+
     if (!response.ok) {
+      console.error('[API Error]', response.status, data);
       throw new Error(data.message || 'API request failed');
     }
 
+    console.log('[API Success]', data);
     return data;
   } catch (error) {
-    console.error('API Error:', error);
+    // Log all errors
+    console.error('[API Exception]', error);
+    // Only log errors that aren't 404s
+    if (error instanceof Error && !error.message.includes('Not found')) {
+      console.error('API Error:', error);
+    }
     throw error;
   }
 }

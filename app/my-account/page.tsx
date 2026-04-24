@@ -15,23 +15,114 @@ export default function MyAccountPage() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   const [activeTab, setActiveTab] = useState('profile');
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [hasAuth, setHasAuth] = useState(false);
 
-  // Redirect if not logged in - use useEffect to avoid setState during render
+  // Check auth immediately on mount - before any render
   useEffect(() => {
-    if (!isAuthenticated || !user) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, user, router]);
+    const checkAuth = () => {
+      try {
+        const token = sessionStorage.getItem('customer_token');
+        const authData = sessionStorage.getItem('auth');
+        
+        console.log('=== My Account Auth Check ===');
+        console.log('Token:', token ? `EXISTS (${token.substring(0, 20)}...)` : 'MISSING');
+        console.log('Auth data:', authData ? `EXISTS` : 'MISSING');
+        
+        if (authData) {
+          try {
+            const parsed = JSON.parse(authData);
+            console.log('Parsed auth data:', parsed);
+          } catch (e) {
+            console.error('Failed to parse auth data:', e);
+          }
+        }
+        
+        if (!token || !authData) {
+          console.log('Redirecting to login - no auth data');
+          // Use replace to prevent back button issues
+          window.location.replace('/login');
+          return;
+        }
+        
+        console.log('Auth verified - showing page');
+        setHasAuth(true);
+        setIsAuthChecked(true);
+      } catch (error) {
+        console.error('Error in auth check:', error);
+        window.location.replace('/login');
+      }
+    };
 
-  // Show nothing while redirecting
-  if (!isAuthenticated || !user) {
+    // Small delay to ensure sessionStorage is ready
+    const timer = setTimeout(checkAuth, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Don't render anything until auth is checked
+  if (!isAuthChecked) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8941E] mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // If auth check failed, don't render (will redirect)
+  if (!hasAuth) {
     return null;
+  }
+
+  // Get user data from Redux or sessionStorage
+  const getUserData = () => {
+    if (user) return user;
+    
+    try {
+      const authData = sessionStorage.getItem('auth');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        return parsed.user;
+      }
+    } catch (e) {
+      console.error('Error parsing auth data:', e);
+    }
+    return null;
+  };
+
+  const userData = getUserData();
+
+  if (!userData) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">Unable to load user data</p>
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="bg-[#B8941E] text-white px-6 py-2 rounded-lg hover:bg-[#9a7a19] transition"
+            >
+              Back to Login
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem('customer_token');
-    router.push('/login');
+    sessionStorage.removeItem('customer_token');
+    sessionStorage.removeItem('auth');
+    window.location.href = '/login';
   };
 
   const tabs = [
@@ -62,11 +153,11 @@ export default function MyAccountPage() {
                 <div className="text-center mb-3 xs:mb-4 sm:mb-5 md:mb-6 pb-3 xs:pb-4 sm:pb-5 md:pb-6 border-b">
                   <div className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 bg-[#B8941E] rounded-full flex items-center justify-center mx-auto mb-2 xs:mb-2.5 sm:mb-3">
                     <span className="text-white text-lg xs:text-xl sm:text-2xl font-bold">
-                      {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                      {userData.name?.[0]?.toUpperCase() || userData.email[0].toUpperCase()}
                     </span>
                   </div>
-                  {user.name && <h3 className="font-bold text-gray-900 text-xs xs:text-sm">{user.name}</h3>}
-                  <p className="text-[10px] xs:text-xs text-gray-500 mt-1 break-all px-2">{user.email}</p>
+                  {userData.name && <h3 className="font-bold text-gray-900 text-xs xs:text-sm">{userData.name}</h3>}
+                  <p className="text-[10px] xs:text-xs text-gray-500 mt-1 break-all px-2">{userData.email}</p>
                 </div>
 
                 {/* Nav - Horizontal scroll on mobile */}
@@ -114,7 +205,7 @@ export default function MyAccountPage() {
                       <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Full Name</label>
                       <input
                         type="text"
-                        value={user.name || ''}
+                        value={userData.name || ''}
                         readOnly
                         className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-xs xs:text-sm sm:text-base"
                       />
@@ -123,17 +214,17 @@ export default function MyAccountPage() {
                       <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Email</label>
                       <input
                         type="email"
-                        value={user.email}
+                        value={userData.email}
                         readOnly
                         className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-xs xs:text-sm sm:text-base break-all"
                       />
                     </div>
-                    {user.phone && (
+                    {userData.phone && (
                       <div>
                         <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Phone</label>
                         <input
                           type="tel"
-                          value={user.phone}
+                          value={userData.phone}
                           readOnly
                           className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-xs xs:text-sm sm:text-base"
                         />

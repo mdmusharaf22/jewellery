@@ -1,20 +1,35 @@
 interface ProductDetailsProps {
   productInfo: {
-    code: string;
-    type: string;
-    occasion: string;
-    collection: string;
+    [key: string]: string | undefined;
   };
   metalDimensions: {
-    metalColor: string;
-    purity: string;
-    grossWeight: string;
-    netWeight: string;
-    length: string;
+    [key: string]: string | undefined;
   };
+  features?: Array<{ key: string; value: string }>;
+  information?: Array<{ key: string; value: string }>;
 }
 
-export default function ProductDetails({ productInfo, metalDimensions }: ProductDetailsProps) {
+export default function ProductDetails({ productInfo, metalDimensions, features = [], information = [] }: ProductDetailsProps) {
+  // Combine productInfo with additional information from API
+  const allProductInfo = { ...productInfo };
+  information.forEach(info => {
+    if (!allProductInfo[info.key]) {
+      allProductInfo[info.key] = info.value;
+    }
+  });
+
+  // Combine metalDimensions with features from API
+  const allMetalDimensions = { ...metalDimensions };
+  features.forEach(feature => {
+    if (!allMetalDimensions[feature.key]) {
+      allMetalDimensions[feature.key] = feature.value;
+    }
+  });
+
+  // Filter out undefined values
+  const filteredProductInfo = Object.entries(allProductInfo).filter(([_, value]) => value !== undefined);
+  const filteredMetalDimensions = Object.entries(allMetalDimensions).filter(([_, value]) => value !== undefined);
+
   return (
     <div className="mb-8 sm:mb-10 md:mb-12">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 sm:mb-2">Product Details</h2>
@@ -27,22 +42,12 @@ export default function ProductDetails({ productInfo, metalDimensions }: Product
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Product Information</h3>
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Product Code</span>
-              <span className="font-medium text-gray-900">{productInfo.code}</span>
-            </div>
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Product Type</span>
-              <span className="font-medium text-gray-900">{productInfo.type}</span>
-            </div>
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Occasion</span>
-              <span className="font-medium text-gray-900">{productInfo.occasion}</span>
-            </div>
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Collection</span>
-              <span className="font-medium text-gray-900">{productInfo.collection}</span>
-            </div>
+            {filteredProductInfo.map(([key, value]) => (
+              <div key={key} className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
+                <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="font-medium text-gray-900">{value}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -50,26 +55,12 @@ export default function ProductDetails({ productInfo, metalDimensions }: Product
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Metal & Dimensions</h3>
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Metal Color</span>
-              <span className="font-medium text-gray-900">{metalDimensions.metalColor}</span>
-            </div>
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Purity</span>
-              <span className="font-medium text-gray-900">{metalDimensions.purity}</span>
-            </div>
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Gross Weight</span>
-              <span className="font-medium text-gray-900">{metalDimensions.grossWeight}</span>
-            </div>
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Net Weight</span>
-              <span className="font-medium text-gray-900">{metalDimensions.netWeight}</span>
-            </div>
-            <div className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
-              <span className="text-gray-600">Length</span>
-              <span className="font-medium text-gray-900">{metalDimensions.length}</span>
-            </div>
+            {filteredMetalDimensions.map(([key, value]) => (
+              <div key={key} className="flex justify-between py-2 sm:py-3 border-b border-gray-200 text-sm sm:text-base">
+                <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span className="font-medium text-gray-900">{value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -18,10 +18,10 @@ const initialState: AuthState = {
   isAuthenticated: false,
 };
 
-// Load auth from localStorage
+// Load auth from sessionStorage
 const loadAuthFromStorage = (): AuthState => {
   if (typeof window !== 'undefined') {
-    const savedAuth = localStorage.getItem('auth');
+    const savedAuth = sessionStorage.getItem('auth');
     if (savedAuth) {
       return JSON.parse(savedAuth);
     }
@@ -38,7 +38,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth', JSON.stringify(state));
+        sessionStorage.setItem('auth', JSON.stringify(state));
       }
     },
     
@@ -47,7 +47,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth');
+        sessionStorage.removeItem('auth');
       }
     },
     
@@ -56,7 +56,7 @@ const authSlice = createSlice({
         state.user = { ...state.user, ...action.payload };
         
         if (typeof window !== 'undefined') {
-          localStorage.setItem('auth', JSON.stringify(state));
+          sessionStorage.setItem('auth', JSON.stringify(state));
         }
       }
     },

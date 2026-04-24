@@ -14,6 +14,52 @@ import TrustBadges from '@/components/product-detail/TrustBadges';
 import Testimonials from '@/components/Testimonials';
 import { getProductBySlug, getProductById, type Product } from '@/lib/productData';
 import { generateDummyProduct } from '@/lib/dummyProductGenerator';
+import { api } from '@/lib/api';
+
+interface ApiProduct {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  short_description: string | null;
+  base_weight: number;
+  cached_price: number | null;
+  dynamic_price: number;
+  is_featured: number;
+  is_customizable: number;
+  metal_type: string;
+  making_charges: number;
+  wastage: number;
+  gst_percentage: number;
+  gemstone_value: number;
+  images: {
+    url: string;
+    is_primary: boolean;
+  }[];
+  videos: string[];
+  length: number[];
+  features: {
+    key: string;
+    value: string;
+  }[];
+  information: {
+    key: string;
+    value: string;
+  }[];
+  dimensions: {
+    key: string;
+    value: string;
+  }[];
+  price_breakup: {
+    gold_value: number;
+    silver_value: number;
+    making_charges: number;
+    gemstone_value: number;
+    wastage: number;
+    gst: number;
+    total: number;
+  };
+}
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -22,39 +68,112 @@ export default function ProductDetailPage() {
   const id = params.id as string;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [zoomData, setZoomData] = useState<{ isZoomed: boolean; position: { x: number; y: number }; imageUrl: string }>({
     isZoomed: false,
     position: { x: 0, y: 0 },
     imageUrl: '',
   });
 
-  // Fetch product data based on id (can be slug or numeric id)
-  useEffect(() => {
-    setLoading(true);
+  // Transform API product to local Product format
+  const transformApiProduct = (apiProduct: ApiProduct): Product => {
+    // Find primary image or use first image
+    let primaryImage = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
     
-    // Try to get product by slug first, then by ID
-    let foundProduct = getProductBySlug(id);
-    if (!foundProduct && !isNaN(Number(id))) {
-      foundProduct = getProductById(id);
+    if (apiProduct.images && apiProduct.images.length > 0) {
+      const primary = apiProduct.images.find(img => img.is_primary === true);
+      if (primary && primary.url) {
+        primaryImage = primary.url;
+      } else if (apiProduct.images[0] && apiProduct.images[0].url) {
+        primaryImage = apiProduct.images[0].url;
+      }
     }
 
-    // If product not found in database, try to extract data from URL or generate dummy
-    if (!foundProduct) {
-      // Try to get product data from URL search params
-      const urlParams = new URLSearchParams(window.location.search);
-      const name = urlParams.get('name');
-      const priceStr = urlParams.get('price');
-      const karat = urlParams.get('karat');
-      
-      const price = priceStr ? parseFloat(priceStr.replace(/,/g, '')) : undefined;
-      
-      foundProduct = generateDummyProduct(id, name || undefined, price, karat || undefined);
-      console.log('Generated dummy product for:', id, { name, price, karat });
-    }
+    // Transform images array
+    const images = apiProduct.images && apiProduct.images.length > 0 
+      ? apiProduct.images.map(img => img.url)
+      : [primaryImage];
 
-    setProduct(foundProduct);
-    setLoading(false);
-  }, [id]);
+    return {
+      id: apiProduct.id,
+      name: apiProduct.name,
+      slug: apiProduct.slug,
+      price: apiProduct.cached_price || apiProduct.dynamic_price || 0,
+      karat: apiProduct.metal_type === 'gold' ? '22KT Gold' : 'Silver',
+      category: category || 'products',
+      images,
+      description: apiProduct.description || apiProduct.short_description || '',
+      productInfo: {
+        weight: `${apiProduct.base_weight}g`,
+        purity: apiProduct.metal_type === 'gold' ? '22KT' : '925 Silver',
+        certification: 'BIS Hallmark',
+        warranty: '1 Year',
+        ...(apiProduct.information.reduce((acc, info) => {
+          acc[info.key] = info.value;
+          return acc;
+        }, {} as Record<string, string>))
+      },
+      metalDimensions: apiProduct.dimensions.reduce((acc, dim) => {
+        acc[dim.key] = dim.value;
+        return acc;
+      }, {} as Record<string, string>),
+      priceBreakup: {
+        goldValue: apiProduct.price_breakup?.gold_value || 0,
+        silverValue: apiProduct.price_breakup?.silver_value || 0,
+        makingCharges: apiProduct.price_breakup?.making_charges || apiProduct.making_charges || 0,
+        gemstoneValue: apiProduct.price_breakup?.gemstone_value || apiProduct.gemstone_value || 0,
+        wastage: apiProduct.price_breakup?.wastage || apiProduct.wastage || 0,
+        gst: apiProduct.price_breakup?.gst || 0,
+        total: apiProduct.price_breakup?.total || apiProduct.cached_price || apiProduct.dynamic_price || 0
+      }
+    };
+  };
+
+  // Fetch product data
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // First try to fetch from API using slug
+        const response = await api.get(`/products/${id}`, { requiresAuth: false });
+        
+        if (response.success && response.data) {
+          const transformedProduct = transformApiProduct(response.data);
+          setProduct(transformedProduct);
+          return;
+        }
+      } catch (apiError) {
+        console.error('API fetch failed:', apiError);
+        // Continue to fallback methods
+      }
+
+      // Fallback to local data
+      let foundProduct = getProductBySlug(id);
+      if (!foundProduct && !isNaN(Number(id))) {
+        foundProduct = getProductById(id);
+      }
+
+      // If product not found in database, try to extract data from URL or generate dummy
+      if (!foundProduct) {
+        // Try to get product data from URL search params
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        const priceStr = urlParams.get('price');
+        const karat = urlParams.get('karat');
+        
+        const price = priceStr ? parseFloat(priceStr.replace(/,/g, '')) : undefined;
+        
+        foundProduct = generateDummyProduct(id, name || undefined, price, karat || undefined);
+        console.log('Generated dummy product for:', id, { name, price, karat });
+      }
+
+      setProduct(foundProduct);
+    };
+
+    fetchProduct().finally(() => setLoading(false));
+  }, [id, category]);
 
   if (loading) {
     return (
@@ -64,6 +183,26 @@ export default function ProductDetailPage() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8941E] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading product...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">{error}</p>
+            <button 
+              onClick={() => router.back()}
+              className="bg-[#B8941E] text-white px-6 py-2 rounded-lg hover:bg-[#A67C00] transition"
+            >
+              Go Back
+            </button>
           </div>
         </div>
         <Footer />

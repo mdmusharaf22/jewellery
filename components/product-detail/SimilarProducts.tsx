@@ -1,54 +1,138 @@
-import Image from 'next/image';
-import Link from 'next/link';
+'use client';
+
+import { useState, useEffect } from 'react';
+import ProductCard from '@/components/ProductCard';
+import Toast from '@/components/Toast';
+import { api } from '@/lib/api';
 
 interface SimilarProductsProps {
   currentProductSlug: string;
   category: string;
 }
 
-export default function SimilarProducts({ currentProductSlug, category }: SimilarProductsProps) {
-  // Mock similar products - replace with API call
-  const similarProducts = [
-    { id: 13, slug: 'temple-jhumka-pair', name: 'Temple Jhumka Pair', price: 86500, karat: '22KT GOLD', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400' },
-    { id: 14, slug: 'antique-lakshmi-haram', name: 'Antique Lakshmi Haram', price: 412000, karat: '22KT GOLD', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400' },
-    { id: 15, slug: 'traditional-vanki', name: 'Traditional Vanki', price: 145000, karat: '22KT GOLD', image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400' },
-    { id: 16, slug: 'kada-bangle-set', name: 'Kada Bangle Set', price: 215500, karat: '22KT GOLD', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400' },
-  ];
+interface ApiSimilarProduct {
+  id: string;
+  name: string;
+  slug: string;
+  cached_price: number | null;
+  dynamic_price: number;
+  metal_type: string;
+  images: {
+    url: string;
+    is_primary: boolean;
+  }[];
+}
+
+export default function SimilarProducts({ currentProductSlug }: SimilarProductsProps) {
+  const [similarProducts, setSimilarProducts] = useState<ApiSimilarProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const handleToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    const fetchSimilarProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(`/products/${currentProductSlug}/similar`, { requiresAuth: false });
+        
+        if (response && response.success && response.data) {
+          setSimilarProducts(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch similar products:', error);
+        setSimilarProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (currentProductSlug) {
+      fetchSimilarProducts();
+    }
+  }, [currentProductSlug]);
+
+  // Transform API product to ProductCard format
+  const transformProduct = (product: ApiSimilarProduct) => {
+    // Find primary image or use first image
+    let imageUrl = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    
+    if (product.images && product.images.length > 0) {
+      const primaryImage = product.images.find(img => img.is_primary === true);
+      if (primaryImage && primaryImage.url) {
+        imageUrl = primaryImage.url;
+      } else if (product.images[0] && product.images[0].url) {
+        imageUrl = product.images[0].url;
+      }
+    }
+    
+    return {
+      id: parseInt(product.id) || Math.floor(Math.random() * 10000),
+      name: product.name,
+      price: product.cached_price || product.dynamic_price || 0,
+      karat: product.metal_type === 'gold' ? '22KT Gold' : 'Silver',
+      image: imageUrl,
+      slug: product.slug,
+      category: 'products',
+    };
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="mb-8 sm:mb-10 md:mb-12 overflow-hidden">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 sm:mb-2">Similar Designs</h2>
+        <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">
+          Discover complementary pieces and similar styles to complete your look.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-gray-100 rounded-lg h-80 animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Don't show section if no similar products
+  if (similarProducts.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="mb-8 sm:mb-10 md:mb-12 overflow-hidden">
-      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 sm:mb-2">Similar Designs</h2>
-      <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">
-        Discover complementary pieces and similar styles to complete your look.
-      </p>
+    <section className="mb-8 sm:mb-10 md:mb-12 overflow-hidden">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
-        {similarProducts.map((product) => (
-          <Link 
-            key={product.id} 
-            href={`/${category}/${product.slug}`}
-            className="group"
-          >
-            <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2 sm:mb-3">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                unoptimized
-              />
-            </div>
-            <p className="text-[10px] xs:text-xs text-[#B8941E] font-medium mb-0.5 sm:mb-1">{product.karat}</p>
-            <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 group-hover:text-[#B8941E] transition text-xs sm:text-sm md:text-base line-clamp-2">
-              {product.name}
-            </h3>
-            <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
-              ₹ {product.price.toLocaleString('en-IN')}
-            </p>
-          </Link>
-        ))}
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 sm:mb-2">Similar Designs</h2>
+        <p className="text-gray-600 text-sm sm:text-base">
+          Discover complementary pieces and similar styles to complete your look.
+        </p>
       </div>
-    </div>
+
+      {/* Products Grid - Same as NewArrivals */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        {similarProducts.map((product) => {
+          const transformedProduct = transformProduct(product);
+          return (
+            <ProductCard
+              key={product.id}
+              product={transformedProduct}
+              viewMode="grid"
+              onToast={handleToast}
+            />
+          );
+        })}
+      </div>
+    </section>
   );
 }

@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
+import { syncGuestCartWithAPI } from '@/store/slices/cartSlice';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, Phone, Eye, EyeOff } from 'lucide-react';
 
 export default function RegisterPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const guestCartItems = useAppSelector((state) => state.cart?.items || []);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -52,8 +54,9 @@ export default function RegisterPage() {
       // Log response to debug structure
       console.log('Register API response:', JSON.stringify(data, null, 2));
 
+      // Store token first
       if (data.data?.token) {
-        localStorage.setItem('customer_token', data.data.token);
+        sessionStorage.setItem('customer_token', data.data.token);
       }
 
       // Try all common nesting patterns
@@ -65,13 +68,31 @@ export default function RegisterPage() {
         data.data ??
         {};
 
-      dispatch(login({
+      const userData = {
         id: customer.id || '',
         name: customer.name || formData.name,
         email: customer.email || formData.email,
         phone: customer.phone || customer.phone_number || formData.phone,
-      }));
+      };
 
+      // Dispatch login action
+      dispatch(login(userData));
+
+      // Wait a bit to ensure state is saved
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Sync guest cart with API if there are items
+      if (guestCartItems.length > 0) {
+        try {
+          await dispatch(syncGuestCartWithAPI(guestCartItems)).unwrap();
+          console.log('Guest cart synced successfully');
+        } catch (syncError) {
+          console.error('Failed to sync guest cart:', syncError);
+          // Continue to home even if sync fails
+        }
+      }
+
+      // Redirect after everything is set
       router.push('/');
     } catch (err: any) {
       setError(err.message || 'Something went wrong');

@@ -15,6 +15,7 @@ export interface DataTableProps {
   loading?: boolean;
   onEdit?: (row: any) => void;
   onDelete?: (row: any) => void;
+  onView?: (row: any) => void;
   actions?: boolean;
   itemsPerPage?: number;
   emptyMessage?: string;
@@ -27,6 +28,7 @@ export default function DataTable({
   loading = false,
   onEdit,
   onDelete,
+  onView,
   actions = true,
   itemsPerPage = 10,
   emptyMessage = 'No data available',
@@ -83,7 +85,7 @@ export default function DataTable({
         <button
           key={i}
           onClick={() => goToPage(i)}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
+          className={`px-3 py-1 rounded-lg text-sm font-medium transition cursor-pointer ${
             currentPage === i
               ? 'bg-amber-500 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
@@ -109,22 +111,22 @@ export default function DataTable({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow flex flex-col" style={{ height: maxHeight }}>
-      {/* Table Container with Scroll */}
+    <div className="bg-white rounded-lg shadow flex flex-col" style={{ height: 'calc(100vh - 280px)' }}>
+      {/* Table Container with Fixed Height and Internal Scroll */}
       <div className="flex-1 overflow-auto">
         <table className="w-full">
-          {/* Sticky Header */}
+          {/* Header - Sticky */}
           <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   {column.sortable ? (
                     <button
                       onClick={() => handleSort(column.key)}
-                      className="flex items-center space-x-1 hover:text-gray-700 transition"
+                      className="flex items-center space-x-1 hover:text-gray-700 transition cursor-pointer"
                     >
                       <span>{column.label}</span>
                       <svg
@@ -151,7 +153,7 @@ export default function DataTable({
                 </th>
               ))}
               {actions && (
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               )}
@@ -193,10 +195,18 @@ export default function DataTable({
                   {actions && (
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-3">
+                        {onView && (
+                          <button
+                            onClick={() => onView(row)}
+                            className="text-green-600 hover:text-green-900 transition cursor-pointer"
+                          >
+                            View
+                          </button>
+                        )}
                         {onEdit && (
                           <button
                             onClick={() => onEdit(row)}
-                            className="text-blue-600 hover:text-blue-900 transition"
+                            className="text-blue-600 hover:text-blue-900 transition cursor-pointer"
                           >
                             Edit
                           </button>
@@ -204,7 +214,7 @@ export default function DataTable({
                         {onDelete && (
                           <button
                             onClick={() => onDelete(row)}
-                            className="text-red-600 hover:text-red-900 transition"
+                            className="text-red-600 hover:text-red-900 transition cursor-pointer"
                           >
                             Delete
                           </button>
@@ -219,9 +229,9 @@ export default function DataTable({
         </table>
       </div>
 
-      {/* Sticky Footer - Pagination */}
+      {/* Pagination - Fixed at Bottom */}
       {paginatedData.length > 0 && totalPages > 1 && (
-        <div className="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between flex-shrink-0">
           <div className="text-sm text-gray-700">
             Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
             <span className="font-medium">{Math.min(endIndex, data.length)}</span> of{' '}
@@ -233,7 +243,7 @@ export default function DataTable({
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-3 py-1 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
               Previous
             </button>
@@ -245,16 +255,13 @@ export default function DataTable({
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-3 py-1 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
               Next
             </button>
           </div>
         </div>
       )}
-
-      {/* Items per page info - Part of footer */}
-
     </div>
   );
 }

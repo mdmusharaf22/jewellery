@@ -13,7 +13,10 @@ interface Product {
   base_weight: number;
   is_featured: number;
   cached_price: number | null;
-  images: any[];
+  images: {
+    url: string;
+    is_primary: boolean;
+  }[];
 }
 
 export default function NewArrivals() {
@@ -50,18 +53,28 @@ export default function NewArrivals() {
 
   // Transform API product to ProductCard format
   const transformProduct = (product: Product) => {
-    const firstImage = product.images && product.images.length > 0 
-      ? product.images[0] 
-      : 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    // Find primary image or use first image
+    let imageUrl = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    
+    if (product.images && product.images.length > 0) {
+      // Find primary image first
+      const primaryImage = product.images.find(img => img.is_primary === true);
+      if (primaryImage && primaryImage.url) {
+        imageUrl = primaryImage.url;
+      } else if (product.images[0] && product.images[0].url) {
+        // Fallback to first image
+        imageUrl = product.images[0].url;
+      }
+    }
     
     return {
       id: product.id,
       name: product.name,
       price: product.cached_price ? product.cached_price.toLocaleString('en-IN') : '0',
       karat: '22KT Gold', // Default, can be enhanced based on product data
-      image: firstImage,
+      image: imageUrl,
       slug: product.slug,
-      category: 'all', // Can be enhanced based on product data
+      category: 'products', // Use 'products' as the category for the URL
     };
   };
 

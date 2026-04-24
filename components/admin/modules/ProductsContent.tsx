@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import DataTable from '@/components/admin/DataTable';
 import ProductModal from '@/components/admin/ProductModal';
+import ProductViewModal from '@/components/admin/ProductViewModal';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 import Toast from '@/components/admin/Toast';
 import {
@@ -16,13 +17,24 @@ import {
 
 export default function ProductsContent() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Search and filter state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterFeatured, setFilterFeatured] = useState<'all' | 'yes' | 'no'>('all');
+  const [filterCustomizable, setFilterCustomizable] = useState<'all' | 'yes' | 'no'>('all');
+  const [filterMetalType, setFilterMetalType] = useState<'all' | 'gold' | 'silver'>('all');
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // View modal state
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [productToView, setProductToView] = useState<Product | null>(null);
 
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -41,12 +53,60 @@ export default function ProductsContent() {
       const data = await getProducts();
       console.log('Fetched products:', data);
       setProducts(data);
+      setFilteredProducts(data); // Initialize filtered products
     } catch {
       showToast('Failed to load products', 'error');
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // Filter and search logic
+  useEffect(() => {
+    let filtered = [...products];
+
+    // Search filter
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(product =>
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Featured filter
+    if (filterFeatured !== 'all') {
+      const isFeatured = filterFeatured === 'yes';
+      filtered = filtered.filter(product => {
+        const productFeatured = product.is_featured === true || product.is_featured === 1 || product.is_featured === '1';
+        return productFeatured === isFeatured;
+      });
+    }
+
+    // Customizable filter
+    if (filterCustomizable !== 'all') {
+      const isCustomizable = filterCustomizable === 'yes';
+      filtered = filtered.filter(product => {
+        const productCustomizable = product.is_customizable === true || product.is_customizable === 1 || product.is_customizable === '1';
+        return productCustomizable === isCustomizable;
+      });
+    }
+
+    // Metal type filter
+    if (filterMetalType !== 'all') {
+      filtered = filtered.filter(product => product.metal_type === filterMetalType);
+    }
+
+    setFilteredProducts(filtered);
+  }, [products, searchTerm, filterFeatured, filterCustomizable, filterMetalType]);
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilterFeatured('all');
+    setFilterCustomizable('all');
+    setFilterMetalType('all');
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -67,6 +127,18 @@ export default function ProductsContent() {
       setSelectedProduct(fullProduct);
       setModalMode('edit');
       setModalOpen(true);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to load product details', 'error');
+    }
+  };
+
+  const handleView = async (product: Product) => {
+    try {
+      // Fetch full product details for viewing
+      const slug = product.slug || product.id;
+      const fullProduct = await getProduct(slug);
+      setProductToView(fullProduct);
+      setViewModalOpen(true);
     } catch (err: any) {
       showToast(err.message || 'Failed to load product details', 'error');
     }
@@ -108,11 +180,58 @@ export default function ProductsContent() {
 
   const columns = [
     {
+      key: 'image',
+      label: 'Image',
+      sortable: false,
+      render: (value: any, row: any) => {
+        // Get the first image from the images array
+        const firstImage = row.images && row.images.length > 0 
+          ? row.images[0] 
+          : null;
+        
+        const imageUrl = firstImage?.url || firstImage;
+        
+        return (
+          <div className="flex items-center">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={row.name || 'Product'}
+                className="w-10 h-10 rounded-lg object-cover bg-gray-100"
+                onError={(e) => {
+                  // Fallback to placeholder if image fails to load
+                  e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNiAxNkMyMC40MTgzIDE2IDI0IDE5LjU4MTcgMjQgMjRDMjQgMjguNDE4MyAyMC40MTgzIDMyIDE2IDMyQzExLjU4MTcgMzIgOCAyOC40MTgzIDggMjRDOCAxOS41ODE3IDExLjU4MTcgMTYgMTYgMTZaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yNiAxNkMzMC40MTgzIDE2IDM0IDE5LjU4MTcgMzQgMjRDMzQgMjguNDE4MyAzMC40MTgzIDMyIDI2IDMyQzIxLjU4MTcgMzIgMTggMjguNDE4MyAxOCAyNEMxOCAxOS41ODE3IDIxLjU4MTcgMTYgMjYgMTZaIiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo=';
+                }}
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
       key: 'name',
       label: 'Product Name',
       sortable: true,
-      render: (value: string) => (
-        <div className="text-sm font-medium text-gray-900">{value}</div>
+      render: (value: string, row: any) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">{value}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'category_name',
+      label: 'Category',
+      sortable: true,
+      render: (value: string, row: any) => (
+        <div className="text-sm text-gray-700">
+          {value || '—'}
+        </div>
       ),
     },
     {
@@ -147,14 +266,7 @@ export default function ProductsContent() {
       label: 'Customizable',
       sortable: false,
       render: (value: any, row: any) => {
-        // Check if the field exists in the response
-        if (value === undefined || value === null) {
-          return (
-            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-500">
-              N/A
-            </span>
-          );
-        }
+        // Handle numeric values (1/0) and boolean values (true/false)
         const isTrue = value === true || value === 1 || value === '1';
         return (
           <span
@@ -184,7 +296,9 @@ export default function ProductsContent() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">All Products</h3>
-          <p className="text-sm text-gray-500 mt-1">Manage your product inventory</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Manage your product inventory ({filteredProducts.length} of {products.length} products)
+          </p>
         </div>
         <button
           onClick={handleAddClick}
@@ -197,15 +311,99 @@ export default function ProductsContent() {
         </button>
       </div>
 
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* Search */}
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
+            <div className="relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by name, description, or category..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+              />
+              <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Featured Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Featured</label>
+            <select
+              value={filterFeatured}
+              onChange={(e) => setFilterFeatured(e.target.value as 'all' | 'yes' | 'no')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+            >
+              <option value="all">All Products</option>
+              <option value="yes">Featured Only</option>
+              <option value="no">Not Featured</option>
+            </select>
+          </div>
+
+          {/* Customizable Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Customizable</label>
+            <select
+              value={filterCustomizable}
+              onChange={(e) => setFilterCustomizable(e.target.value as 'all' | 'yes' | 'no')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+            >
+              <option value="all">All Products</option>
+              <option value="yes">Customizable</option>
+              <option value="no">Not Customizable</option>
+            </select>
+          </div>
+
+          {/* Metal Type Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Metal Type</label>
+            <select
+              value={filterMetalType}
+              onChange={(e) => setFilterMetalType(e.target.value as 'all' | 'gold' | 'silver')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+            >
+              <option value="all">All Types</option>
+              <option value="gold">Gold</option>
+              <option value="silver">Silver</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Clear Filters Button */}
+        {(searchTerm || filterFeatured !== 'all' || filterCustomizable !== 'all' || filterMetalType !== 'all') && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Clear All Filters
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* Table */}
       <DataTable
         columns={columns}
-        data={products}
+        data={filteredProducts}
         loading={loading}
+        onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
         itemsPerPage={10}
-        emptyMessage="No products found"
+        emptyMessage={
+          searchTerm || filterFeatured !== 'all' || filterCustomizable !== 'all' || filterMetalType !== 'all'
+            ? "No products match your filters"
+            : "No products found"
+        }
       />
 
       {/* Create / Edit Modal */}
@@ -215,6 +413,16 @@ export default function ProductsContent() {
         onSubmit={handleModalSubmit}
         product={selectedProduct}
         mode={modalMode}
+      />
+
+      {/* View Modal */}
+      <ProductViewModal
+        isOpen={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setProductToView(null);
+        }}
+        product={productToView}
       />
 
       {/* Delete Confirm Modal */}

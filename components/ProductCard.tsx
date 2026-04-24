@@ -4,11 +4,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addToCart } from '@/store/slices/cartSlice';
+import { addToCart, addToCartAsync } from '@/store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '@/store/slices/wishlistSlice';
 
 interface Product {
-  id: number;
+  id: number | string;
   name: string;
   price: number | string;
   karat: string;
@@ -30,22 +30,45 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
   // Check if product is in wishlist
   const { items = [] } = useAppSelector((state) => state.wishlist || { items: [] });
   const isInWishlist = items.some(item => item.id === product.id);
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const price = typeof product.price === 'string' 
       ? parseFloat(product.price.replace(/,/g, ''))
       : product.price;
     
-    dispatch(addToCart({
-      id: product.id,
-      name: product.name,
-      price,
-      karat: product.karat,
-      image: product.image,
-    }));
-    onToast?.('Added to cart!', 'success');
+    if (isAuthenticated) {
+      // Use API for authenticated users
+      try {
+        await dispatch(addToCartAsync({ 
+          productId: String(product.id), 
+          quantity: 1,
+          productData: {
+            id: product.id,
+            name: product.name,
+            price,
+            karat: product.karat,
+            image: product.image,
+          }
+        })).unwrap();
+        onToast?.('Added to cart!', 'success');
+      } catch (error) {
+        console.error('Failed to add to cart:', error);
+        onToast?.('Failed to add to cart', 'error');
+      }
+    } else {
+      // Use local storage for guest users
+      dispatch(addToCart({
+        id: product.id,
+        name: product.name,
+        price,
+        karat: product.karat,
+        image: product.image,
+      }));
+      onToast?.('Added to cart!', 'success');
+    }
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {

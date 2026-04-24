@@ -233,7 +233,7 @@ export default function Header() {
 
               {/* User Icon */}
               <Link 
-                href={isAuthenticated ? "/dashboard" : "/login"}
+                href={isAuthenticated ? "/my-account" : "/login"}
                 className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition"
                 aria-label="Account"
               >

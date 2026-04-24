@@ -2,12 +2,16 @@
 
 export const isAuthenticated = (): boolean => {
   if (typeof window === 'undefined') return false;
-  const token = sessionStorage.getItem('admin_access_token');
-  return !!token;
+  const adminToken = sessionStorage.getItem('admin_access_token');
+  const customerToken = sessionStorage.getItem('customer_token');
+  return !!(adminToken || customerToken);
 };
 
 export const getAccessToken = (): string | null => {
   if (typeof window === 'undefined') return null;
+  // Check for customer token first, then admin token
+  const customerToken = sessionStorage.getItem('customer_token');
+  if (customerToken) return customerToken;
   return sessionStorage.getItem('admin_access_token');
 };
 
@@ -27,6 +31,8 @@ export const logout = () => {
   sessionStorage.removeItem('admin_access_token');
   sessionStorage.removeItem('admin_refresh_token');
   sessionStorage.removeItem('admin_user');
+  sessionStorage.removeItem('customer_token');
+  sessionStorage.removeItem('auth');
 };
 
 export const setAuthTokens = (accessToken: string, refreshToken: string, user: any) => {

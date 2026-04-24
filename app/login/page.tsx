@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
+import { syncGuestCartWithAPI } from '@/store/slices/cartSlice';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const guestCartItems = useAppSelector((state) => state.cart?.items || []);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -42,8 +44,9 @@ export default function LoginPage() {
       // Log response to debug structure
       console.log('Login API response:', JSON.stringify(data, null, 2));
 
+      // Store token first
       if (data.data?.token) {
-        localStorage.setItem('customer_token', data.data.token);
+        sessionStorage.setItem('customer_token', data.data.token);
       }
 
       // Try all common nesting patterns
@@ -55,14 +58,48 @@ export default function LoginPage() {
         data.data ??
         {};
 
-      dispatch(login({
+      const userData = {
         id: customer.id || '',
         name: customer.name || '',
         email: customer.email || formData.email,
         phone: customer.phone || customer.phone_number || '',
-      }));
+      };
 
-      router.push('/my-account');
+      console.log('Dispatching login with user data:', userData);
+
+      // Dispatch login action
+      dispatch(login(userData));
+
+      // Wait longer to ensure state is saved
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Verify auth was saved
+      const savedAuth = sessionStorage.getItem('auth');
+      const savedToken = sessionStorage.getItem('customer_token');
+      console.log('After login - Auth in storage:', savedAuth);
+      console.log('After login - Token in storage:', savedToken);
+      
+      if (!savedAuth || !savedToken) {
+        console.error('ERROR: Auth data not saved to sessionStorage!');
+        setError('Failed to save login session. Please try again.');
+        return;
+      }
+
+      // Sync guest cart with API if there are items
+      if (guestCartItems.length > 0) {
+        console.log('Syncing guest cart with', guestCartItems.length, 'items');
+        try {
+          await dispatch(syncGuestCartWithAPI(guestCartItems)).unwrap();
+          console.log('Guest cart synced successfully');
+        } catch (syncError) {
+          console.error('Failed to sync guest cart:', syncError);
+          // Continue to my-account even if sync fails
+        }
+      }
+
+      console.log('Redirecting to /my-account');
+      // Use window.location for hard redirect to ensure state is fresh
+      window.location.href = '/my-account';
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
