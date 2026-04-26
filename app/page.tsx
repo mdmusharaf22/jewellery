@@ -30,10 +30,10 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen overflow-x-hidden w-full max-w-[100vw]">
+    <main className="min-h-screen w-full">
       <Header />
       <Hero />
-      <div className="py-6 xs:py-8 sm:py-10 md:py-12 lg:py-16 overflow-x-hidden w-full">
+      <div className="py-6 xs:py-8 sm:py-10 md:py-12 lg:py-16 w-full">
         <div className="w-[98%] mx-auto mb-8 xs:mb-10 sm:mb-12 md:mb-14 lg:mb-18">
           <CategoryCarousel
             title="Shop by Category"

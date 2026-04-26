@@ -275,9 +275,9 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Gold Navigation Bar - Sticky on scroll - Hidden on mobile */}
+      {/* Gold Navigation Bar - Always Sticky - Hidden on mobile */}
       <div
-        className={`bg-[#B8941E] transition-all duration-300 hidden lg:block overflow-hidden ${isScrolled ? 'sticky top-0 z-50 shadow-lg' : ''}`}
+        className="bg-[#B8941E] sticky top-0 z-50 shadow-lg transition-all duration-300 hidden lg:block overflow-hidden"
       >
         <div className="w-full px-4 lg:px-8 max-w-[100vw]">
           <nav className="flex items-center justify-center gap-6 lg:gap-8 py-1.5 relative">

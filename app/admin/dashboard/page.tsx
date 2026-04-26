@@ -3,14 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated, logout, getAdminUser } from '@/lib/auth';
+import { isAuthenticated, logout, getAdminUser, ensureValidToken } from '@/lib/auth';
 import DashboardContent from '@/components/admin/modules/DashboardContent';
 import CategoriesContent from '@/components/admin/modules/CategoriesContent';
 import ProductsContent from '@/components/admin/modules/ProductsContent';
 import OrdersContent from '@/components/admin/modules/OrdersContent';
 import CustomersContent from '@/components/admin/modules/CustomersContent';
 import SettingsContent from '@/components/admin/modules/SettingsContent';
-import UploadsContent from '@/components/admin/modules/UploadsContent';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -23,18 +22,36 @@ export default function AdminDashboard() {
   useEffect(() => {
     setMounted(true);
     
-    // Check authentication
-    const authenticated = isAuthenticated();
-    setIsAuthChecked(true);
-    
-    if (!authenticated) {
-      router.push('/admin/login');
-      return;
-    }
+    const checkAuthAndRefresh = async () => {
+      // Check authentication
+      const authenticated = isAuthenticated();
+      
+      if (!authenticated) {
+        console.log('[Admin Dashboard] Not authenticated, redirecting to login');
+        router.push('/admin/login');
+        return;
+      }
 
-    // Get admin user info
-    const user = getAdminUser();
-    setAdminUser(user);
+      // Try to refresh token if needed
+      console.log('[Admin Dashboard] Checking token validity...');
+      const tokenValid = await ensureValidToken();
+      
+      if (!tokenValid) {
+        console.log('[Admin Dashboard] Token refresh failed, redirecting to login');
+        logout();
+        router.push('/admin/login');
+        return;
+      }
+
+      console.log('[Admin Dashboard] Token valid, loading dashboard');
+      setIsAuthChecked(true);
+
+      // Get admin user info
+      const user = getAdminUser();
+      setAdminUser(user);
+    };
+
+    checkAuthAndRefresh();
   }, [router]);
 
   const handleLogout = () => {
@@ -145,20 +162,6 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            onClick={() => setActiveSection('uploads')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
-              activeSection === 'uploads'
-                ? 'bg-amber-500 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            {sidebarOpen && <span className="font-medium">Uploads</span>}
-          </button>
-
-          <button
             onClick={() => setActiveSection('settings')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
               activeSection === 'settings'
@@ -226,7 +229,6 @@ export default function AdminDashboard() {
                   {activeSection === 'orders' && 'Orders Management'}
                   {activeSection === 'customers' && 'Customers Management'}
                   {activeSection === 'settings' && 'Settings'}
-                  {activeSection === 'uploads' && 'Image Uploads'}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
                   {activeSection === 'dashboard' && 'Welcome back! Here\'s what\'s happening today.'}
@@ -235,7 +237,6 @@ export default function AdminDashboard() {
                   {activeSection === 'orders' && 'View and manage customer orders'}
                   {activeSection === 'customers' && 'Manage customer information'}
                   {activeSection === 'settings' && 'Configure your store settings'}
-                  {activeSection === 'uploads' && 'Upload and remove images from R2 storage'}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
@@ -258,7 +259,6 @@ export default function AdminDashboard() {
             {activeSection === 'orders' && <OrdersContent />}
             {activeSection === 'customers' && <CustomersContent />}
             {activeSection === 'settings' && <SettingsContent />}
-            {activeSection === 'uploads' && <UploadsContent />}
           </div>
         </div>
       </main>
