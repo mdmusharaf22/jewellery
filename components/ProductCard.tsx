@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCart, addToCartAsync } from '@/store/slices/cartSlice';
-import { addToWishlist, removeFromWishlist } from '@/store/slices/wishlistSlice';
+import { addToWishlist, removeFromWishlist, toggleWishlistAsync } from '@/store/slices/wishlistSlice';
 
 interface Product {
   id: number | string;
@@ -39,29 +39,35 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
       ? parseFloat(product.price.replace(/,/g, ''))
       : product.price;
     
+    // Ensure product ID is a string
+    const productId = String(product.id);
+    
+    console.log('[ProductCard] Adding to cart:', {
+      productId,
+      name: product.name,
+      price,
+      isAuthenticated
+    });
+    
     if (isAuthenticated) {
       // Use API for authenticated users
       try {
         await dispatch(addToCartAsync({ 
-          productId: String(product.id), 
-          quantity: 1,
-          productData: {
-            id: product.id,
-            name: product.name,
-            price,
-            karat: product.karat,
-            image: product.image,
-          }
+          productId: productId, 
+          quantity: 1
         })).unwrap();
+        console.log('[ProductCard] Added to cart via API');
         onToast?.('Added to cart!', 'success');
       } catch (error) {
-        console.error('Failed to add to cart:', error);
+        console.error('[ProductCard] Failed to add to cart:', error);
         onToast?.('Failed to add to cart', 'error');
       }
     } else {
       // Use local storage for guest users
+      console.log('[ProductCard] Adding to guest cart');
       dispatch(addToCart({
-        id: product.id,
+        id: productId,
+        product_id: productId,
         name: product.name,
         price,
         karat: product.karat,
@@ -71,25 +77,50 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
     }
   };
 
-  const handleToggleWishlist = (e: React.MouseEvent) => {
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const price = typeof product.price === 'string' 
       ? parseFloat(product.price.replace(/,/g, ''))
       : product.price;
     
-    if (isInWishlist) {
-      dispatch(removeFromWishlist(product.id));
-      onToast?.('Removed from wishlist', 'info');
+    // Ensure product ID is a string
+    const productId = String(product.id);
+    
+    console.log('[ProductCard] Toggling wishlist:', {
+      productId,
+      name: product.name,
+      isInWishlist,
+      isAuthenticated
+    });
+    
+    if (isAuthenticated) {
+      // Use API for authenticated users
+      try {
+        await dispatch(toggleWishlistAsync(productId)).unwrap();
+        console.log('[ProductCard] Wishlist toggled via API');
+        onToast?.(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist!', isInWishlist ? 'info' : 'success');
+      } catch (error) {
+        console.error('[ProductCard] Failed to toggle wishlist:', error);
+        onToast?.('Failed to update wishlist', 'error');
+      }
     } else {
-      dispatch(addToWishlist({
-        id: product.id,
-        name: product.name,
-        price,
-        karat: product.karat,
-        image: product.image,
-      }));
-      onToast?.('Added to wishlist!', 'success');
+      // Use local storage for guest users
+      console.log('[ProductCard] Toggling guest wishlist');
+      if (isInWishlist) {
+        dispatch(removeFromWishlist(productId));
+        onToast?.('Removed from wishlist', 'info');
+      } else {
+        dispatch(addToWishlist({
+          id: productId,
+          product_id: productId,
+          name: product.name,
+          price,
+          karat: product.karat,
+          image: product.image,
+        }));
+        onToast?.('Added to wishlist!', 'success');
+      }
     }
   };
 

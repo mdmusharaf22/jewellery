@@ -5,15 +5,31 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Heart, ShoppingBag, User, Store } from 'lucide-react';
 import SearchPopup from './SearchPopup';
+import { useAppSelector } from '@/store/hooks';
 
 export default function Header() {
-  const [cartCount, setCartCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  // Use Redux hooks instead of manual subscription
+  const cartItems = useAppSelector((state) => state.cart?.items || []);
+  const wishlistItems = useAppSelector((state) => state.wishlist?.items || []);
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
+  const user = useAppSelector((state) => state.auth?.user || null);
+  
+  // Calculate counts from Redux state
+  const cartCount = cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const wishlistCount = wishlistItems.length;
+  
   const [goldPrice, setGoldPrice] = useState('7,245');
   const [silverPrice, setSilverPrice] = useState('94');
   const [pricesLoading, setPricesLoading] = useState(true);
+
+  // Log cart state whenever it changes
+  useEffect(() => {
+    console.log('[Header] Cart state updated:', {
+      itemsLength: cartItems.length,
+      cartCount,
+      items: cartItems.map(item => ({ id: item.id, name: item.name, quantity: item.quantity }))
+    });
+  }, [cartItems, cartCount]);
 
   // Fetch live gold and silver prices
   useEffect(() => {
@@ -83,34 +99,6 @@ export default function Header() {
     const interval = setInterval(fetchPrices, 10 * 1000);
     
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    // Subscribe to Redux store updates
-    if (typeof window !== 'undefined') {
-      try {
-        const { store } = require('@/store/store');
-        
-        const updateCounts = () => {
-          const state = store.getState();
-          const items = state.cart?.items || [];
-          const wishlist = state.wishlist?.items || [];
-          const auth = state.auth || { isAuthenticated: false, user: null };
-          
-          setCartCount(items.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0));
-          setWishlistCount(wishlist.length);
-          setIsAuthenticated(auth.isAuthenticated);
-          setUser(auth.user);
-        };
-        
-        updateCounts();
-        const unsubscribe = store.subscribe(updateCounts);
-        
-        return () => unsubscribe();
-      } catch (e) {
-        console.error('Redux store not available');
-      }
-    }
   }, []);
   
   const [searchOpen, setSearchOpen] = useState(false);

@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import { syncGuestCartWithAPI } from '@/store/slices/cartSlice';
+import { syncGuestWishlistWithAPI } from '@/store/slices/wishlistSlice';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, Phone, Eye, EyeOff } from 'lucide-react';
 
@@ -13,6 +14,7 @@ export default function RegisterPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const guestCartItems = useAppSelector((state) => state.cart?.items || []);
+  const guestWishlistItems = useAppSelector((state) => state.wishlist?.items || []);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -88,7 +90,18 @@ export default function RegisterPage() {
           console.log('Guest cart synced successfully');
         } catch (syncError) {
           console.error('Failed to sync guest cart:', syncError);
-          // Continue to home even if sync fails
+          // Continue even if sync fails
+        }
+      }
+
+      // Sync guest wishlist with API if there are items
+      if (guestWishlistItems.length > 0) {
+        try {
+          await dispatch(syncGuestWishlistWithAPI(guestWishlistItems)).unwrap();
+          console.log('Guest wishlist synced successfully');
+        } catch (syncError) {
+          console.error('Failed to sync guest wishlist:', syncError);
+          // Continue even if sync fails
         }
       }
 

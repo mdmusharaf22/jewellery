@@ -64,10 +64,12 @@ export const updateCartItem = async (cartItemId: string, quantity: number): Prom
 // Remove item from cart
 export const removeFromCartAPI = async (cartItemId: string): Promise<CartResponse> => {
   try {
+    console.log('[Cart Service] removeFromCartAPI called with cart_item_id:', cartItemId);
     const response = await api.delete(`/cart/${cartItemId}`, { requiresAuth: true });
+    console.log('[Cart Service] removeFromCartAPI response:', response);
     return response;
   } catch (error) {
-    console.error('Error removing from cart:', error);
+    console.error('[Cart Service] Error removing from cart:', error);
     throw error;
   }
 };

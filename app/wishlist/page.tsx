@@ -1,9 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { removeFromWishlist } from '@/store/slices/wishlistSlice';
+import { removeFromWishlist, fetchWishlist, toggleWishlistAsync } from '@/store/slices/wishlistSlice';
 import { addToCart } from '@/store/slices/cartSlice';
 import Image from 'next/image';
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
@@ -13,12 +14,57 @@ import Link from 'next/link';
 
 export default function WishlistPage() {
   const dispatch = useAppDispatch();
-  const { items = [] } = useAppSelector((state) => state.wishlist || { items: [] });
+  const { items = [], loading = false } = useAppSelector((state) => state.wishlist || { items: [], loading: false });
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
-  const handleRemove = (id: number) => {
-    dispatch(removeFromWishlist(id));
-    setToast({ message: 'Removed from wishlist', type: 'info' });
+  // Fetch wishlist from API on mount if authenticated
+  useEffect(() => {
+    console.log('[Wishlist Page] ========== FETCH CHECK ==========');
+    console.log('[Wishlist Page] isAuthenticated:', isAuthenticated);
+    
+    if (isAuthenticated) {
+      // Always fetch wishlist from API when authenticated to ensure we have wishlist_item_id
+      console.log('[Wishlist Page] ✅ Fetching wishlist from API...');
+      dispatch(fetchWishlist())
+        .unwrap()
+        .then(() => {
+          console.log('[Wishlist Page] ✅ Wishlist fetched successfully');
+        })
+        .catch((error) => {
+          console.error('[Wishlist Page] ❌ Failed to fetch wishlist:', error);
+        });
+    } else {
+      console.log('[Wishlist Page] ⚠️  User is guest, using local wishlist');
+    }
+    console.log('[Wishlist Page] ====================================');
+  }, [isAuthenticated, dispatch]);
+
+  const handleRemove = async (item: any) => {
+    console.log('[Wishlist Page] Remove item clicked:', {
+      itemId: item.id,
+      wishlistItemId: item.wishlist_item_id,
+      isAuthenticated,
+      name: item.name
+    });
+    
+    if (isAuthenticated && item.product_id) {
+      // Use API for authenticated users - toggle will remove it
+      console.log('[Wishlist Page] Removing via API with product_id:', item.product_id);
+      try {
+        await dispatch(toggleWishlistAsync(item.product_id)).unwrap();
+        console.log('[Wishlist Page] Item removed successfully via API');
+        setToast({ message: 'Removed from wishlist', type: 'info' });
+      } catch (error) {
+        console.error('[Wishlist Page] Failed to remove item:', error);
+        setToast({ message: 'Failed to remove from wishlist', type: 'error' });
+      }
+    } else {
+      // Use local storage for guest users
+      console.log('[Wishlist Page] Removing from guest wishlist with id:', item.id);
+      dispatch(removeFromWishlist(item.id));
+      setToast({ message: 'Removed from wishlist', type: 'info' });
+    }
   };
 
   const handleAddToCart = (e: React.MouseEvent, item: any) => {
@@ -101,7 +147,7 @@ export default function WishlistPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          handleRemove(item.id);
+                          handleRemove(item);
                         }}
                         className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-50 transition z-10"
                       >

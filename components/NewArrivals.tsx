@@ -35,15 +35,33 @@ export default function NewArrivals() {
     const fetchNewArrivals = async () => {
       try {
         setLoading(true);
+        console.log('[New Arrivals] Fetching from API...');
         const response = await api.get('/products/new-arrivals', { requiresAuth: false });
         
+        console.log('[New Arrivals] Full API Response:', JSON.stringify(response, null, 2));
+        
+        // Handle different response structures
+        let productsData = [];
         if (response.success && response.data) {
-          setProducts(response.data);
+          // Check if data is an array or nested in data.products
+          productsData = Array.isArray(response.data) ? response.data : (response.data.products || []);
+        } else if (Array.isArray(response)) {
+          // Direct array response
+          productsData = response;
+        }
+        
+        console.log('[New Arrivals] Loaded', productsData.length, 'products');
+        setProducts(productsData);
+        
+        if (productsData.length === 0) {
+          console.warn('[New Arrivals] No products found in response');
         }
       } catch (error) {
-        console.error('Error fetching new arrivals:', error);
+        console.error('[New Arrivals] Error fetching:', error);
         handleToast('Failed to load new arrivals', 'error');
+        setProducts([]);
       } finally {
+        console.log('[New Arrivals] Setting loading to false');
         setLoading(false);
       }
     };

@@ -22,14 +22,34 @@ export function handleUnauthorized() {
     const adminToken = sessionStorage.getItem('admin_access_token');
     const customerToken = sessionStorage.getItem('customer_token');
     
+    console.log('[Auth] 401 Unauthorized - Checking tokens:', { 
+      hasAdminToken: !!adminToken, 
+      hasCustomerToken: !!customerToken 
+    });
+    
     if (adminToken) {
       // Admin session expired
+      console.log('[Auth] Admin session expired, redirecting to /admin/login');
       sessionStorage.removeItem('admin_access_token');
+      sessionStorage.removeItem('admin_refresh_token');
+      sessionStorage.removeItem('admin_user');
       window.location.href = '/admin/login';
     } else if (customerToken) {
       // Customer session expired
+      console.log('[Auth] Customer session expired, redirecting to /login');
       sessionStorage.removeItem('customer_token');
+      sessionStorage.removeItem('auth');
       window.location.href = '/login';
+    } else {
+      // No token found, check current path
+      const currentPath = window.location.pathname;
+      if (currentPath.startsWith('/admin')) {
+        console.log('[Auth] No token on admin path, redirecting to /admin/login');
+        window.location.href = '/admin/login';
+      } else {
+        console.log('[Auth] No token on customer path, redirecting to /login');
+        window.location.href = '/login';
+      }
     }
   }
 }

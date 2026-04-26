@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import { syncGuestCartWithAPI } from '@/store/slices/cartSlice';
+import { syncGuestWishlistWithAPI } from '@/store/slices/wishlistSlice';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const guestCartItems = useAppSelector((state) => state.cart?.items || []);
+  const guestWishlistItems = useAppSelector((state) => state.wishlist?.items || []);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -85,16 +87,64 @@ export default function LoginPage() {
         return;
       }
 
-      // Sync guest cart with API if there are items
+      // Sync guest cart with API if there are items (only once)
       if (guestCartItems.length > 0) {
-        console.log('Syncing guest cart with', guestCartItems.length, 'items');
-        try {
-          await dispatch(syncGuestCartWithAPI(guestCartItems)).unwrap();
-          console.log('Guest cart synced successfully');
-        } catch (syncError) {
-          console.error('Failed to sync guest cart:', syncError);
-          // Continue to my-account even if sync fails
+        // Check if we're already syncing to prevent duplicate calls
+        const isSyncing = sessionStorage.getItem('cart_syncing');
+        if (isSyncing === 'true') {
+          console.log('Cart sync already in progress, skipping');
+        } else {
+          console.log('Syncing guest cart with', guestCartItems.length, 'items');
+          console.log('Guest cart items:', guestCartItems.map(item => ({
+            id: item.id,
+            product_id: item.product_id,
+            name: item.name
+          })));
+          
+          try {
+            // Mark that we're syncing to prevent duplicate calls
+            sessionStorage.setItem('cart_syncing', 'true');
+            await dispatch(syncGuestCartWithAPI(guestCartItems)).unwrap();
+            sessionStorage.removeItem('cart_syncing');
+            console.log('Guest cart synced successfully');
+          } catch (syncError) {
+            sessionStorage.removeItem('cart_syncing');
+            console.error('Failed to sync guest cart:', syncError);
+            // Continue even if sync fails
+          }
         }
+      } else {
+        console.log('No guest cart items to sync');
+      }
+
+      // Sync guest wishlist with API if there are items
+      if (guestWishlistItems.length > 0) {
+        // Check if we're already syncing to prevent duplicate calls
+        const isSyncing = sessionStorage.getItem('wishlist_syncing');
+        if (isSyncing === 'true') {
+          console.log('Wishlist sync already in progress, skipping');
+        } else {
+          console.log('Syncing guest wishlist with', guestWishlistItems.length, 'items');
+          console.log('Guest wishlist items:', guestWishlistItems.map(item => ({
+            id: item.id,
+            product_id: item.product_id,
+            name: item.name
+          })));
+          
+          try {
+            // Mark that we're syncing to prevent duplicate calls
+            sessionStorage.setItem('wishlist_syncing', 'true');
+            await dispatch(syncGuestWishlistWithAPI(guestWishlistItems)).unwrap();
+            sessionStorage.removeItem('wishlist_syncing');
+            console.log('Guest wishlist synced successfully');
+          } catch (syncError) {
+            sessionStorage.removeItem('wishlist_syncing');
+            console.error('Failed to sync guest wishlist:', syncError);
+            // Continue even if sync fails
+          }
+        }
+      } else {
+        console.log('No guest wishlist items to sync');
       }
 
       console.log('Redirecting to /my-account');
