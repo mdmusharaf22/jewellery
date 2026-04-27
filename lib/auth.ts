@@ -9,10 +9,25 @@ export const isAuthenticated = (): boolean => {
 
 export const getAccessToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  // Check for customer token first, then admin token
-  const customerToken = localStorage.getItem('customer_token');
-  if (customerToken) return customerToken;
-  return sessionStorage.getItem('admin_access_token');
+  
+  // Check current path to determine which token to use
+  const isAdminPath = window.location.pathname.startsWith('/admin');
+  
+  if (isAdminPath) {
+    // For admin paths, only use admin token
+    const adminToken = sessionStorage.getItem('admin_access_token');
+    if (adminToken) {
+      console.log('[Auth] Using admin token for admin path');
+    }
+    return adminToken;
+  } else {
+    // For customer paths, only use customer token
+    const customerToken = localStorage.getItem('customer_token');
+    if (customerToken) {
+      console.log('[Auth] Using customer token for customer path');
+    }
+    return customerToken;
+  }
 };
 
 export const getRefreshToken = (): string | null => {
@@ -31,8 +46,8 @@ export const logout = () => {
   sessionStorage.removeItem('admin_access_token');
   sessionStorage.removeItem('admin_refresh_token');
   sessionStorage.removeItem('admin_user');
-  sessionStorage.removeItem('customer_token');
-  sessionStorage.removeItem('auth');
+  localStorage.removeItem('customer_token');
+  localStorage.removeItem('auth');
 };
 
 export const setAuthTokens = (accessToken: string, refreshToken: string, user: any) => {

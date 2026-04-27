@@ -12,6 +12,7 @@ export interface Product {
   description?: string;
   short_description?: string;
   category_id?: string;
+  category_name?: string;
   base_weight?: number;
   is_customizable?: boolean;
   length_metric?: string;

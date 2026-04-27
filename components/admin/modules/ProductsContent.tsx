@@ -14,10 +14,13 @@ import {
   deleteProduct,
   Product,
 } from '@/lib/services/productService';
+import { getCategories, Category } from '@/lib/services/categoryService';
 
 export default function ProductsContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryMap, setCategoryMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -47,14 +50,59 @@ export default function ProductsContent() {
     setToast({ message, type });
   };
 
-  const fetchProducts = useCallback(async () => {
+  // Fetch both categories and products, then merge
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getProducts();
-      console.log('Fetched products:', data);
-      setProducts(data);
-      setFilteredProducts(data); // Initialize filtered products
-    } catch {
+      // Fetch categories and products in parallel
+      const [categoriesData, productsData] = await Promise.all([
+        getCategories(),
+        getProducts()
+      ]);
+      
+      console.log('Fetched categories:', categoriesData);
+      console.log('Fetched products:', productsData);
+      
+      setCategories(categoriesData);
+      
+      // Create a map of category_id to category_name
+      // Include both parent categories and subcategories
+      const map: Record<string, string> = {};
+      categoriesData.forEach(category => {
+        map[category.id] = category.name;
+        
+        // Also add subcategories if they exist
+        if (category.children && Array.isArray(category.children)) {
+          category.children.forEach((subcat: any) => {
+            map[subcat.id] = subcat.name;
+          });
+        }
+      });
+      setCategoryMap(map);
+      
+      console.log('Category map (including subcategories):', map);
+      
+      // Add category_name to each product
+      const productsWithCategoryNames = productsData.map(product => {
+        const categoryName = product.category_id ? map[product.category_id] : undefined;
+        
+        if (product.category_id && !categoryName) {
+          console.warn(`⚠️ Product "${product.name}" references non-existent category: ${product.category_id}`);
+        }
+        
+        console.log('Product:', product.name, 'category_id:', product.category_id, 'mapped name:', categoryName);
+        return {
+          ...product,
+          category_name: categoryName || (product.category_id ? 'Unknown Category' : undefined)
+        };
+      });
+      
+      console.log('Products with category names:', productsWithCategoryNames);
+      
+      setProducts(productsWithCategoryNames);
+      setFilteredProducts(productsWithCategoryNames);
+    } catch (error) {
+      console.error('Failed to load data:', error);
       showToast('Failed to load products', 'error');
     } finally {
       setLoading(false);
@@ -108,9 +156,10 @@ export default function ProductsContent() {
     setFilterMetalType('all');
   };
 
+  // Fetch data on mount
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    fetchData();
+  }, [fetchData]);
 
   // Handlers
   const handleAddClick = () => {
@@ -159,7 +208,7 @@ export default function ProductsContent() {
       console.log('Updated product result:', result);
       showToast('Product updated successfully', 'success');
     }
-    await fetchProducts();
+    await fetchData();
   };
 
   const handleDeleteConfirm = async () => {
@@ -170,7 +219,7 @@ export default function ProductsContent() {
       showToast('Product deleted successfully', 'success');
       setDeleteModalOpen(false);
       setProductToDelete(null);
-      await fetchProducts();
+      await fetchData();
     } catch {
       showToast('Failed to delete product', 'error');
     } finally {

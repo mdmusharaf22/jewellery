@@ -34,9 +34,13 @@ export default function AdminLogin() {
       if (response.ok && data.success) {
         // Store access token in sessionStorage
         if (data.data?.tokens?.access_token) {
+          console.log('[Admin Login] Storing tokens in sessionStorage');
           sessionStorage.setItem('admin_access_token', data.data.tokens.access_token);
           sessionStorage.setItem('admin_refresh_token', data.data.tokens.refresh_token);
           sessionStorage.setItem('admin_user', JSON.stringify(data.data.user));
+          
+          console.log('[Admin Login] Tokens stored, redirecting to dashboard');
+          console.log('[Admin Login] Token:', data.data.tokens.access_token.substring(0, 20) + '...');
           
           // Redirect to admin dashboard
           router.push('/admin/dashboard');

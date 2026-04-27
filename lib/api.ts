@@ -37,8 +37,8 @@ export function handleUnauthorized() {
     } else if (customerToken) {
       // Customer session expired
       console.log('[Auth] Customer session expired, redirecting to /login');
-      sessionStorage.removeItem('customer_token');
-      sessionStorage.removeItem('auth');
+      localStorage.removeItem('customer_token');
+      localStorage.removeItem('auth');
       window.location.href = '/login';
     } else {
       // No token found, check current path
