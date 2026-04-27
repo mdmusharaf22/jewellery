@@ -5,14 +5,67 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Heart, ShoppingBag, User, Store } from 'lucide-react';
 import SearchPopup from './SearchPopup';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { checkAuth, getUserFromSession } from '@/lib/authSync';
+import { login } from '@/store/slices/authSlice';
 
 export default function Header() {
+  const dispatch = useAppDispatch();
+  
   // Use Redux hooks instead of manual subscription
   const cartItems = useAppSelector((state) => state.cart?.items || []);
   const wishlistItems = useAppSelector((state) => state.wishlist?.items || []);
   const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
   const user = useAppSelector((state) => state.auth?.user || null);
+  
+  // Also check sessionStorage directly for cross-tab sync
+  const [isAuthSynced, setIsAuthSynced] = useState(false);
+  
+  useEffect(() => {
+    // Check auth from localStorage on mount
+    const authFromStorage = checkAuth();
+    setIsAuthSynced(authFromStorage);
+    
+    // If Redux says not authenticated but localStorage says yes, sync it
+    if (!isAuthenticated && authFromStorage) {
+      const user = getUserFromSession();
+      if (user) {
+        dispatch(login(user));
+        console.log('[Header] Synced auth from localStorage to Redux');
+      }
+    }
+    
+    // Listen for storage changes from other tabs
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'customer_token' || e.key === 'auth') {
+        console.log('[Header] Storage changed in another tab:', e.key, e.newValue ? 'set' : 'removed');
+        const authFromStorage = checkAuth();
+        setIsAuthSynced(authFromStorage);
+        
+        if (authFromStorage) {
+          // User logged in on another tab
+          const user = getUserFromSession();
+          if (user) {
+            dispatch(login(user));
+            console.log('[Header] User logged in on another tab - syncing');
+          }
+        } else {
+          // User logged out on another tab
+          console.log('[Header] User logged out on another tab - clearing auth');
+          // Force page reload to clear all state
+          window.location.reload();
+        }
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [isAuthenticated, dispatch]);
+  
+  const isUserAuthenticated = isAuthenticated || isAuthSynced;
   
   // Calculate counts from Redux state
   const cartCount = cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
@@ -222,7 +275,7 @@ export default function Header() {
 
               {/* User Icon */}
               <Link 
-                href={isAuthenticated ? "/my-account" : "/login"}
+                href={isUserAuthenticated ? "/my-account" : "/login"}
                 className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition"
                 aria-label="Account"
               >

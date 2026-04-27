@@ -72,6 +72,7 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
         price,
         karat: product.karat,
         image: product.image,
+        slug: product.slug, // Include slug for order creation
       }));
       onToast?.('Added to cart!', 'success');
     }

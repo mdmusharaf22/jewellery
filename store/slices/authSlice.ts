@@ -18,7 +18,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
 };
 
-// Load auth from sessionStorage
+// Load auth from localStorage
 const loadAuthFromStorage = (): AuthState => {
   // Only access storage on client side
   if (typeof window === 'undefined') {
@@ -26,8 +26,8 @@ const loadAuthFromStorage = (): AuthState => {
     return initialState;
   }
   
-  console.log('[Auth Storage] Loading from sessionStorage...');
-  const savedAuth = sessionStorage.getItem('auth');
+  console.log('[Auth Storage] Loading from localStorage...');
+  const savedAuth = localStorage.getItem('auth');
   console.log('[Auth Storage] Raw auth data:', savedAuth);
   
   if (savedAuth) {
@@ -39,7 +39,7 @@ const loadAuthFromStorage = (): AuthState => {
       console.error('[Auth Storage] Error parsing auth from storage:', error);
     }
   } else {
-    console.log('[Auth Storage] No auth data found in sessionStorage');
+    console.log('[Auth Storage] No auth data found in localStorage');
   }
   
   return initialState;
@@ -71,8 +71,8 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       
       if (typeof window !== 'undefined') {
-        sessionStorage.setItem('auth', JSON.stringify(state));
-        console.log('[Auth] Saved to sessionStorage. isAuthenticated:', state.isAuthenticated);
+        localStorage.setItem('auth', JSON.stringify(state));
+        console.log('[Auth] Saved to localStorage. isAuthenticated:', state.isAuthenticated);
       }
     },
     
@@ -81,7 +81,9 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('auth');
+        localStorage.removeItem('auth');
+        localStorage.removeItem('customer_token');
+        console.log('[Auth] Logged out - cleared localStorage');
       }
     },
     
@@ -90,7 +92,7 @@ const authSlice = createSlice({
         state.user = { ...state.user, ...action.payload };
         
         if (typeof window !== 'undefined') {
-          sessionStorage.setItem('auth', JSON.stringify(state));
+          localStorage.setItem('auth', JSON.stringify(state));
         }
       }
     },

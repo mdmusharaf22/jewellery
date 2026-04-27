@@ -20,7 +20,7 @@ interface RequestOptions extends RequestInit {
 export function handleUnauthorized() {
   if (typeof window !== 'undefined') {
     const adminToken = sessionStorage.getItem('admin_access_token');
-    const customerToken = sessionStorage.getItem('customer_token');
+    const customerToken = localStorage.getItem('customer_token');
     
     console.log('[Auth] 401 Unauthorized - Checking tokens:', { 
       hasAdminToken: !!adminToken, 

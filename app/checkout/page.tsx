@@ -9,26 +9,89 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { CreditCard, Truck, Shield, MapPin, User, Mail, Phone, Home } from 'lucide-react';
 
+// Declare Razorpay type
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 export default function CheckoutPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { items = [], total = 0 } = useAppSelector((state) => state.cart || { items: [], total: 0 });
   const { user = null, isAuthenticated = false } = useAppSelector((state) => state.auth || { user: null, isAuthenticated: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
+
+  // Check authentication from localStorage (works across tabs)
+  const checkAuth = () => {
+    if (typeof window === 'undefined') return false;
+    const token = localStorage.getItem('customer_token');
+    const authData = localStorage.getItem('auth');
+    return !!(token && authData);
+  };
+
+  const isUserAuthenticated = isAuthenticated || checkAuth();
 
   // Fetch cart on mount if authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    setHasCheckedAuth(true);
+    if (isUserAuthenticated) {
       dispatch(fetchCart());
     }
-  }, [isAuthenticated, dispatch]);
+  }, [isUserAuthenticated, dispatch]);
+
+  // Fetch user profile and pre-fill form
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (isUserAuthenticated) {
+        setIsLoadingProfile(true);
+        try {
+          const token = localStorage.getItem('customer_token');
+          const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+          
+          const response = await fetch(`${API}/customers/auth/me`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          const data = await response.json();
+          
+          if (data.success && data.data?.profile) {
+            const profile = data.data.profile;
+            setFormData({
+              firstName: profile.name || '',
+              lastName: '',
+              email: profile.email || '',
+              phone: profile.phone || '',
+              address: profile.address || '',
+              city: '',
+              state: '',
+              pincode: '',
+              paymentMethod: 'cod',
+            });
+          }
+        } catch (error) {
+          console.error('Failed to fetch profile:', error);
+        } finally {
+          setIsLoadingProfile(false);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [isUserAuthenticated]);
 
   const [formData, setFormData] = useState({
-    firstName: user?.name?.split(' ')[0] || '',
-    lastName: user?.name?.split(' ')[1] || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    address: user?.address || '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
     city: '',
     state: '',
     pincode: '',
@@ -47,19 +110,133 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
     
     try {
-      // Here you would typically process the order via API
-      console.log('Order submitted:', { formData, items, total });
+      const token = localStorage.getItem('customer_token');
+      const API = process.env.NEXT_PUBLIC_API_BASE_URL;
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Prepare cart items - get product slugs from items
+      // Use the slug property if available, otherwise use the product name converted to slug format
+      const productSlugs = items.map(item => {
+        // If item has a slug property, use it
+        if (item.slug) {
+          return item.slug;
+        }
+        // Otherwise, try to get it from the product object
+        if (item.product_slug) {
+          return item.product_slug;
+        }
+        // Fallback: convert product name to slug format
+        return item.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      }).join(',');
       
-      // Clear cart
-      dispatch(clearCart());
+      console.log('[Checkout] Product slugs:', productSlugs);
+      console.log('[Checkout] Cart items:', items);
       
-      // Redirect to success page
-      router.push('/order-success');
-    } catch (error) {
+      // Create order via API
+      const orderResponse = await fetch(`${API}/orders/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          product_slug: productSlugs,
+          user_details: {
+            name: formData.firstName,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address
+          }
+        })
+      });
+
+      const orderData = await orderResponse.json();
+      
+      if (!orderData.success) {
+        throw new Error(orderData.message || 'Failed to create order');
+      }
+
+      const { order_id, razorpay_order_id, amount, currency } = orderData.data;
+
+      // Initialize Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_your_key_id', // Replace with your Razorpay key
+        amount: amount,
+        currency: currency,
+        name: 'Sree Ganesh Jewellers',
+        description: 'Order Payment',
+        order_id: razorpay_order_id,
+        handler: async function (response: any) {
+          // Payment successful
+          console.log('Payment successful:', response);
+          
+          // Verify payment on backend (optional but recommended)
+          try {
+            const verifyResponse = await fetch(`${API}/orders/verify-payment`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                order_id: order_id
+              })
+            });
+
+            const verifyData = await verifyResponse.json();
+            
+            if (verifyData.success) {
+              // Clear cart
+              dispatch(clearCart());
+              
+              // Redirect to success page
+              router.push(`/order-success?order_id=${order_id}`);
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name: formData.firstName,
+          email: formData.email,
+          contact: formData.phone
+        },
+        theme: {
+          color: '#B8941E'
+        },
+        modal: {
+          ondismiss: function() {
+            setIsSubmitting(false);
+            console.log('Payment cancelled by user');
+          }
+        }
+      };
+
+      // Load Razorpay script if not already loaded
+      if (typeof window !== 'undefined') {
+        if (!(window as any).Razorpay) {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.async = true;
+          script.onload = () => {
+            const rzp = new (window as any).Razorpay(options);
+            rzp.open();
+          };
+          document.body.appendChild(script);
+        } else {
+          const rzp = new (window as any).Razorpay(options);
+          rzp.open();
+        }
+      }
+      
+    } catch (error: any) {
       console.error('Order submission failed:', error);
+      alert(error.message || 'Failed to create order. Please try again.');
       setIsSubmitting(false);
     }
   };
@@ -69,30 +246,15 @@ export default function CheckoutPage() {
   const tax = Math.round(subtotal * 0.03);
   const finalTotal = subtotal + shipping + tax;
 
-  if (!isAuthenticated) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 py-12">
-          <div className="w-[90%] mx-auto max-w-md text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Please Login</h1>
-            <p className="text-gray-600 mb-6">You need to be logged in to checkout</p>
-            <a
-              href="/login"
-              className="inline-block bg-[#B8941E] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#9a7a19] transition"
-            >
-              Login to Continue
-            </a>
-          </div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+  // Check if cart is empty and redirect
+  useEffect(() => {
+    if (!isLoadingProfile && items.length === 0) {
+      router.replace('/cart');
+    }
+  }, [items.length, isLoadingProfile, router]);
 
   if (items.length === 0) {
-    router.push('/cart');
-    return null;
+    return null; // Don't render anything while redirecting
   }
 
   return (
@@ -200,11 +362,17 @@ export default function CheckoutPage() {
                     Shipping Information
                   </h2>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                  {isLoadingProfile ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B8941E] mx-auto mb-2"></div>
+                      <p className="text-sm text-gray-600">Loading your information...</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="sm:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
                         <User className="w-4 h-4 text-gray-400" />
-                        First Name <span className="text-red-500">*</span>
+                        Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -212,23 +380,7 @@ export default function CheckoutPage() {
                         value={formData.firstName}
                         onChange={handleInputChange}
                         required
-                        placeholder="Enter first name"
-                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none transition"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
-                        <User className="w-4 h-4 text-gray-400" />
-                        Last Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Enter last name"
+                        placeholder="Enter your full name"
                         className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none transition"
                       />
                     </div>
@@ -281,100 +433,37 @@ export default function CheckoutPage() {
                         className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none transition resize-none"
                       />
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        City <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Enter city"
-                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none transition"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        State <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Enter state"
-                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none transition"
-                      />
-                    </div>
-                    
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        Pincode <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="pincode"
-                        value={formData.pincode}
-                        onChange={handleInputChange}
-                        required
-                        pattern="[0-9]{6}"
-                        placeholder="6-digit pincode"
-                        maxLength={6}
-                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-[#B8941E] focus:outline-none transition"
-                      />
-                    </div>
-                  </div>
-                </div>
 
-                {/* Payment Method */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-5 sm:mb-6 flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-[#B8941E]" />
-                    Payment Method
-                  </h2>
-                  
-                  <div className="space-y-3">
-                    <label className={`flex items-start sm:items-center p-4 border-2 rounded-lg cursor-pointer transition ${
-                      formData.paymentMethod === 'cod' ? 'border-[#B8941E] bg-amber-50' : 'border-gray-200 hover:border-[#B8941E]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="cod"
-                        checked={formData.paymentMethod === 'cod'}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-[#B8941E] mt-0.5 sm:mt-0 flex-shrink-0"
-                      />
-                      <div className="ml-3 flex-1">
-                        <span className="font-semibold text-gray-900 block">Cash on Delivery</span>
-                        <span className="text-xs text-gray-500">Pay when you receive your order</span>
-                      </div>
-                    </label>
-                    
-                    <label className={`flex items-start sm:items-center p-4 border-2 rounded-lg cursor-pointer transition ${
-                      formData.paymentMethod === 'online' ? 'border-[#B8941E] bg-amber-50' : 'border-gray-200 hover:border-[#B8941E]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="online"
-                        checked={formData.paymentMethod === 'online'}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-[#B8941E] mt-0.5 sm:mt-0 flex-shrink-0"
-                      />
-                      <div className="ml-3 flex-1">
-                        <span className="font-semibold text-gray-900 block">Online Payment</span>
-                        <span className="text-xs text-gray-500">UPI, Cards, Net Banking, Wallets</span>
-                      </div>
-                    </label>
+                    {/* Hidden fields */}
+                    <input type="hidden" name="city" value={formData.city || 'N/A'} />
+                    <input type="hidden" name="state" value={formData.state || 'N/A'} />
+                    <input type="hidden" name="pincode" value={formData.pincode || '000000'} />
+                    <input type="hidden" name="lastName" value={formData.lastName || ''} />
+                  </div>
+                  )}
+
+                  {/* Place Order Button - Desktop */}
+                  <div className="hidden lg:block mt-6">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !formData.firstName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.address.trim()}
+                      className="w-full bg-[#B8941E] text-white py-3.5 rounded-lg font-bold hover:bg-[#9a7a19] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="w-5 h-5" />
+                          <span>Place Order</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -382,7 +471,7 @@ export default function CheckoutPage() {
                 <div className="lg:hidden">
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !formData.firstName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.address.trim()}
                     className="w-full bg-[#B8941E] text-white py-3.5 rounded-lg font-bold hover:bg-[#9a7a19] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
@@ -396,7 +485,7 @@ export default function CheckoutPage() {
                     ) : (
                       <>
                         <Shield className="w-5 h-5" />
-                        <span>Place Order - ₹ {finalTotal.toLocaleString('en-IN')}</span>
+                        <span>Place Order</span>
                       </>
                     )}
                   </button>

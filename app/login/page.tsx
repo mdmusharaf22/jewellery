@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -9,16 +9,27 @@ import { syncGuestCartWithAPI } from '@/store/slices/cartSlice';
 import { syncGuestWishlistWithAPI } from '@/store/slices/wishlistSlice';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { checkAuth } from '@/lib/authSync';
 
 export default function LoginPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
   const guestCartItems = useAppSelector((state) => state.cart?.items || []);
   const guestWishlistItems = useAppSelector((state) => state.wishlist?.items || []);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    const authFromStorage = checkAuth();
+    if (isAuthenticated || authFromStorage) {
+      console.log('[Login] User already authenticated, redirecting to my-account');
+      router.replace('/my-account');
+    }
+  }, [isAuthenticated, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,7 +59,7 @@ export default function LoginPage() {
 
       // Store token first
       if (data.data?.token) {
-        sessionStorage.setItem('customer_token', data.data.token);
+        localStorage.setItem('customer_token', data.data.token);
       }
 
       // Try all common nesting patterns
@@ -76,8 +87,8 @@ export default function LoginPage() {
       await new Promise(resolve => setTimeout(resolve, 300));
 
       // Verify auth was saved
-      const savedAuth = sessionStorage.getItem('auth');
-      const savedToken = sessionStorage.getItem('customer_token');
+      const savedAuth = localStorage.getItem('auth');
+      const savedToken = localStorage.getItem('customer_token');
       console.log('After login - Auth in storage:', savedAuth);
       console.log('After login - Token in storage:', savedToken);
       

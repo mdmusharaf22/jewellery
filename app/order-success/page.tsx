@@ -4,17 +4,9 @@ import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { CheckCircle, Package, Truck, Mail, Phone } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 export default function OrderSuccessPage() {
-  useEffect(() => {
-    // Trigger confetti animation
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-  }, []);
+  // Removed confetti animation since canvas-confetti is not installed
 
   // Mock order data - in real app, get from URL params or state
   const orderDetails = {

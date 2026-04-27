@@ -12,6 +12,7 @@ export interface CartItem {
   selectedPurity?: string;
   selectedLength?: string;
   cart_item_id?: string; // For API operations
+  slug?: string; // Product slug for order creation
 }
 
 interface CartState {
@@ -404,7 +405,8 @@ const cartSlice = createSlice({
           cart_item_id: item.cart_item_id,
           product_id: item.product_id,
           name: item.name,
-          quantity: item.quantity
+          quantity: item.quantity,
+          slug: item.slug
         });
         
         // API returns primary_image directly, not nested in images array
@@ -419,12 +421,14 @@ const cartSlice = createSlice({
           karat: item.metal_type === 'gold' ? '22KT Gold' : 'Silver',
           image: image,
           quantity: item.quantity,
+          slug: item.slug, // Include slug from API
         };
         
         console.log('[Cart] Transformed to:', {
           id: transformed.id,
           cart_item_id: transformed.cart_item_id,
-          name: transformed.name
+          name: transformed.name,
+          slug: transformed.slug
         });
         
         return transformed;

@@ -15,6 +15,7 @@ export default function CartPage() {
   const { items = [], total = 0, loading = false } = useAppSelector((state) => state.cart || { items: [], total: 0, loading: false });
   const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
   const [couponCode, setCouponCode] = useState('');
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // Log cart state on mount
   useEffect(() => {
@@ -98,8 +99,46 @@ export default function CartPage() {
     }
   };
 
-  const handleCheckout = () => {
-    router.push('/checkout');
+  const handleCheckout = async () => {
+    setIsCheckingOut(true);
+    
+    try {
+      // Call the /customers/auth/me API if user is authenticated
+      if (isAuthenticated) {
+        const token = localStorage.getItem('customer_token');
+        const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+        
+        const response = await fetch(`${API}/customers/auth/me`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        
+        if (data.success && data.data?.profile) {
+          // Update local storage with fresh profile data
+          const authData = localStorage.getItem('auth');
+          if (authData) {
+            const parsed = JSON.parse(authData);
+            parsed.user = { ...parsed.user, ...data.data.profile };
+            localStorage.setItem('auth', JSON.stringify(parsed));
+          }
+          
+          console.log('[Cart] Profile fetched successfully before checkout');
+        }
+      }
+      
+      // Navigate to checkout
+      router.push('/checkout');
+    } catch (error) {
+      console.error('[Cart] Failed to fetch profile:', error);
+      // Still navigate to checkout even if API fails
+      router.push('/checkout');
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   const subtotal = total;
@@ -254,9 +293,20 @@ export default function CartPage() {
 
                   <button
                     onClick={handleCheckout}
-                    className="w-full bg-[#B8941E] text-white py-2.5 xs:py-3 rounded-lg text-sm xs:text-base font-semibold hover:bg-[#9a7a19] transition mb-2 xs:mb-3"
+                    disabled={isCheckingOut}
+                    className="w-full bg-[#B8941E] text-white py-2.5 xs:py-3 rounded-lg text-sm xs:text-base font-semibold hover:bg-[#9a7a19] transition mb-2 xs:mb-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    Proceed to Checkout
+                    {isCheckingOut ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      'Proceed to Checkout'
+                    )}
                   </button>
 
                   <a

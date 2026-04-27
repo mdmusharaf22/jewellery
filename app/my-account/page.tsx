@@ -25,13 +25,81 @@ export default function MyAccountPage() {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [hasAuth, setHasAuth] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [userData, setUserData] = useState<any>(null);
+  
+  // Profile edit state
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: '',
+    phone: '',
+    address: ''
+  });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+
+  // Get user data from Redux or sessionStorage
+  const getUserData = () => {
+    if (user) return user;
+    
+    try {
+      const authData = localStorage.getItem('auth');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        return parsed.user;
+      }
+    } catch (e) {
+      console.error('Error parsing auth data:', e);
+    }
+    return null;
+  };
+
+  // Fetch user profile from API
+  const fetchUserProfile = async () => {
+    setIsLoadingProfile(true);
+    try {
+      const token = localStorage.getItem('customer_token');
+      const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+      
+      const response = await fetch(`${API}/customers/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.data?.profile) {
+        const profile = data.data.profile;
+        setProfileData({
+          name: profile.name || '',
+          phone: profile.phone || '',
+          address: profile.address || ''
+        });
+        
+        // Update local storage with fresh data
+        const authData = localStorage.getItem('auth');
+        if (authData) {
+          const parsed = JSON.parse(authData);
+          parsed.user = { ...parsed.user, ...profile };
+          localStorage.setItem('auth', JSON.stringify(parsed));
+          // Update userData state to trigger re-render
+          setUserData(parsed.user);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
 
   // Check auth immediately on mount - before any render
   useEffect(() => {
     const checkAuth = () => {
       try {
-        const token = sessionStorage.getItem('customer_token');
-        const authData = sessionStorage.getItem('auth');
+        const token = localStorage.getItem('customer_token');
+        const authData = localStorage.getItem('auth');
         
         console.log('=== My Account Auth Check ===');
         console.log('Token:', token ? `EXISTS (${token.substring(0, 20)}...)` : 'MISSING');
@@ -62,18 +130,76 @@ export default function MyAccountPage() {
       }
     };
 
-    // Small delay to ensure sessionStorage is ready
-    const timer = setTimeout(checkAuth, 50);
-    return () => clearTimeout(timer);
-  }, []);
+    // Check immediately without delay
+    checkAuth();
+  }, []); // Empty dependency array - only run once on mount
 
   // Fetch wishlist when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(fetchWishlist());
       dispatch(fetchCart());
+      fetchUserProfile(); // Fetch user profile data
     }
   }, [isAuthenticated, dispatch]);
+
+  // Initialize profile data from local storage on mount
+  useEffect(() => {
+    const data = getUserData();
+    setUserData(data);
+    if (data) {
+      setProfileData({
+        name: data.name || '',
+        phone: data.phone || '',
+        address: data.address || ''
+      });
+    }
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    setIsSavingProfile(true);
+    try {
+      const token = localStorage.getItem('customer_token');
+      const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+      
+      const response = await fetch(`${API}/customers/auth/me`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: profileData.name,
+          phone: profileData.phone,
+          address: profileData.address
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setToast({ message: 'Profile updated successfully!', type: 'success' });
+        setIsEditingProfile(false);
+        
+        // Update local storage
+        const authData = localStorage.getItem('auth');
+        if (authData) {
+          const parsed = JSON.parse(authData);
+          parsed.user = { ...parsed.user, ...profileData };
+          localStorage.setItem('auth', JSON.stringify(parsed));
+          // Update userData state to trigger re-render
+          setUserData(parsed.user);
+        }
+      } else {
+        setToast({ message: data.message || 'Failed to update profile', type: 'error' });
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      setToast({ message: 'Failed to update profile', type: 'error' });
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
 
   const handleToggleWishlist = async (productId: string, productName: string) => {
     try {
@@ -147,24 +273,6 @@ export default function MyAccountPage() {
     return null;
   }
 
-  // Get user data from Redux or sessionStorage
-  const getUserData = () => {
-    if (user) return user;
-    
-    try {
-      const authData = sessionStorage.getItem('auth');
-      if (authData) {
-        const parsed = JSON.parse(authData);
-        return parsed.user;
-      }
-    } catch (e) {
-      console.error('Error parsing auth data:', e);
-    }
-    return null;
-  };
-
-  const userData = getUserData();
-
   if (!userData) {
     return (
       <>
@@ -187,8 +295,8 @@ export default function MyAccountPage() {
 
   const handleLogout = () => {
     dispatch(logout());
-    sessionStorage.removeItem('customer_token');
-    sessionStorage.removeItem('auth');
+    localStorage.removeItem('customer_token');
+    localStorage.removeItem('auth');
     window.location.href = '/login';
   };
 
@@ -197,7 +305,6 @@ export default function MyAccountPage() {
     { id: 'orders', name: 'Orders', icon: Package },
     { id: 'wishlist', name: 'Wishlist', icon: Heart },
     { id: 'cart', name: 'Cart', icon: ShoppingCart },
-    { id: 'addresses', name: 'Addresses', icon: MapPin },
   ];
 
   return (
@@ -270,43 +377,98 @@ export default function MyAccountPage() {
                 <div className="bg-white rounded-lg shadow-sm p-3 xs:p-4 sm:p-6 md:p-8">
                   <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-5 md:mb-6">
                     <h2 className="text-sm xs:text-base sm:text-lg md:text-xl font-bold text-gray-900">Profile Information</h2>
-                    <button className="flex items-center gap-1 text-xs xs:text-sm text-[#B8941E] hover:underline">
-                      <Edit className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4" />
-                      Edit
-                    </button>
+                    {!isEditingProfile ? (
+                      <button 
+                        onClick={() => setIsEditingProfile(true)}
+                        className="flex items-center gap-1 text-xs xs:text-sm text-[#B8941E] hover:underline"
+                      >
+                        <Edit className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4" />
+                        Edit
+                      </button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => {
+                            setIsEditingProfile(false);
+                            fetchUserProfile(); // Reload data on cancel
+                          }}
+                          className="text-xs xs:text-sm text-gray-600 hover:underline"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={handleSaveProfile}
+                          disabled={isSavingProfile}
+                          className="text-xs xs:text-sm text-[#B8941E] hover:underline font-semibold disabled:opacity-50"
+                        >
+                          {isSavingProfile ? 'Saving...' : 'Save'}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="space-y-3 xs:space-y-3.5 sm:space-y-4">
-                    <div>
-                      <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                      <input
-                        type="text"
-                        value={userData.name || ''}
-                        readOnly
-                        className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-xs xs:text-sm sm:text-base"
-                      />
+                  {isLoadingProfile ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B8941E] mx-auto mb-2"></div>
+                      <p className="text-sm text-gray-600">Loading profile...</p>
                     </div>
-                    <div>
-                      <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Email</label>
-                      <input
-                        type="email"
-                        value={userData.email}
-                        readOnly
-                        className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-xs xs:text-sm sm:text-base break-all"
-                      />
-                    </div>
-                    {userData.phone && (
+                  ) : (
+                    <div className="space-y-3 xs:space-y-3.5 sm:space-y-4">
+                      <div>
+                        <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input
+                          type="text"
+                          value={isEditingProfile ? profileData.name : profileData.name}
+                          onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                          readOnly={!isEditingProfile}
+                          className={`w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border rounded-lg text-xs xs:text-sm sm:text-base ${
+                            isEditingProfile 
+                              ? 'border-gray-300 bg-white text-gray-900 focus:border-[#B8941E] focus:outline-none' 
+                              : 'border-gray-200 bg-gray-50 text-gray-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input
+                          type="email"
+                          value={userData?.email || ''}
+                          disabled
+                          className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 text-xs xs:text-sm sm:text-base break-all cursor-not-allowed"
+                        />
+                      </div>
                       <div>
                         <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Phone</label>
                         <input
                           type="tel"
-                          value={userData.phone}
-                          readOnly
-                          className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 text-xs xs:text-sm sm:text-base"
+                          value={isEditingProfile ? profileData.phone : profileData.phone}
+                          onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                          readOnly={!isEditingProfile}
+                          placeholder={isEditingProfile ? "Enter phone number" : ""}
+                          className={`w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border rounded-lg text-xs xs:text-sm sm:text-base ${
+                            isEditingProfile 
+                              ? 'border-gray-300 bg-white text-gray-900 focus:border-[#B8941E] focus:outline-none' 
+                              : 'border-gray-200 bg-gray-50 text-gray-900'
+                          }`}
                         />
                       </div>
-                    )}
-                  </div>
+                      <div>
+                        <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <textarea
+                          value={isEditingProfile ? profileData.address : profileData.address}
+                          onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
+                          readOnly={!isEditingProfile}
+                          placeholder={isEditingProfile ? "Enter your address" : ""}
+                          rows={3}
+                          className={`w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 border rounded-lg text-xs xs:text-sm sm:text-base resize-none ${
+                            isEditingProfile 
+                              ? 'border-gray-300 bg-white text-gray-900 focus:border-[#B8941E] focus:outline-none' 
+                              : 'border-gray-200 bg-gray-50 text-gray-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -482,22 +644,6 @@ export default function MyAccountPage() {
                       </div>
                     </>
                   )}
-                </div>
-              )}
-
-              {/* Addresses Tab */}
-              {activeTab === 'addresses' && (
-                <div className="bg-white rounded-lg shadow-sm p-3 xs:p-4 sm:p-6 md:p-8">
-                  <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-3 xs:mb-4 sm:mb-5 md:mb-6 gap-2 xs:gap-0">
-                    <h2 className="text-sm xs:text-base sm:text-lg md:text-xl font-bold text-gray-900">Saved Addresses</h2>
-                    <button className="bg-[#B8941E] text-white px-3 xs:px-4 py-1.5 xs:py-2 rounded-lg text-xs xs:text-sm font-semibold hover:bg-[#9a7a19] transition">
-                      Add Address
-                    </button>
-                  </div>
-                  <div className="text-center py-8 xs:py-10 sm:py-12 text-gray-500">
-                    <MapPin className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 mx-auto mb-2 xs:mb-2.5 sm:mb-3 text-gray-300" />
-                    <p className="text-xs xs:text-sm sm:text-base">No saved addresses</p>
-                  </div>
                 </div>
               )}
             </div>

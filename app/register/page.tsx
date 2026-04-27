@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -9,10 +9,12 @@ import { syncGuestCartWithAPI } from '@/store/slices/cartSlice';
 import { syncGuestWishlistWithAPI } from '@/store/slices/wishlistSlice';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, Phone, Eye, EyeOff } from 'lucide-react';
+import { checkAuth } from '@/lib/authSync';
 
 export default function RegisterPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated || false);
   const guestCartItems = useAppSelector((state) => state.cart?.items || []);
   const guestWishlistItems = useAppSelector((state) => state.wishlist?.items || []);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +26,15 @@ export default function RegisterPage() {
     password: '',
   });
   const [error, setError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    const authFromStorage = checkAuth();
+    if (isAuthenticated || authFromStorage) {
+      console.log('[Register] User already authenticated, redirecting to my-account');
+      router.replace('/my-account');
+    }
+  }, [isAuthenticated, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -58,7 +69,7 @@ export default function RegisterPage() {
 
       // Store token first
       if (data.data?.token) {
-        sessionStorage.setItem('customer_token', data.data.token);
+        localStorage.setItem('customer_token', data.data.token);
       }
 
       // Try all common nesting patterns
