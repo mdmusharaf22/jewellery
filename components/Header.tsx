@@ -116,6 +116,7 @@ export default function Header() {
       setGoldMenuOpen(false);
       setSilverMenuOpen(false);
     };
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -277,10 +278,10 @@ export default function Header() {
 
       {/* Gold Navigation Bar - Always Sticky - Hidden on mobile */}
       <div
-        className="bg-[#B8941E] sticky top-0 z-50 shadow-lg transition-all duration-300 hidden lg:block overflow-hidden"
+        className="bg-[#B8941E] sticky top-0 z-50 shadow-lg transition-all duration-300 hidden lg:block"
       >
         <div className="w-full px-4 lg:px-8 max-w-[100vw]">
-          <nav className="flex items-center justify-center gap-6 lg:gap-8 py-1.5 relative">
+          <nav className="flex items-center justify-center gap-6 lg:gap-8 py-1.5">
             <Link href="/" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Home
             </Link>
@@ -293,7 +294,7 @@ export default function Header() {
             >
               <button className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4">
                 Gold
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-3 h-3 transition-transform duration-200 ${goldMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -307,7 +308,7 @@ export default function Header() {
             >
               <button className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4">
                 Silver
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-3 h-3 transition-transform duration-200 ${silverMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -334,22 +335,22 @@ export default function Header() {
           </nav>
         </div>
 
-        {/* Gold Dropdown - Hidden on mobile/tablet */}
+        {/* Gold Dropdown - Positioned outside nav container */}
         {goldMenuOpen && (
           <div
-            className="hidden lg:block absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
+            className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-xl z-[9999] border-t-2 border-[#B8941E]"
             onMouseEnter={handleGoldEnter}
             onMouseLeave={handleGoldLeave}
           >
-            <div className="w-full py-6">
-              <div className="grid grid-cols-[60%_35%] gap-8 px-12">
+            <div className="w-full py-8 px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
                 {/* Categories */}
-                <div className="grid grid-cols-2 gap-x-12">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                   {goldCategories.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block leading-tight py-0.5"
+                      className="text-base text-gray-800 hover:text-[#B8941E] transition font-medium block leading-relaxed py-1 hover:bg-white/50 px-2 rounded"
                       onClick={() => setGoldMenuOpen(false)}
                     >
                       {item.name}
@@ -359,35 +360,35 @@ export default function Header() {
 
                 {/* Two Banner Images */}
                 <div className="flex flex-col gap-4">
-                  <div className="relative h-[200px] rounded-lg overflow-hidden group">
+                  <div className="relative h-[180px] rounded-lg overflow-hidden group">
                     <Image
                       src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=400&fit=crop&q=80"
                       alt="Gold Necklaces"
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      sizes="35vw"
+                      sizes="50vw"
                       priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
                       <div className="text-white">
-                        <p className="text-2xl font-bold">Necklaces</p>
+                        <p className="text-xl font-bold">Necklaces</p>
                         <p className="text-sm">Premium Collection</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="relative h-[200px] rounded-lg overflow-hidden group">
+                  <div className="relative h-[180px] rounded-lg overflow-hidden group">
                     <Image
                       src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&h=400&fit=crop&q=80"
                       alt="Gold Bangles"
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      sizes="35vw"
+                      sizes="50vw"
                       priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
                       <div className="text-white">
-                        <p className="text-2xl font-bold">Bangles</p>
+                        <p className="text-xl font-bold">Bangles</p>
                         <p className="text-sm">Traditional Designs</p>
                       </div>
                     </div>
@@ -398,22 +399,22 @@ export default function Header() {
           </div>
         )}
 
-        {/* Silver Dropdown - Hidden on mobile/tablet */}
+        {/* Silver Dropdown - Positioned outside nav container */}
         {silverMenuOpen && (
           <div
-            className="hidden lg:block absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-lg z-[100]"
+            className="absolute left-0 right-0 w-full bg-[#F5F1E8] shadow-xl z-[9999] border-t-2 border-[#B8941E]"
             onMouseEnter={handleSilverEnter}
             onMouseLeave={handleSilverLeave}
           >
-            <div className="w-full py-8">
-              <div className="grid grid-cols-[60%_35%] gap-8 px-12">
+            <div className="w-full py-8 px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
                 {/* Categories */}
-                <div className="grid grid-cols-2 gap-x-12">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                   {silverCategories.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="text-lg text-gray-800 hover:text-[#B8941E] transition font-medium block leading-tight py-0.5"
+                      className="text-base text-gray-800 hover:text-[#B8941E] transition font-medium block leading-relaxed py-1 hover:bg-white/50 px-2 rounded"
                       onClick={() => setSilverMenuOpen(false)}
                     >
                       {item.name}
@@ -428,7 +429,7 @@ export default function Header() {
                     alt="Silver Collection"
                     fill
                     className="object-cover"
-                    sizes="35vw"
+                    sizes="50vw"
                     priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">

@@ -82,7 +82,7 @@ export async function apiRequest(
   }
 
   try {
-    const response = await fetch(url, {
+    let response = await fetch(url, {
       ...restOptions,
       headers: requestHeaders,
     });
@@ -90,11 +90,38 @@ export async function apiRequest(
     // Log response status
     console.log(`[API Response] ${response.status} ${response.statusText} - ${url}`);
 
-    // Handle 401 Unauthorized - session expired
-    if (response.status === 401) {
-      console.error('[API Error] 401 Unauthorized - Session expired');
-      handleUnauthorized();
-      throw new Error('Session expired. Please login again.');
+    // Handle 401/403 Unauthorized - try refresh token
+    if ((response.status === 401 || response.status === 403) && requiresAuth) {
+      console.log('[API] Token expired or unauthorized, attempting refresh...');
+      
+      const { refreshAccessToken } = await import('./auth');
+      const refreshed = await refreshAccessToken();
+      
+      if (refreshed) {
+        // Retry with new token
+        const newToken = getAccessToken();
+        if (newToken) {
+          requestHeaders['Authorization'] = `Bearer ${newToken}`;
+        }
+        
+        response = await fetch(url, {
+          ...restOptions,
+          headers: requestHeaders,
+        });
+        
+        console.log(`[API Retry] ${response.status} ${response.statusText} - ${url}`);
+        
+        if (response.ok) {
+          console.log('[API] Request successful after token refresh');
+        }
+      }
+      
+      // If still unauthorized after refresh, redirect to login
+      if ((response.status === 401 || response.status === 403) && requiresAuth) {
+        console.error('[API Error] Authentication failed after refresh - redirecting to login');
+        handleUnauthorized();
+        throw new Error('Session expired. Please login again.');
+      }
     }
 
     const data = await response.json();

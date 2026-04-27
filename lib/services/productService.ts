@@ -1,7 +1,7 @@
 // Product Service - API calls for product CRUD operations
 
 import { getAccessToken } from '../auth';
-import { handleUnauthorized } from '../api';
+import { handleUnauthorized, apiRequest } from '../api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -77,6 +77,34 @@ export const getProduct = async (slug: string): Promise<Product> => {
     return data.data;
   } catch (error) {
     console.error('Error fetching product:', error);
+    throw error;
+  }
+};
+
+// Get featured products with enhanced auth handling
+export const getFeaturedProducts = async (): Promise<Product[]> => {
+  try {
+    // Use the enhanced API request function that handles refresh tokens
+    const data = await apiRequest('/products/featured', { requiresAuth: true });
+    return data.data || [];
+  } catch (error) {
+    console.error('Error fetching featured products:', error);
+    
+    // If authenticated request fails, try public products endpoint as fallback
+    try {
+      console.log('Trying public products endpoint as fallback...');
+      const publicData = await apiRequest('/products', { requiresAuth: false });
+      
+      if (publicData.success && publicData.data) {
+        // Filter for featured products
+        const featuredProducts = publicData.data.filter((product: Product) => product.is_featured === true);
+        console.log('Found', featuredProducts.length, 'featured products from public endpoint');
+        return featuredProducts;
+      }
+    } catch (fallbackError) {
+      console.error('Fallback to public endpoint also failed:', fallbackError);
+    }
+    
     throw error;
   }
 };

@@ -6,59 +6,140 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
+interface FeaturedProduct {
+  id: string;
+  name: string;
+  slug?: string;
+  short_description?: string;
+  base_weight?: number;
+  is_customizable?: boolean;
+  is_featured?: boolean;
+  cached_price?: number;
+  metal_type?: string;
+  images?: Array<{ url: string; alt?: string }>;
+}
+
 export default function PopularPicks() {
   const [isClient, setIsClient] = useState(false);
+  const [products, setProducts] = useState<FeaturedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const products = [
+  useEffect(() => {
+    if (!isClient) return;
+    
+    // Fetch featured products when component mounts
+    const loadFeaturedProducts = async () => {
+      setLoading(true);
+      setError(null);
+      console.log('PopularPicks: Starting to fetch featured products...');
+      
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+        console.log('PopularPicks: API_BASE_URL:', API_BASE_URL);
+        
+        if (!API_BASE_URL) {
+          console.error('PopularPicks: API_BASE_URL is not configured');
+          throw new Error('API_BASE_URL is not configured');
+        }
+
+        const url = `${API_BASE_URL}/products/featured`;
+        console.log('PopularPicks: Fetching from URL:', url);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors', // Explicitly set CORS mode
+        });
+
+        console.log('PopularPicks: Response status:', response.status);
+        console.log('PopularPicks: Response ok:', response.ok);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('PopularPicks: Error response:', errorText);
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        const data = await response.json();
+        console.log('PopularPicks: API Response:', data);
+
+        if (data.success && data.data) {
+          const featuredProducts = data.data;
+          console.log('PopularPicks: Featured products count:', featuredProducts.length);
+          console.log('PopularPicks: First product:', featuredProducts[0]);
+          setProducts(featuredProducts);
+        } else {
+          console.warn('PopularPicks: API response indicates failure or no data');
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error('PopularPicks: Failed to load featured products:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error');
+        // Fallback to empty array if API fails
+        setProducts([]);
+      } finally {
+        setLoading(false);
+        console.log('PopularPicks: Loading finished');
+      }
+    };
+
+    loadFeaturedProducts();
+  }, [isClient]);
+
+  // Fallback products for when API is unavailable or returns empty
+  const fallbackProducts = [
     { 
-      id: 1, 
+      id: '1', 
       name: 'Lakshmi Bridal Choker', 
-      price: '2,18,000', 
-      karat: '22KT Gold',
-      image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80'
+      cached_price: 218000, 
+      metal_type: '22KT Gold',
+      images: [{ url: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80', alt: 'Lakshmi Bridal Choker' }]
     },
     { 
-      id: 2, 
+      id: '2', 
       name: 'Temple Jhumka Pair', 
-      price: '86,500', 
-      karat: '22KT Gold',
-      image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80'
+      cached_price: 86500, 
+      metal_type: '22KT Gold',
+      images: [{ url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80', alt: 'Temple Jhumka Pair' }]
     },
     { 
-      id: 3, 
+      id: '3', 
       name: 'Silver Pooja Gift Set', 
-      price: '14,800', 
-      karat: '999 Silver',
-      image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80'
+      cached_price: 14800, 
+      metal_type: '999 Silver',
+      images: [{ url: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80', alt: 'Silver Pooja Gift Set' }]
     },
     { 
-      id: 4, 
+      id: '4', 
       name: 'Festival Gold Coin', 
-      price: '39,950', 
-      karat: '24KT Gold',
-      image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80'
-    },
-    { 
-      id: 5, 
-      name: 'Diamond Pendant Set', 
-      price: '1,45,000', 
-      karat: '18KT Gold',
-      image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop&q=80'
-    },
-    { 
-      id: 6, 
-      name: 'Antique Bangle Set', 
-      price: '95,000', 
-      karat: '22KT Gold',
-      image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&h=600&fit=crop&q=80'
+      cached_price: 39950, 
+      metal_type: '24KT Gold',
+      images: [{ url: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80', alt: 'Festival Gold Coin' }]
     },
   ];
 
-  if (!isClient) {
+  // Use API products if available, otherwise fallback
+  const displayProducts = products.length > 0 ? products : fallbackProducts;
+
+  // Helper function to format price
+  const formatPrice = (price?: number) => {
+    if (!price) return '0';
+    return new Intl.NumberFormat('en-IN').format(price);
+  };
+
+  // Helper function to get product image
+  const getProductImage = (product: FeaturedProduct) => {
+    return product.images?.[0]?.url || 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+  };
+
+  if (!isClient || loading) {
     return (
       <section className="bg-white">
         <div className="container mx-auto px-4 lg:px-8">
@@ -119,12 +200,12 @@ export default function PopularPicks() {
           }}
           className="popular-swiper cursor-grab"
         >
-          {products.map((product) => (
+          {displayProducts.map((product) => (
             <SwiperSlide key={product.id}>
               <div className="cursor-pointer group">
                 <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-shadow duration-300 group-hover:shadow-sm">
                   <Image
-                    src={product.image}
+                    src={getProductImage(product)}
                     alt={product.name}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -142,11 +223,11 @@ export default function PopularPicks() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-[#B8941E] mb-1 font-medium">{product.karat}</p>
+                  <p className="text-xs text-[#B8941E] mb-1 font-medium">{product.metal_type || 'Gold'}</p>
                   <h3 className="font-semibold text-base mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition-colors duration-300">
                     {product.name}
                   </h3>
-                  <p className="text-lg font-bold text-[#1a1a1a]">₹ {product.price}</p>
+                  <p className="text-lg font-bold text-[#1a1a1a]">₹ {formatPrice(product.cached_price)}</p>
                 </div>
               </div>
             </SwiperSlide>
