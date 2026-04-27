@@ -103,6 +103,10 @@ export default function ProductDetailPage() {
       category: category || 'products',
       images,
       description: apiProduct.description || apiProduct.short_description || '',
+      purityOptions: apiProduct.metal_type === 'gold' ? ['22KT (916)', '18KT'] : ['999 Silver'],
+      lengthOptions: apiProduct.length && apiProduct.length.length > 0 
+        ? apiProduct.length.map(l => `${l} inches`) 
+        : ['Standard'],
       productInfo: {
         weight: `${apiProduct.base_weight}g`,
         purity: apiProduct.metal_type === 'gold' ? '22KT' : '925 Silver',

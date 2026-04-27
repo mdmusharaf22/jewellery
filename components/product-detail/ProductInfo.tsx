@@ -21,8 +21,16 @@ interface ProductInfoProps {
 }
 
 export default function ProductInfo({ product }: ProductInfoProps) {
-  const [selectedPurity, setSelectedPurity] = useState(product.purityOptions[0]);
-  const [selectedLength, setSelectedLength] = useState(product.lengthOptions[0]);
+  // Provide default values if arrays are empty or undefined
+  const purityOptions = product.purityOptions && product.purityOptions.length > 0 
+    ? product.purityOptions 
+    : ['22KT (916)'];
+  const lengthOptions = product.lengthOptions && product.lengthOptions.length > 0 
+    ? product.lengthOptions 
+    : ['Standard'];
+    
+  const [selectedPurity, setSelectedPurity] = useState(purityOptions[0]);
+  const [selectedLength, setSelectedLength] = useState(lengthOptions[0]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const dispatch = useAppDispatch();
 
@@ -96,7 +104,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <div>
         <label className="block text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">GOLD PURITY</label>
         <div className="flex gap-2 sm:gap-3 flex-wrap">
-          {product.purityOptions.map((option) => (
+          {purityOptions.map((option) => (
             <button
               key={option}
               onClick={() => setSelectedPurity(option)}
@@ -116,7 +124,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <div>
         <label className="block text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">LENGTH</label>
         <div className="flex gap-2 sm:gap-3 flex-wrap">
-          {product.lengthOptions.map((option) => (
+          {lengthOptions.map((option) => (
             <button
               key={option}
               onClick={() => setSelectedLength(option)}

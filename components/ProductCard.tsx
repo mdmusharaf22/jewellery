@@ -154,7 +154,7 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
           
           {/* Heart Icon - Always Visible in Top Right */}
           <button 
-            className={`absolute top-2 xs:top-3 sm:top-4 right-2 xs:right-3 sm:right-4 w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-lg ${
+            className={`absolute top-2 xs:top-3 sm:top-4 right-2 xs:right-3 sm:right-4 w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-lg cursor-pointer ${
               isInWishlist 
                 ? 'bg-red-500 hover:bg-red-600' 
                 : 'bg-white hover:bg-gray-50'
@@ -232,7 +232,7 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
         
         {/* Heart Icon - Always Visible in Top Right */}
         <button 
-          className={`absolute top-1.5 xs:top-2 sm:top-3 right-1.5 xs:right-2 sm:right-3 w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition z-10 ${
+          className={`absolute top-1.5 xs:top-2 sm:top-3 right-1.5 xs:right-2 sm:right-3 w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition z-10 cursor-pointer ${
             isInWishlist 
               ? 'bg-red-500 hover:bg-red-600' 
               : 'bg-white hover:bg-gray-50'
