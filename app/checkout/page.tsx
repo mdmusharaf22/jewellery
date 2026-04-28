@@ -167,39 +167,24 @@ export default function CheckoutPage() {
         order_id: razorpay_order_id,
         handler: async function (response: any) {
           // Payment successful
-          console.log('Payment successful:', response);
+          console.log('=== RAZORPAY PAYMENT SUCCESS ===');
+          console.log('Full Response:', JSON.stringify(response, null, 2));
+          console.log('Order ID:', order_id);
+          console.log('Razorpay Order ID:', response.razorpay_order_id);
+          console.log('Razorpay Payment ID:', response.razorpay_payment_id);
+          console.log('Razorpay Signature:', response.razorpay_signature);
+          console.log('================================');
           
-          // Verify payment on backend (optional but recommended)
-          try {
-            const verifyResponse = await fetch(`${API}/orders/verify-payment`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token && { 'Authorization': `Bearer ${token}` })
-              },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                order_id: order_id
-              })
-            });
-
-            const verifyData = await verifyResponse.json();
-            
-            if (verifyData.success) {
-              // Clear cart
-              dispatch(clearCart());
-              
-              // Redirect to success page
-              router.push(`/order-success?order_id=${order_id}`);
-            } else {
-              throw new Error('Payment verification failed');
-            }
-          } catch (error) {
-            console.error('Payment verification error:', error);
-            alert('Payment verification failed. Please contact support.');
-          }
+          // Clear cart
+          dispatch(clearCart());
+          
+          // Redirect to success page with payment details
+          const successUrl = `/payment-success?order_id=${order_id}&payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}`;
+          console.log('Redirecting to:', successUrl);
+          
+          setTimeout(() => {
+            router.push(successUrl);
+          }, 500);
         },
         prefill: {
           name: formData.firstName,
@@ -211,8 +196,20 @@ export default function CheckoutPage() {
         },
         modal: {
           ondismiss: function() {
+            console.log('=== RAZORPAY PAYMENT CANCELLED/FAILED ===');
+            console.log('User dismissed the payment modal');
+            console.log('Order ID:', order_id);
+            console.log('Razorpay Order ID:', razorpay_order_id);
+            console.log('=========================================');
             setIsSubmitting(false);
-            console.log('Payment cancelled by user');
+            
+            // Redirect to failure page
+            const failureUrl = `/payment-failure?order_id=${order_id}&razorpay_order_id=${razorpay_order_id}&error_reason=Payment Cancelled&error_description=You cancelled the payment or closed the payment window.`;
+            console.log('Redirecting to:', failureUrl);
+            
+            setTimeout(() => {
+              router.push(failureUrl);
+            }, 500);
           }
         }
       };
