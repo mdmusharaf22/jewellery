@@ -77,7 +77,7 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
                   {searchResults.map((product) => (
                     <a
                       key={product.id}
-                      href={`/${product.category}/${product.slug}?name=${encodeURIComponent(product.name)}&price=${product.price}&karat=${encodeURIComponent(product.karat)}`}
+                      href={`/p/details/${product.slug}?name=${encodeURIComponent(product.name)}&price=${product.price}&karat=${encodeURIComponent(product.karat)}`}
                       onClick={onClose}
                       className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:border-[#B8941E] hover:shadow-md transition group"
                     >

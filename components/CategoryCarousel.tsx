@@ -2,36 +2,76 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
-  image: string;
+  slug: string;
+  image_url: string | null;
+  metal_type: string;
 }
 
 interface CategoryCarouselProps {
   title: string;
   subtitle: string;
-  categories: Category[];
   autoplayDelay?: number;
 }
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function CategoryCarousel({
   title,
   subtitle,
-  categories,
   autoplayDelay = 4000,
 }: CategoryCarouselProps) {
   const [isClient, setIsClient] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  if (!isClient) {
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/categories`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            // Filter only parent categories (parent_id === null)
+            const parentCategories = data.data.filter((cat: any) => cat.parent_id === null);
+            setCategories(parentCategories);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Show blank placeholder if no image
+  const getImageUrl = (category: Category) => {
+    return category.image_url || null;
+  };
+
+  if (!isClient || loading) {
     return (
       <section className="bg-white">
         <div className="container mx-auto px-4 lg:px-8">
@@ -56,6 +96,10 @@ export default function CategoryCarousel({
     );
   }
 
+  if (categories.length === 0) {
+    return null; // Don't show section if no categories
+  }
+
   return (
     <section className="bg-white overflow-hidden">
       <div className="container mx-auto px-2 xs:px-3 sm:px-4 lg:px-8 max-w-[100vw]">
@@ -77,7 +121,7 @@ export default function CategoryCarousel({
             delay: autoplayDelay,
             disableOnInteraction: false,
           }}
-          loop={true}
+          loop={categories.length > 2}
           breakpoints={{
             640: {
               slidesPerView: 3,
@@ -90,27 +134,40 @@ export default function CategoryCarousel({
           }}
           className="category-swiper cursor-grab"
         >
-          {categories.map((category) => (
-            <SwiperSlide key={category.id}>
-              <div className="cursor-pointer group">
-                <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-shadow duration-300 group-hover:shadow-sm">
-                  <Image
-                    src={category.image}
-                    alt={category.name}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    loading="eager"
-                    unoptimized
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-                </div>
-                <h3 className="text-center font-semibold text-[#1a1a1a] text-sm md:text-base group-hover:text-[#B8941E] transition-colors duration-300">
-                  {category.name}
-                </h3>
-              </div>
-            </SwiperSlide>
-          ))}
+          {categories.map((category) => {
+            const imageUrl = getImageUrl(category);
+            return (
+              <SwiperSlide key={category.id}>
+                <Link href={`/products/${category.slug}`} className="cursor-pointer group block">
+                  <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-shadow duration-300 group-hover:shadow-sm bg-gray-100">
+                    {imageUrl ? (
+                      <>
+                        <Image
+                          src={imageUrl}
+                          alt={category.name}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-110"
+                          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                          loading="eager"
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-center font-semibold text-[#1a1a1a] text-sm md:text-base group-hover:text-[#B8941E] transition-colors duration-300">
+                    {category.name}
+                  </h3>
+                </Link>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
       </div>
     </section>

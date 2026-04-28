@@ -49,6 +49,7 @@ interface Product {
 
 const VALID_CATEGORIES = new Set([
   'all',
+  'gold', 'silver', // Added metal type categories
   'tali', 'gold-kaapu', 'tali-chain', 'bracelet', 'necklace',
   'gold-jhumkas', 'kalipot', 'gold-dollar', 'dollar-chain',
   'gold-ring', 'stud', 'bangles', 'haram',
@@ -274,7 +275,7 @@ export default function CategoryOrProductPage() {
         </div>
 
         {/* Product Section - Only Image Gallery and Product Info */}
-        <div className="w-[95%] sm:w-[90%] mx-auto px-2 xs:px-3 sm:px-4 py-4 xs:py-6 sm:py-8 max-w-[100vw]">
+        <div className="w-[90%] mx-auto px-2 xs:px-3 sm:px-4 py-4 xs:py-6 sm:py-8 max-w-[100vw]">
           <div className="lg:flex lg:gap-4 xl:gap-6 2xl:gap-8 mb-6 sm:mb-8">
             {/* Left: Image Gallery - Sticky only for this section */}
             <div className="lg:w-1/2">
@@ -392,7 +393,7 @@ export default function CategoryOrProductPage() {
 
       {/* Main Content */}
       <div className="bg-white">
-        <div className="container mx-auto px-4 py-12">
+        <div className="w-[90%] mx-auto px-4 py-12">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <aside className="lg:w-1/4">

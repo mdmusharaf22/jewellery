@@ -20,8 +20,10 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [shortDescription, setShortDescription] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [parentCategoryId, setParentCategoryId] = useState('');
+  const [subcategoryId, setSubcategoryId] = useState('');
   const [categories, setCategories] = useState<any[]>([]);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [baseWeight, setBaseWeight] = useState('');
   const [lengthMetric, setLengthMetric] = useState('');
@@ -31,6 +33,8 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
   const [isCustomizable, setIsCustomizable] = useState(false);
   const [cachedPrice, setCachedPrice] = useState('');
   const [metalType, setMetalType] = useState<'gold' | 'silver' | ''>('');
+  const [ageGroup, setAgeGroup] = useState<'adult' | 'kid' | ''>('');
+  const [gender, setGender] = useState<'male' | 'female' | 'unisex' | ''>('unisex');
   const [makingCharges, setMakingCharges] = useState('');
   const [gemstoneValue, setGemstoneValue] = useState('');
   const [wastage, setWastage] = useState('');
@@ -62,7 +66,8 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
       setName(product.name || '');
       setDescription(product.description || '');
       setShortDescription(product.short_description || '');
-      setCategoryId(product.category_id || '');
+      setParentCategoryId(product.category_id || '');
+      setSubcategoryId(product.subcategory_id || '');
       setBaseWeight(product.base_weight !== undefined ? String(product.base_weight) : '');
       setLengthMetric(product.length_metric || '');
       setSeoTitle(product.seo_title || '');
@@ -71,28 +76,63 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
       setIsCustomizable(!!product.is_customizable);
       setCachedPrice(product.cached_price !== undefined && product.cached_price !== null ? String(product.cached_price) : '');
       setMetalType(product.metal_type || '');
-      setMakingCharges(product.making_charges !== undefined && product.making_charges !== null ? String(product.making_charges) : '');
-      setGemstoneValue(product.gemstone_value !== undefined && product.gemstone_value !== null ? String(product.gemstone_value) : '');
-      setWastage(product.wastage !== undefined && product.wastage !== null ? String(product.wastage) : '');
-      setGst(product.gst !== undefined && product.gst !== null ? String(product.gst) : '');
+      setAgeGroup(product.age_group || '');
+      setGender(product.gender || 'unisex');
+      
+      // Load from price_breakup if available, otherwise from direct properties
+      setMakingCharges(
+        product.price_breakup?.making_charges !== undefined && product.price_breakup?.making_charges !== null 
+          ? String(product.price_breakup.making_charges)
+          : (product.making_charges !== undefined && product.making_charges !== null ? String(product.making_charges) : '')
+      );
+      setGemstoneValue(
+        product.price_breakup?.gemstone_value !== undefined && product.price_breakup?.gemstone_value !== null
+          ? String(product.price_breakup.gemstone_value)
+          : (product.gemstone_value !== undefined && product.gemstone_value !== null ? String(product.gemstone_value) : '')
+      );
+      setWastage(
+        product.price_breakup?.wastage !== undefined && product.price_breakup?.wastage !== null
+          ? String(product.price_breakup.wastage)
+          : (product.wastage !== undefined && product.wastage !== null ? String(product.wastage) : '')
+      );
+      setGst(
+        product.price_breakup?.gst !== undefined && product.price_breakup?.gst !== null
+          ? String(product.price_breakup.gst)
+          : (product.gst !== undefined && product.gst !== null ? String(product.gst) : '')
+      );
+      
       setLengths(product.length?.join(',') || '');
       
       // Load existing images and videos
       setImageUrls(product.images || []);
       setVideoUrls(product.videos || []);
       
+      // Populate subcategories if parent category is set
+      if (product.category_id && categories.length > 0) {
+        const selectedParent = categories.find((cat: any) => cat.id === product.category_id);
+        if (selectedParent && selectedParent.children) {
+          setSubcategories(selectedParent.children);
+        }
+      }
+      
       console.log('Loaded values:', {
         description: product.description,
-        categoryId: product.category_id,
+        parentCategoryId: product.category_id,
+        subcategoryId: product.subcategory_id,
         lengthMetric: product.length_metric,
         seoTitle: product.seo_title,
         metalType: product.metal_type,
+        ageGroup: product.age_group,
+        gender: product.gender,
         makingCharges: product.making_charges
       });
       
-      // Features: convert array of strings to array of {key: '', value: string}
+      // Features: load key-value pairs correctly
       if (product.features && Array.isArray(product.features) && product.features.length > 0) {
-        setFeatures(product.features.map((f: any) => ({ key: '', value: typeof f === 'string' ? f : f.value || '' })));
+        setFeatures(product.features.map((f: any) => ({
+          key: f.key || '',
+          value: f.value || ''
+        })));
       } else {
         setFeatures([{ key: '', value: '' }]);
       }
@@ -115,7 +155,8 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
     setName('');
     setDescription('');
     setShortDescription('');
-    setCategoryId('');
+    setParentCategoryId('');
+    setSubcategoryId('');
     setBaseWeight('');
     setLengthMetric('');
     setSeoTitle('');
@@ -133,6 +174,8 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
     setDimensions([{ key: '', value: '' }]);
     setLivePrice(null);
     setMetalType('');
+    setAgeGroup('');
+    setGender('unisex');
     setMakingCharges('');
     setGemstoneValue('');
     setWastage('');
@@ -196,13 +239,31 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
       
       const data = await res.json();
       if (data.success && data.data) {
-        // Keep all categories with nested structure
-        setCategories(data.data);
+        // Keep only parent categories
+        const parentCategories = data.data.filter((cat: any) => !cat.parent_id);
+        setCategories(parentCategories);
       }
     } catch (err) {
       // Silent error handling
     } finally {
       setLoadingCategories(false);
+    }
+  };
+
+  // Handle parent category change and populate subcategories
+  const handleParentCategoryChange = (parentId: string) => {
+    setParentCategoryId(parentId);
+    setSubcategoryId(''); // Reset subcategory when parent changes
+    
+    if (parentId) {
+      const selectedParent = categories.find((cat: any) => cat.id === parentId);
+      if (selectedParent && selectedParent.children) {
+        setSubcategories(selectedParent.children);
+      } else {
+        setSubcategories([]);
+      }
+    } else {
+      setSubcategories([]);
     }
   };
 
@@ -348,13 +409,16 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
         description: description || "",
         short_description: shortDescription || "",
         base_weight: parseFloat(baseWeight),
-        category_id: categoryId || "",
+        category_id: parentCategoryId || "",
+        subcategory_id: subcategoryId || "",
         is_customizable: isCustomizable,
         is_featured: isFeatured,
         length_metric: lengthMetric || "",
         seo_title: seoTitle || "",
         seo_description: seoDescription || "",
-        metal_type: metalType || "gold", // Default to "gold" since API expects 'gold' | 'silver'
+        metal_type: metalType || "",
+        age_group: ageGroup || "",
+        gender: gender || "",
         making_charges: makingCharges ? parseFloat(makingCharges) : 0,
         wastage: wastage ? parseFloat(wastage) : 0,
         gst_percentage: gst ? parseFloat(gst) : 0,
@@ -436,34 +500,84 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Parent Category</label>
                     <select
-                      value={categoryId}
-                      onChange={(e) => setCategoryId(e.target.value)}
+                      value={parentCategoryId}
+                      onChange={(e) => handleParentCategoryChange(e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                       disabled={loading || loadingCategories}
                     >
-                      <option value="">Select Category</option>
-                      {categories
-                        .filter((cat: any) => !cat.parent_id)
-                        .map((cat: any) => (
-                          <optgroup key={cat.id} label={cat.name}>
-                            {cat.children && cat.children.length > 0 ? (
-                              cat.children.map((sub: any) => (
-                                <option key={sub.id} value={sub.id}>
-                                  {sub.name}
-                                </option>
-                              ))
-                            ) : (
-                              <option value={cat.id}>{cat.name}</option>
-                            )}
-                          </optgroup>
-                        ))}
+                      <option value="">Select Parent Category</option>
+                      {categories.map((cat: any) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory</label>
+                    <select
+                      value={subcategoryId}
+                      onChange={(e) => setSubcategoryId(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      disabled={loading || loadingCategories || !parentCategoryId}
+                    >
+                      <option value="">Select Subcategory</option>
+                      {subcategories.map((sub: any) => (
+                        <option key={sub.id} value={sub.id}>
+                          {sub.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Metal Type</label>
+                    <select
+                      value={metalType}
+                      onChange={(e) => handleMetalTypeChange(e.target.value as 'gold' | 'silver' | '')}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      disabled={loading}
+                    >
+                      <option value="">Select Metal Type</option>
+                      <option value="gold">Gold</option>
+                      <option value="silver">Silver</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Base Weight (g) <span className="text-red-500">*</span></label>
                     <input type="number" step="0.01" value={baseWeight} onChange={(e) => setBaseWeight(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent" disabled={loading} placeholder="e.g., 15.5" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Age Group</label>
+                    <select
+                      value={ageGroup}
+                      onChange={(e) => setAgeGroup(e.target.value as 'adult' | 'kid' | '')}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      disabled={loading}
+                    >
+                      <option value="">Select Age Group</option>
+                      <option value="adult">Adult</option>
+                      <option value="kid">Kid</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'unisex' | '')}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      disabled={loading}
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="unisex">Unisex</option>
+                    </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">

@@ -5,8 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
-import 'swiper/css';
-import 'swiper/css/pagination';
+
 
 export default function Hero() {
   const pathname = usePathname();
@@ -62,7 +61,7 @@ export default function Hero() {
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
-            <div className="relative min-h-[400px] xs:min-h-[450px] sm:min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
+            <div className="relative h-[80dvh]">
               <div className="absolute inset-0">
                 <div className="relative w-full h-full">
                   <div 
@@ -76,17 +75,17 @@ export default function Hero() {
               <div className="absolute inset-0 flex items-center">
                 <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 max-w-[100vw]">
                   <div className="max-w-xl lg:max-w-2xl">
-                    <div className="inline-block bg-white rounded-full px-3 py-1 xs:px-4 xs:py-1.5 sm:px-5 sm:py-2 mb-3 xs:mb-4 sm:mb-6 md:mb-8">
-                      <p className="text-[#1a1a1a] text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-medium">
+                    <div className="inline-block bg-white rounded-full px-3 py-1 xs:px-4 xs:py-1.5 sm:px-5 sm:py-2 mb-3 xs:mb-4">
+                      <p className="text-[#1a1a1a] text-xs font-medium">
                         {slide.tag}
                       </p>
                     </div>
 
-                    <h1 className="text-white text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 xs:mb-3 sm:mb-4 md:mb-6 leading-[1.2] max-w-lg whitespace-pre-line">
+                    <h1 className="text-white text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-[1.2] max-w-lg whitespace-pre-line">
                       {slide.title}
                     </h1>
 
-                    <p className="text-white/90 text-[11px] xs:text-xs sm:text-sm md:text-base mb-3 xs:mb-4 sm:mb-6 md:mb-8 max-w-md leading-relaxed">
+                    <p className="text-white/90 text-[11px] xs:text-xs sm:text-sm md:text-base mb-3 max-w-md leading-relaxed">
                       {slide.description}
                     </p>
 

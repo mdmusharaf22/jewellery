@@ -140,10 +140,20 @@ export default function CategoriesContent() {
   };
 
   // ── CRUD handlers ─────────────────────────────────────────────────────────
-  const handleCreate = async (formData: { name: string }) => {
+  const handleCreate = async (formData: { name: string; metal_type?: string; image_url?: string }) => {
     const isSubView = view === 'subcategories';
     const payload: any = { name: formData.name };
-    if (isSubView) payload.parent_id = activeParent!.id;
+    if (isSubView) {
+      payload.parent_id = activeParent!.id;
+    } else {
+      // For parent categories, include metal_type and image_url
+      if (formData.metal_type) {
+        payload.metal_type = formData.metal_type;
+      }
+      if (formData.image_url) {
+        payload.image_url = formData.image_url;
+      }
+    }
 
     const res = await fetch(`${API}/categories`, {
       method: 'POST',
@@ -170,10 +180,20 @@ export default function CategoriesContent() {
     }
   };
 
-  const handleUpdate = async (formData: { name: string }) => {
+  const handleUpdate = async (formData: { name: string; metal_type?: string; image_url?: string }) => {
     if (!selectedItem) return;
     const payload: any = { name: formData.name };
-    if (view === 'subcategories') payload.parent_id = activeParent.id;
+    if (view === 'subcategories') {
+      payload.parent_id = activeParent.id;
+    } else {
+      // For parent categories, include metal_type and image_url
+      if (formData.metal_type) {
+        payload.metal_type = formData.metal_type;
+      }
+      if (formData.image_url) {
+        payload.image_url = formData.image_url;
+      }
+    }
 
     const res = await fetch(`${API}/categories/${selectedItem.id}`, {
       method: 'PUT',
@@ -279,6 +299,16 @@ export default function CategoriesContent() {
         >
           {value}
         </button>
+      ),
+    },
+    {
+      key: 'metal_type',
+      label: 'Metal Type',
+      sortable: true,
+      render: (value: string) => (
+        <span className="text-sm text-gray-900 capitalize">
+          {value || '—'}
+        </span>
       ),
     },
     {
@@ -408,6 +438,7 @@ export default function CategoriesContent() {
         category={selectedItem}
         mode={modalMode}
         label={view === 'subcategories' ? 'Subcategory' : 'Category'}
+        isParentCategory={view === 'categories'}
       />
 
       {/* Delete Modal */}

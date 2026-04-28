@@ -140,12 +140,12 @@ export default function OrdersContent() {
               {Array.from({ length: meta.total_pages }, (_, i) => i + 1)
                 .filter((p) => p === 1 || p === meta.total_pages || Math.abs(p - page) <= 2)
                 .map((p, idx, arr) => (
-                  <>
+                  <div key={`page-group-${p}`} className="flex items-center">
                     {idx > 0 && arr[idx - 1] !== p - 1 && (
                       <span key={`ellipsis-${p}`} className="px-2 text-gray-500">…</span>
                     )}
                     <button
-                      key={p}
+                      key={`button-${p}`}
                       onClick={() => setPage(p)}
                       className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
                         page === p
@@ -155,7 +155,7 @@ export default function OrdersContent() {
                     >
                       {p}
                     </button>
-                  </>
+                  </div>
                 ))}
               <button
                 onClick={() => setPage((p) => p + 1)}

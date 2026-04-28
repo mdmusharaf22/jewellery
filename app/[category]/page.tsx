@@ -59,13 +59,13 @@ export default function CategoryPage() {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40" />
         <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold">All Products</h1>
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold">{categoryName}</h1>
         </div>
       </section>
 
       {/* Main Content */}
       <div className="bg-white overflow-hidden">
-        <div className="container mx-auto px-2 xs:px-3 sm:px-4 py-4 sm:py-6 md:py-8 max-w-[100vw]">
+        <div className="w-[90%] mx-auto px-2 xs:px-3 sm:px-4 py-4 sm:py-6 md:py-8 max-w-[100vw]">
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8">
             {/* Sidebar Filters */}
             <aside className="lg:w-1/4">

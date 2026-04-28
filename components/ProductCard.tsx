@@ -129,8 +129,8 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
     ? parseFloat(product.price.replace(/,/g, ''))
     : product.price;
 
-  const productUrl = product.slug && product.category 
-    ? `/${product.category}/${product.slug}?name=${encodeURIComponent(product.name)}&price=${price}&karat=${encodeURIComponent(product.karat)}`
+  const productUrl = product.slug 
+    ? `/p/details/${product.slug}?name=${encodeURIComponent(product.name)}&price=${price}&karat=${encodeURIComponent(product.karat)}`
     : '#';
 
   // List View
@@ -138,7 +138,7 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
     return (
       <a
         href={productUrl}
-        className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 group flex flex-col sm:flex-row gap-3 xs:gap-4 sm:gap-6 p-2 xs:p-3 sm:p-4"
+        className="bg-white overflow-hidden hover:shadow-md transition-all duration-300 group flex flex-col sm:flex-row gap-3 xs:gap-4 sm:gap-6 p-2 xs:p-3 sm:p-4"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -216,12 +216,12 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
   return (
     <a
       href={productUrl}
-      className="bg-white rounded-lg overflow-hidden hover:shadow-xs transition-all duration-300 group cursor-pointer block"
+      className="bg-white overflow-hidden hover:shadow-xs transition-all duration-300 group cursor-pointer block"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+      <div className="relative aspect-square overflow-hidden bg-gray-100 rounded-lg">
         <Image
           src={product.image}
           alt={product.name}
@@ -270,9 +270,9 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
       </div>
 
       {/* Product Info */}
-      <div className="p-2 xs:p-2.5 sm:p-3 md:p-4">
-        <p className="text-[9px] xs:text-[10px] sm:text-xs text-[#B8941E] font-medium mb-0.5 sm:mb-1">{product.karat}</p>
-        <h3 className="font-bold text-xs xs:text-sm sm:text-base mb-1 sm:mb-2 text-[#1a1a1a] group-hover:text-[#B8941E] transition line-clamp-2 leading-tight">
+      <div className="py-2">
+        <p className="text-[9px] xs:text-[10px] sm:text-xs text-[#B8941E] font-medium mb-0.5">{product.karat}</p>
+        <h3 className="font-bold text-xs xs:text-sm sm:text-base text-[#1a1a1a] group-hover:text-[#B8941E] transition line-clamp-2 leading-tight">
           {product.name}
         </h3>
         <p className="text-sm xs:text-base sm:text-lg font-bold text-[#1a1a1a]">

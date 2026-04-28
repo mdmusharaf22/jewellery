@@ -23,7 +23,6 @@ export default function ProductFilters({
 }: ProductFiltersProps) {
   const router = useRouter();
   const [expandedSections, setExpandedSections] = useState({
-    categories: true,
     priceRange: true,
     carat: true,
   });
@@ -43,42 +42,12 @@ export default function ProductFilters({
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const goldCategories = [
-    { label: 'All Gold', value: 'gold' },
-    { label: 'TALI', value: 'tali' },
-    { label: 'TALI CHAIN', value: 'tali-chain' },
-    { label: 'Necklace', value: 'necklace' },
-    { label: 'Kalipot', value: 'kalipot' },
-    { label: 'Dollar chain', value: 'dollar-chain' },
-    { label: 'Stud', value: 'stud' },
-    { label: 'Bangles', value: 'bangles' },
-    { label: 'Gold Kaapu', value: 'gold-kaapu' },
-    { label: 'Bracelet', value: 'bracelet' },
-    { label: 'Gold Jhumkas', value: 'gold-jhumkas' },
-    { label: 'Gold Dollar', value: 'gold-dollar' },
-    { label: 'Gold Ring', value: 'gold-ring' },
-    { label: 'Haram', value: 'haram' },
-  ];
-
-  const silverCategories = [
-    { label: 'All Silver', value: 'silver' },
-    { label: 'Anklet', value: 'anklet' },
-    { label: 'Kappu', value: 'kappu' },
-    { label: 'Key Chain', value: 'key-chain' },
-    { label: 'Ring', value: 'ring' },
-    { label: 'Tattu', value: 'tattu' },
-  ];
-
   const caratOptions = [
     { label: 'All', value: 'all' },
     { label: '18K', value: '18k' },
     { label: '22K', value: '22k' },
     { label: '24K', value: '24k' },
   ];
-
-  const handleCategoryChange = (category: string) => {
-    router.push(`/${category}`);
-  };
 
   const formatPrice = (value: number) => {
     if (value >= 100000) {
@@ -91,69 +60,6 @@ export default function ProductFilters({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        {/* Categories Section */}
-        <div className="border-b border-gray-200">
-          <button
-            onClick={() => toggleSection('categories')}
-            className="w-full px-3 xs:px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-gray-50 transition"
-          >
-            <h3 className="text-base sm:text-lg font-bold text-[#1a1a1a]">Categories</h3>
-            {expandedSections.categories ? (
-              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-            ) : (
-              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-            )}
-          </button>
-          
-          {expandedSections.categories && (
-            <div className="px-3 xs:px-4 sm:px-6 pb-3 sm:pb-4">
-              {/* Gold Section */}
-              <div className="mb-3 sm:mb-4">
-                <h4 className="text-xs sm:text-sm font-semibold text-gray-900 mb-1.5 sm:mb-2">Gold Jewels</h4>
-                <div className="space-y-1.5 sm:space-y-2">
-                  {goldCategories.map((category) => (
-                    <label key={category.value} className="flex items-center cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="category"
-                        value={category.value}
-                        checked={selectedCategory === category.value}
-                        onChange={() => handleCategoryChange(category.value)}
-                        className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
-                      />
-                      <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 group-hover:text-[#B8941E] transition">
-                        {category.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Silver Section */}
-              <div>
-                <h4 className="text-xs sm:text-sm font-semibold text-gray-900 mb-1.5 sm:mb-2">Silver Jewels</h4>
-                <div className="space-y-1.5 sm:space-y-2">
-                  {silverCategories.map((category) => (
-                    <label key={category.value} className="flex items-center cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="category"
-                        value={category.value}
-                        checked={selectedCategory === category.value}
-                        onChange={() => handleCategoryChange(category.value)}
-                        className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B8941E] border-gray-300 focus:ring-[#B8941E]"
-                      />
-                      <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 group-hover:text-[#B8941E] transition">
-                        {category.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Price Range Section */}
         <div className="border-b border-gray-200">
           <button

@@ -246,7 +246,7 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Product Section */}
-      <div className="w-[95%] sm:w-[90%] mx-auto px-2 xs:px-3 sm:px-4 py-4 xs:py-6 sm:py-8 max-w-[100vw] overflow-hidden">
+      <div className="w-[90%] mx-auto px-2 xs:px-3 sm:px-4 py-4 xs:py-6 sm:py-8 max-w-[100vw] overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 xs:gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Left: Image Gallery - Sticky */}
           <div className="lg:sticky lg:top-4 lg:self-start">

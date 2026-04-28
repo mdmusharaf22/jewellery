@@ -8,6 +8,15 @@ import SearchPopup from './SearchPopup';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { checkAuth, getUserFromSession } from '@/lib/authSync';
 import { login } from '@/store/slices/authSlice';
+import { getCategories, type Category } from '@/lib/services/categoryService';
+
+// Extended Category interface to match API response
+interface CategoryWithChildren extends Category {
+  parent_id?: string | null;
+  metal_type?: string;
+  image_url?: string | null;
+  children?: CategoryWithChildren[];
+}
 
 export default function Header() {
   const dispatch = useAppDispatch();
@@ -75,6 +84,10 @@ export default function Header() {
   const [silverPrice, setSilverPrice] = useState('94');
   const [pricesLoading, setPricesLoading] = useState(true);
 
+  // Categories state
+  const [categories, setCategories] = useState<CategoryWithChildren[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
   // Log cart state whenever it changes
   useEffect(() => {
     console.log('[Header] Cart state updated:', {
@@ -83,6 +96,25 @@ export default function Header() {
       items: cartItems.map(item => ({ id: item.id, name: item.name, quantity: item.quantity }))
     });
   }, [cartItems, cartCount]);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const data = await getCategories();
+        setCategories(data as CategoryWithChildren[]);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        // Fallback to empty array on error
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Fetch live gold and silver prices
   useEffect(() => {
@@ -145,13 +177,48 @@ export default function Header() {
       }
     };
 
-    // Initial fetch
+    let interval: NodeJS.Timeout | null = null;
+
+    // Initial fetch on load
     fetchPrices();
     
-    // Refresh prices every 10 seconds for demo (change to 5 minutes in production)
-    const interval = setInterval(fetchPrices, 10 * 1000);
+    // Set up 20-minute interval only when page is visible
+    const startInterval = () => {
+      if (interval) clearInterval(interval);
+      interval = setInterval(fetchPrices, 20 * 60 * 1000); // 20 minutes
+    };
+
+    const stopInterval = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    // Handle page visibility changes
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+        console.log('Page hidden - stopping price updates');
+      } else {
+        fetchPrices(); // Fetch immediately when page becomes visible
+        startInterval();
+        console.log('Page visible - resuming price updates');
+      }
+    };
+
+    // Start interval if page is visible
+    if (!document.hidden) {
+      startInterval();
+    }
+
+    // Listen for visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
-    return () => clearInterval(interval);
+    return () => {
+      stopInterval();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
   
   const [searchOpen, setSearchOpen] = useState(false);
@@ -196,33 +263,32 @@ export default function Header() {
     silverCloseTimeout.current = setTimeout(() => setSilverMenuOpen(false), 120);
   };
 
-  const goldCategories = [
-    { name: 'TALI', href: '/tali' },
-    { name: 'Gold Kaapu', href: '/gold-kaapu' },
-    { name: 'TALI CHAIN', href: '/tali-chain' },
-    { name: 'Bracelet', href: '/bracelet' },
-    { name: 'Necklace', href: '/necklace' },
-    { name: 'Gold Jhumkas', href: '/gold-jhumkas' },
-    { name: 'Kalipot', href: '/kalipot' },
-    { name: 'Gold Dollar', href: '/gold-dollar' },
-    { name: 'Dollar chain', href: '/dollar-chain' },
-    { name: 'Gold Ring', href: '/gold-ring' },
-    { name: 'Stud', href: '/stud' },
-    { name: 'All', href: '/all' },
-    { name: 'Bangles', href: '/bangles' },
-    { name: 'Haram', href: '/haram' },
-  ];
+  // Filter categories by metal type and prepare menu structure
+  const goldCategories = categories
+    .filter(cat => cat.metal_type === 'gold' && !cat.parent_id)
+    .map(parent => ({
+      title: parent.name,
+      slug: parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-'),
+      items: parent.children && parent.children.length > 0
+        ? parent.children.map(child => ({
+            name: child.name,
+            href: `/products/${child.slug || child.name.toLowerCase().replace(/\s+/g, '-')}`
+          }))
+        : [{ name: parent.name, href: `/products/${parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-')}` }]
+    }));
 
-  const silverCategories = [
-    { name: 'Anklet', href: '/anklet' },
-    { name: 'Ring', href: '/ring' },
-    { name: 'Bangles', href: '/bangles' },
-    { name: 'Bracelet', href: '/bracelet' },
-    { name: 'Kappu', href: '/kappu' },
-    { name: 'Tattu', href: '/tattu' },
-    { name: 'Key Chain', href: '/key-chain' },
-    { name: 'All', href: '/all' },
-  ];
+  const silverCategories = categories
+    .filter(cat => cat.metal_type === 'silver' && !cat.parent_id)
+    .map(parent => ({
+      title: parent.name,
+      slug: parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-'),
+      items: parent.children && parent.children.length > 0
+        ? parent.children.map(child => ({
+            name: child.name,
+            href: `/products/${child.slug || child.name.toLowerCase().replace(/\s+/g, '-')}`
+          }))
+        : [{ name: parent.name, href: `/products/${parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-')}` }]
+    }));
 
   return (
     <>
@@ -231,11 +297,23 @@ export default function Header() {
         <div className="w-full px-2 sm:px-4 lg:px-8 max-w-[100vw]">
           <div className="flex flex-wrap justify-between items-center gap-1 sm:gap-2">
             <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-6 text-[10px] sm:text-[11px] md:text-xs">
-              <span className="whitespace-nowrap">
-                Gold: ₹{pricesLoading ? '...' : goldPrice}/g
+              <span className="whitespace-nowrap flex items-center gap-1">
+                Gold: ₹
+                {pricesLoading ? (
+                  <div className="h-3 w-12 bg-gray-300 rounded animate-pulse"></div>
+                ) : (
+                  goldPrice
+                )}
+                /g
               </span>
-              <span className="whitespace-nowrap">
-                Silver: ₹{pricesLoading ? '...' : silverPrice}/g
+              <span className="whitespace-nowrap flex items-center gap-1">
+                Silver: ₹
+                {pricesLoading ? (
+                  <div className="h-3 w-8 bg-gray-300 rounded animate-pulse"></div>
+                ) : (
+                  silverPrice
+                )}
+                /g
               </span>
             </div>
             <div className="text-[9px] sm:text-[11px] md:text-xs hidden md:block">
@@ -367,13 +445,13 @@ export default function Header() {
               </button>
             </div>
 
-            <Link href="/mens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+            <Link href="/collections/mens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Men's Collection
             </Link>
-            <Link href="/womens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+            <Link href="/collections/womens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Women's Collection
             </Link>
-            <Link href="/kids-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
+            <Link href="/collections/kids-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
               Kids Collection
             </Link>
             <Link href="/about" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">
@@ -395,56 +473,58 @@ export default function Header() {
             onMouseEnter={handleGoldEnter}
             onMouseLeave={handleGoldLeave}
           >
-            <div className="w-full py-8 px-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-                {/* Categories */}
-                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                  {goldCategories.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="text-base text-gray-800 hover:text-[#B8941E] transition font-medium block leading-relaxed py-1 hover:bg-white/50 px-2 rounded"
-                      onClick={() => setGoldMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+            <div className="w-full py-8 px-8 min-h-[60dvh]">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full h-full">
+                {/* Categories Grid - 2 columns */}
+                <div className="lg:col-span-2 grid grid-cols-2 gap-x-6 gap-y-4 content-start">
+                  {categoriesLoading ? (
+                    // Skeleton loader for gold categories
+                    Array.from({ length: 6 }).map((_, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="h-5 w-24 bg-gray-300 rounded animate-pulse mb-2"></div>
+                        <div className="h-3 w-32 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-28 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-30 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    ))
+                  ) : goldCategories.length > 0 ? (
+                    goldCategories.map((category) => (
+                      <div key={category.slug} className="space-y-2">
+                        <h3 className="text-base font-bold text-gray-900 mb-2">
+                          {category.title}
+                        </h3>
+                        <div className="space-y-1">
+                          {category.items.map((item) => (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              className="text-sm text-gray-700 hover:text-gold-primary transition font-medium block leading-relaxed hover:underline underline-offset-2 decoration-1 decoration-gold-dark"
+                              onClick={() => setGoldMenuOpen(false)}
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-2 text-center text-gray-500 py-4">
+                      No gold categories available
+                    </div>
+                  )}
                 </div>
 
-                {/* Two Banner Images */}
-                <div className="flex flex-col gap-4">
-                  <div className="relative h-[180px] rounded-lg overflow-hidden group">
-                    <Image
-                      src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=400&fit=crop&q=80"
-                      alt="Gold Necklaces"
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      sizes="50vw"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
-                      <div className="text-white">
-                        <p className="text-xl font-bold">Necklaces</p>
-                        <p className="text-sm">Premium Collection</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="relative h-[180px] rounded-lg overflow-hidden group">
-                    <Image
-                      src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&h=400&fit=crop&q=80"
-                      alt="Gold Bangles"
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      sizes="50vw"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
-                      <div className="text-white">
-                        <p className="text-xl font-bold">Bangles</p>
-                        <p className="text-sm">Traditional Designs</p>
-                      </div>
-                    </div>
+                {/* Description Section - 3rd column */}
+                <div className="flex items-start justify-start bg-gradient-to-br from-gold-light to-cream rounded-lg p-6">
+                  <div className="text-left">
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">
+                      Gold Jewellery Collections
+                    </h2>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      Discover our exquisite range of handcrafted gold jewellery. 
+                      From traditional designs to contemporary styles, each piece 
+                      is crafted with precision and certified for purity.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -459,37 +539,58 @@ export default function Header() {
             onMouseEnter={handleSilverEnter}
             onMouseLeave={handleSilverLeave}
           >
-            <div className="w-full py-8 px-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-                {/* Categories */}
-                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                  {silverCategories.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="text-base text-gray-800 hover:text-[#B8941E] transition font-medium block leading-relaxed py-1 hover:bg-white/50 px-2 rounded"
-                      onClick={() => setSilverMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+            <div className="w-full py-8 px-8 min-h-[60dvh]">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full h-full">
+                {/* Categories Grid - 2 columns */}
+                <div className="lg:col-span-2 grid grid-cols-2 gap-x-6 gap-y-4 content-start">
+                  {categoriesLoading ? (
+                    // Skeleton loader for silver categories
+                    Array.from({ length: 6 }).map((_, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="h-5 w-24 bg-gray-300 rounded animate-pulse mb-2"></div>
+                        <div className="h-3 w-32 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-28 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-3 w-30 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    ))
+                  ) : silverCategories.length > 0 ? (
+                    silverCategories.map((category) => (
+                      <div key={category.slug} className="space-y-2">
+                        <h3 className="text-base font-bold text-gray-900 mb-2">
+                          {category.title}
+                        </h3>
+                        <div className="space-y-1">
+                          {category.items.map((item) => (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              className="text-sm text-gray-700 hover:text-gold-primary transition font-medium block leading-relaxed hover:underline underline-offset-2 decoration-1 decoration-gold-dark"
+                              onClick={() => setSilverMenuOpen(false)}
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-2 text-center text-gray-500 py-4">
+                      No silver categories available
+                    </div>
+                  )}
                 </div>
 
-                {/* Single Banner Image */}
-                <div className="relative h-full min-h-[200px] rounded-lg overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=800&fit=crop&q=80"
-                    alt="Silver Collection"
-                    fill
-                    className="object-cover"
-                    sizes="50vw"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                    <div className="text-white">
-                      <p className="text-4xl font-bold mb-1">2000+</p>
-                      <p className="text-lg">Designs</p>
-                    </div>
+                {/* Description Section - 3rd column */}
+                <div className="flex items-start justify-start bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg p-6">
+                  <div className="text-left">
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">
+                      Silver Jewellery Collections
+                    </h2>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      Explore our stunning collection of pure silver jewellery. 
+                      Elegant designs perfect for everyday wear and special occasions, 
+                      crafted with 925 sterling silver.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -503,11 +604,11 @@ export default function Header() {
         <div className="lg:hidden bg-white border-t shadow-lg">
           <nav className="w-full px-4 py-4 flex flex-col gap-1 max-h-[70vh] overflow-y-auto">
             <Link href="/" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link href="/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Gold</Link>
-            <Link href="/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Silver</Link>
-            <Link href="/mens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Men's Collection</Link>
-            <Link href="/womens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Women's Collection</Link>
-            <Link href="/kids-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Kids Collection</Link>
+            <Link href="/products/gold" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Gold</Link>
+            <Link href="/products/silver" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Silver</Link>
+            <Link href="/collections/mens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Men's Collection</Link>
+            <Link href="/collections/womens-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Women's Collection</Link>
+            <Link href="/collections/kids-collection" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Kids Collection</Link>
             <Link href="/about" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>About</Link>
             <Link href="/savings-scheme" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Savings Schema</Link>
             <Link href="/contact" className="text-[#1a1a1a] hover:text-[#D4AF37] hover:bg-gray-50 py-3 px-3 font-medium rounded transition" onClick={() => setMobileMenuOpen(false)}>Contact Us</Link>

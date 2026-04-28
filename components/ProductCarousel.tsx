@@ -200,6 +200,11 @@ export default function ProductCarousel({
   // Use API items if available, otherwise use provided items
   const displayItems = fetchFromApi === 'featured' && apiItems.length > 0 ? apiItems : items;
 
+  // Don't show static items if we're fetching from API and have no results
+  if (fetchFromApi === 'featured' && !loading && apiItems.length === 0) {
+    return null; // Hide the section if no featured products
+  }
+
   if (!isClient || (fetchFromApi === 'featured' && loading)) {
     return (
       <section className="bg-white">

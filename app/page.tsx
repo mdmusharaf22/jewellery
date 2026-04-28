@@ -9,16 +9,6 @@ import Testimonials from '@/components/Testimonials';
 import Footer from '@/components/Footer';
 
 export default function Home() {
-  // Category data
-  const categories = [
-    { id: 1, name: 'Gold Necklaces', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=500&h=700&fit=crop&q=80' },
-    { id: 2, name: 'Earrings', image: 'https://images.unsplash.com/photo-1535556116002-6281ff3e9f36?w=500&h=700&fit=crop&q=80' },
-    { id: 3, name: 'Bangles', image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=500&h=700&fit=crop&q=80' },
-    { id: 4, name: 'Silver', image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=500&h=700&fit=crop&q=80' },
-    { id: 5, name: 'Savings Plan', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=500&h=700&fit=crop&q=80' },
-    { id: 6, name: 'Rings', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&h=700&fit=crop&q=80' },
-  ];
-
   // Fallback popular products data (used only if API fails)
   const fallbackPopularProducts = [
     { id: 1, name: 'Lakshmi Bridal Choker', price: '2,18,000', karat: '22KT Gold', slug: 'lakshmi-bridal-choker', category: 'necklace', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80' },
@@ -36,7 +26,6 @@ export default function Home() {
           <CategoryCarousel
             title="Shop by Category"
             subtitle="Traditional favourites and everyday essentials curated for Indian families"
-            categories={categories}
             autoplayDelay={4000}
           />
         </div>
