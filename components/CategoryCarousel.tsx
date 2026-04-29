@@ -121,7 +121,7 @@ export default function CategoryCarousel({
             delay: autoplayDelay,
             disableOnInteraction: false,
           }}
-          loop={categories.length > 2}
+          loop={categories.length > 5}
           breakpoints={{
             640: {
               slidesPerView: 3,

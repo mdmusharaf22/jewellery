@@ -234,7 +234,7 @@ export default function ProductCarousel({
             delay: autoplayDelay,
             disableOnInteraction: false,
           }}
-          loop={true}
+          loop={displayItems.length > 4}
           breakpoints={{
             640: { slidesPerView: 2, spaceBetween: 24 },
             1024: { slidesPerView: 4, spaceBetween: 32 },

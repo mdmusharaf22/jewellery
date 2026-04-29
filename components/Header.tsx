@@ -326,6 +326,7 @@ export default function Header() {
                   alt="SriGanesh Jewellers"
                   fill
                   className="object-contain object-left"
+                  sizes="(max-width: 640px) 96px, (max-width: 768px) 128px, 192px"
                   priority
                 />
               </div>
