@@ -57,7 +57,7 @@ export default function SimilarProducts({ currentProductSlug }: SimilarProductsP
   // Transform API product to ProductCard format
   const transformProduct = (product: ApiSimilarProduct) => {
     // Find primary image or use first image
-    let imageUrl = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    let imageUrl = '';
     
     if (product.images && product.images.length > 0) {
       const primaryImage = product.images.find(img => img.is_primary === true);

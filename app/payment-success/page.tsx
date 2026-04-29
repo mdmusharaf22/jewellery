@@ -217,34 +217,6 @@ export default function PaymentSuccessPage() {
                   )}
                 </button>
               </div>
-
-              {/* Payment ID */}
-              {orderDetails.payment_id && (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="mb-2 sm:mb-0 flex-1">
-                    <p className="text-sm text-gray-600 mb-1">Payment ID</p>
-                    <p className="text-sm sm:text-base font-semibold text-gray-900 font-mono break-all">
-                      {orderDetails.payment_id}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(orderDetails.payment_id, 'payment_id')}
-                    className="flex items-center gap-1.5 text-sm text-[#B8941E] hover:text-[#9a7a19] font-medium self-start sm:self-auto transition"
-                  >
-                    {copied === 'payment_id' ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        Copy
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
             </div>
 
             {/* Confirmation Notice */}

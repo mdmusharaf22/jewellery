@@ -250,6 +250,18 @@ export default function CheckoutPage() {
     }
   }, [items.length, isLoadingProfile, router]);
 
+  // Show skeleton while loading profile
+  if (isLoadingProfile) {
+    const CheckoutSkeleton = require('@/components/skeletons/CheckoutSkeleton').default;
+    return (
+      <>
+        <Header />
+        <CheckoutSkeleton />
+        <Footer />
+      </>
+    );
+  }
+
   if (items.length === 0) {
     return null; // Don't render anything while redirecting
   }

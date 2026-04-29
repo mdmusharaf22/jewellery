@@ -93,40 +93,8 @@ export default function PopularPicks() {
     loadFeaturedProducts();
   }, [isClient]);
 
-  // Fallback products for when API is unavailable or returns empty
-  const fallbackProducts = [
-    { 
-      id: '1', 
-      name: 'Lakshmi Bridal Choker', 
-      cached_price: 218000, 
-      metal_type: '22KT Gold',
-      images: [{ url: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80', alt: 'Lakshmi Bridal Choker' }]
-    },
-    { 
-      id: '2', 
-      name: 'Temple Jhumka Pair', 
-      cached_price: 86500, 
-      metal_type: '22KT Gold',
-      images: [{ url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop&q=80', alt: 'Temple Jhumka Pair' }]
-    },
-    { 
-      id: '3', 
-      name: 'Silver Pooja Gift Set', 
-      cached_price: 14800, 
-      metal_type: '999 Silver',
-      images: [{ url: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop&q=80', alt: 'Silver Pooja Gift Set' }]
-    },
-    { 
-      id: '4', 
-      name: 'Festival Gold Coin', 
-      cached_price: 39950, 
-      metal_type: '24KT Gold',
-      images: [{ url: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&h=600&fit=crop&q=80', alt: 'Festival Gold Coin' }]
-    },
-  ];
-
-  // Use API products if available, otherwise fallback
-  const displayProducts = products.length > 0 ? products : fallbackProducts;
+  // Use API products - no fallback
+  const displayProducts = products;
 
   // Helper function to format price
   const formatPrice = (price?: number) => {
@@ -136,7 +104,7 @@ export default function PopularPicks() {
 
   // Helper function to get product image
   const getProductImage = (product: FeaturedProduct) => {
-    return product.images?.[0]?.url || 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    return product.images?.[0]?.url || '';
   };
 
   if (!isClient || loading) {
@@ -164,6 +132,11 @@ export default function PopularPicks() {
         </div>
       </section>
     );
+  }
+
+  // Don't render section if no products
+  if (displayProducts.length === 0) {
+    return null;
   }
 
   return (
@@ -204,15 +177,23 @@ export default function PopularPicks() {
             <SwiperSlide key={product.id}>
               <div className="cursor-pointer group">
                 <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3 transition-shadow duration-300 group-hover:shadow-sm">
-                  <Image
-                    src={getProductImage(product)}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    loading="eager"
-                    unoptimized
-                  />
+                  {getProductImage(product) ? (
+                    <Image
+                      src={getProductImage(product)}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      loading="eager"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                      <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                   
                   <button className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-[#B8941E] hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">

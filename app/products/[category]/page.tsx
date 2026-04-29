@@ -127,7 +127,7 @@ export default function CategoryOrProductPage() {
   // Transform API product to local Product format
   const transformApiProduct = (apiProduct: ApiProduct): Product => {
     // Find primary image or use first image
-    let primaryImage = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    let primaryImage = '';
     
     if (apiProduct.images && apiProduct.images.length > 0) {
       const primary = apiProduct.images.find(img => img.is_primary === true);
@@ -241,15 +241,11 @@ export default function CategoryOrProductPage() {
 
   // Loading state
   if (loading) {
+    const ProductDetailSkeleton = require('@/components/skeletons/ProductDetailSkeleton').default;
     return (
       <>
         <Header />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8941E] mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
+        <ProductDetailSkeleton />
         <Footer />
       </>
     );

@@ -167,7 +167,7 @@ export default function ProductCarousel({
                 name: product.name,
                 price: product.cached_price ? new Intl.NumberFormat('en-IN').format(product.cached_price) : '0',
                 karat: product.metal_type || 'Gold',
-                image: product.images?.[0]?.url || 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80',
+                image: product.images?.[0]?.url || '',
                 slug: product.slug,
                 category: 'featured',
               }));
@@ -206,29 +206,8 @@ export default function ProductCarousel({
   }
 
   if (!isClient || (fetchFromApi === 'featured' && loading)) {
-    return (
-      <section className="bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-[#1a1a1a]">
-            {title}
-          </h2>
-          <p className="text-center text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
-            {subtitle}
-          </p>
-        </div>
-        <div className="px-4 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="space-y-4">
-                <div className="aspect-square rounded-lg bg-gray-200 animate-pulse" />
-                <div className="h-3 bg-gray-200 rounded animate-pulse w-16" />
-                <div className="h-5 bg-gray-200 rounded animate-pulse w-24" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
+    const ProductCarouselSkeleton = require('./skeletons/ProductCarouselSkeleton').default;
+    return <ProductCarouselSkeleton title={title} subtitle={subtitle} />;
   }
 
   const handleToast = (message: string, type: 'success' | 'error' | 'info') => {

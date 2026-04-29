@@ -188,15 +188,11 @@ export default function ProductDetailPage() {
 
   // Loading state
   if (loading) {
+    const ProductDetailSkeleton = require('@/components/skeletons/ProductDetailSkeleton').default;
     return (
       <>
         <Header />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8941E] mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
+        <ProductDetailSkeleton />
         <Footer />
       </>
     );

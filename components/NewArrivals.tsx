@@ -72,7 +72,7 @@ export default function NewArrivals() {
   // Transform API product to ProductCard format
   const transformProduct = (product: Product) => {
     // Find primary image or use first image
-    let imageUrl = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    let imageUrl = '';
     
     if (product.images && product.images.length > 0) {
       // Find primary image first
@@ -150,9 +150,10 @@ export default function NewArrivals() {
         {/* Loading State */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-gray-100 rounded-lg h-80 animate-pulse"></div>
-            ))}
+            {[1, 2, 3, 4].map((i) => {
+              const ProductCardSkeleton = require('./skeletons/ProductCardSkeleton').default;
+              return <ProductCardSkeleton key={i} />;
+            })}
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">

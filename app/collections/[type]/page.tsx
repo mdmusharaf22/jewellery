@@ -57,8 +57,10 @@ export default function CollectionPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000]);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 50000000 });
   const [selectedKarat, setSelectedKarat] = useState<string>('all');
+  const [isCustomizable, setIsCustomizable] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
 
   const config = COLLECTION_CONFIG[type as keyof typeof COLLECTION_CONFIG];
 
@@ -73,15 +75,21 @@ export default function CollectionPage() {
           let filtered = response.data;
           
           if (config) {
-            // Filter by age group
-            if (config.ageFilter) {
-              filtered = filtered.filter((p: Product) => p.age_group === config.ageFilter);
-            }
-            
-            // Filter by gender
-            if (config.genderFilter) {
+            // Apply filtering based on collection type
+            if (type === 'mens-collection') {
+              // Men's Collection: age_group = 'adult' AND (gender = 'male' OR gender = 'unisex')
               filtered = filtered.filter((p: Product) => 
-                config.genderFilter!.includes(p.gender)
+                p.age_group === 'adult' && (p.gender === 'male' || p.gender === 'unisex')
+              );
+            } else if (type === 'womens-collection') {
+              // Women's Collection: age_group = 'adult' AND (gender = 'female' OR gender = 'unisex')
+              filtered = filtered.filter((p: Product) => 
+                p.age_group === 'adult' && (p.gender === 'female' || p.gender === 'unisex')
+              );
+            } else if (type === 'kids-collection') {
+              // Kids Collection: age_group = 'kid' (any gender)
+              filtered = filtered.filter((p: Product) => 
+                p.age_group === 'kid'
               );
             }
           }
@@ -107,7 +115,7 @@ export default function CollectionPage() {
 
     // Price filter
     filtered = filtered.filter(
-      (product) => product.cached_price >= priceRange[0] && product.cached_price <= priceRange[1]
+      (product) => product.cached_price >= priceRange.min && product.cached_price <= priceRange.max
     );
 
     // Karat filter (metal type)
@@ -115,8 +123,18 @@ export default function CollectionPage() {
       filtered = filtered.filter((product) => product.metal_type === selectedKarat);
     }
 
+    // Customizable filter
+    if (isCustomizable) {
+      filtered = filtered.filter((product) => product.is_customizable === 1);
+    }
+
+    // Featured filter
+    if (isFeatured) {
+      filtered = filtered.filter((product) => product.is_featured === 1);
+    }
+
     setFilteredProducts(filtered);
-  }, [products, priceRange, selectedKarat]);
+  }, [products, priceRange, selectedKarat, isCustomizable, isFeatured]);
 
   if (!config) {
     return (
@@ -140,16 +158,32 @@ export default function CollectionPage() {
     <>
       <Header />
       
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#B8941E] to-[#D4AF37] text-white py-12 md:py-16">
-        <div className="w-[90%] mx-auto text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">{config.title}</h1>
-          <p className="text-lg md:text-xl opacity-90">{config.description}</p>
+      {/* Hero Banner */}
+      <section 
+        className="relative h-[150px] xs:h-[180px] sm:h-[200px] flex items-center justify-center overflow-hidden w-full"
+      >
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2a2420]/90 to-[#3E2723]/90 z-10"></div>
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url(https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1920&h=600&fit=crop&q=80)',
+          }}
+        ></div>
+        
+        {/* Content */}
+        <div className="relative z-20 text-center text-white px-4 w-full">
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-3">
+            {config.title}
+          </h1>
+          <p className="text-sm xs:text-base sm:text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
+            {config.description}
+          </p>
         </div>
-      </div>
+      </section>
 
       {/* Breadcrumb */}
-      <div className="bg-gray-50 py-3 sm:py-4">
+      <div className="bg-gray-50 py-3 sm:py-4 w-full">
         <div className="w-[90%] mx-auto px-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <a href="/" className="hover:text-[#B8941E] transition">Home</a>
@@ -160,15 +194,22 @@ export default function CollectionPage() {
       </div>
 
       {/* Products Section */}
-      <div className="w-[90%] mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="w-full mx-auto px-4 py-8">
+        <div className="w-[90%] mx-auto">
+          <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
             <ProductFilters
+              selectedCategory="all"
+              onCategoryChange={() => {}}
               priceRange={priceRange}
-              onPriceChange={setPriceRange}
-              selectedKarat={selectedKarat}
-              onKaratChange={setSelectedKarat}
+              onPriceRangeChange={setPriceRange}
+              selectedCarat={selectedKarat}
+              onCaratChange={setSelectedKarat}
+              isCustomizable={isCustomizable}
+              onCustomizableChange={setIsCustomizable}
+              isFeatured={isFeatured}
+              onFeaturedChange={setIsFeatured}
             />
           </aside>
 
@@ -202,7 +243,7 @@ export default function CollectionPage() {
                 {filteredProducts.map((product) => {
                   const primaryImage = product.images.find(img => img.is_primary)?.url || 
                                      product.images[0]?.url || 
-                                     'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+                                     '';
                   
                   return (
                     <ProductCard
@@ -228,6 +269,7 @@ export default function CollectionPage() {
                 <p className="text-gray-600 mb-8">Try adjusting your filters to see more results.</p>
               </div>
             )}
+          </div>
           </div>
         </div>
       </div>

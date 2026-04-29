@@ -78,7 +78,7 @@ export default function ProductDetailPage() {
   // Transform API product to local Product format
   const transformApiProduct = (apiProduct: ApiProduct): Product => {
     // Find primary image or use first image
-    let primaryImage = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop&q=80';
+    let primaryImage = '';
     
     if (apiProduct.images && apiProduct.images.length > 0) {
       const primary = apiProduct.images.find(img => img.is_primary === true);

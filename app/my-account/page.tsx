@@ -254,15 +254,11 @@ export default function MyAccountPage() {
 
   // Don't render anything until auth is checked
   if (!isAuthChecked) {
+    const PageSkeleton = require('@/components/skeletons/PageSkeleton').default;
     return (
       <>
         <Header />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8941E] mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
+        <PageSkeleton />
         <Footer />
       </>
     );
@@ -408,10 +404,10 @@ export default function MyAccountPage() {
                   </div>
 
                   {isLoadingProfile ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B8941E] mx-auto mb-2"></div>
-                      <p className="text-sm text-gray-600">Loading profile...</p>
-                    </div>
+                    (() => {
+                      const ProfileSkeleton = require('@/components/skeletons/ProfileSkeleton').default;
+                      return <ProfileSkeleton />;
+                    })()
                   ) : (
                     <div className="space-y-3 xs:space-y-3.5 sm:space-y-4">
                       <div>

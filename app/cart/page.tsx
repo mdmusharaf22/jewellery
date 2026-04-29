@@ -164,10 +164,10 @@ export default function CartPage() {
           <h1 className="text-2xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-4 xs:mb-6 sm:mb-8">Shopping Cart</h1>
 
           {loading ? (
-            <div className="bg-white rounded-lg shadow-sm p-6 xs:p-8 sm:p-10 md:p-12 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8941E] mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading cart...</p>
-            </div>
+            (() => {
+              const CartSkeleton = require('@/components/skeletons/CartSkeleton').default;
+              return <CartSkeleton />;
+            })()
           ) : items.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-6 xs:p-8 sm:p-10 md:p-12 text-center">
               <ShoppingBag className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 xs:mb-4" />
