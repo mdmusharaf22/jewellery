@@ -56,15 +56,15 @@ export default function CategoryCarousel({
           if (data.success && data.data) {
             let filteredCategories;
             
-            // If metalType is provided, show subcategories (parent_id !== null) filtered by metal_type
+            // If metalType is provided, show parent categories filtered by metal_type
             if (metalType) {
               filteredCategories = data.data.filter((cat: any) => 
-                cat.parent_id !== null && 
+                cat.parent_id === null && 
                 cat.metal_type && 
                 cat.metal_type.toLowerCase() === metalType.toLowerCase()
               );
             } else {
-              // Otherwise, show only parent categories (parent_id === null)
+              // Otherwise, show all parent categories
               filteredCategories = data.data.filter((cat: any) => cat.parent_id === null);
             }
             

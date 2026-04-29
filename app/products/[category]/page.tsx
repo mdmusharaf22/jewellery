@@ -495,9 +495,13 @@ export default function CategoryOrProductPage() {
           </div>
         )}
 
-        <div className="w-[98%] mx-auto mb-14 md:mb-18">
-          <TrustBadges />
-        </div>
+        {/* TrustBadges - Only for non-gold/silver pages */}
+        {category !== 'gold' && category !== 'silver' && (
+          <div className="w-[98%] mx-auto mb-14 md:mb-18">
+            <TrustBadges />
+          </div>
+        )}
+
         <div className="w-[100%] mx-auto">
           <Testimonials />
         </div>
