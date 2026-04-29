@@ -17,14 +17,14 @@ export const getAccessToken = (): string | null => {
     // For admin paths, only use admin token
     const adminToken = sessionStorage.getItem('admin_access_token');
     if (adminToken) {
-      console.log('[Auth] Using admin token for admin path');
+
     }
     return adminToken;
   } else {
     // For customer paths, only use customer token
     const customerToken = localStorage.getItem('customer_token');
     if (customerToken) {
-      console.log('[Auth] Using customer token for customer path');
+
     }
     return customerToken;
   }
@@ -63,12 +63,10 @@ export const refreshAccessToken = async (): Promise<boolean> => {
     const refreshToken = getRefreshToken();
     
     if (!refreshToken) {
-      console.log('[Auth] No refresh token available');
+
       return false;
     }
 
-    console.log('[Auth] Attempting to refresh access token...');
-    
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`, {
       method: 'POST',
       headers: {
@@ -78,15 +76,14 @@ export const refreshAccessToken = async (): Promise<boolean> => {
     });
 
     if (!response.ok) {
-      console.log('[Auth] Token refresh failed:', response.status);
+
       return false;
     }
 
     const data = await response.json();
     
     if (data.success && data.data?.access_token) {
-      console.log('[Auth] Token refreshed successfully');
-      
+
       // Update access token
       sessionStorage.setItem('admin_access_token', data.data.access_token);
       
@@ -103,10 +100,9 @@ export const refreshAccessToken = async (): Promise<boolean> => {
       return true;
     }
 
-    console.log('[Auth] Token refresh response invalid');
     return false;
   } catch (error) {
-    console.error('[Auth] Error refreshing token:', error);
+
     return false;
   }
 };
@@ -116,7 +112,7 @@ export const ensureValidToken = async (): Promise<boolean> => {
   const accessToken = getAccessToken();
   
   if (!accessToken) {
-    console.log('[Auth] No access token found');
+
     return false;
   }
 
@@ -124,10 +120,9 @@ export const ensureValidToken = async (): Promise<boolean> => {
   const refreshed = await refreshAccessToken();
   
   if (refreshed) {
-    console.log('[Auth] Token refreshed successfully');
+
     return true;
   }
 
-  console.log('[Auth] Token refresh failed');
   return false;
 };

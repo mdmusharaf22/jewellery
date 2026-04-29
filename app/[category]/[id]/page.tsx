@@ -149,7 +149,7 @@ export default function ProductDetailPage() {
           return;
         }
       } catch (apiError) {
-        console.error('API fetch failed:', apiError);
+
         // Continue to fallback methods
       }
 
@@ -170,7 +170,7 @@ export default function ProductDetailPage() {
         const price = priceStr ? parseFloat(priceStr.replace(/,/g, '')) : undefined;
         
         foundProduct = generateDummyProduct(id, name || undefined, price, karat || undefined);
-        console.log('Generated dummy product for:', id, { name, price, karat });
+
       }
 
       setProduct(foundProduct);

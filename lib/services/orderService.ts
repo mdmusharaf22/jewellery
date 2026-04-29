@@ -28,7 +28,7 @@ export const getOrders = async (page = 1, limit = 20): Promise<OrdersResponse> =
       meta: response.meta || { total: 0, page: 1, limit, total_pages: 0 },
     };
   } catch (error) {
-    console.error('Error fetching orders:', error);
+
     throw error;
   }
 };

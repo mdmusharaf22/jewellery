@@ -55,11 +55,10 @@ export default function SubCategoriesModal({
       });
       const data = await res.json();
       const all: SubCategory[] = data.data || [];
-      console.log('All categories:', all);
-      console.log('Parent ID:', parentCategory.id);
+
       // Filter by parent_id — compare as strings to be safe
       const subs = all.filter((c) => String(c.parent_id) === String(parentCategory.id));
-      console.log('Filtered subs:', subs);
+
       setSubCategories(subs);
     } catch {
       showToast('Failed to load subcategories', 'error');

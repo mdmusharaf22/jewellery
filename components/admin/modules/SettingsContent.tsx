@@ -40,7 +40,7 @@ export default function SettingsContent() {
         });
       }
     } catch (error) {
-      console.error('Failed to fetch settings:', error);
+
       setToast({ message: 'Failed to load settings', type: 'error' });
     } finally {
       setLoading(false);
@@ -65,7 +65,7 @@ export default function SettingsContent() {
         setToast({ message: response.message || 'Failed to save settings', type: 'error' });
       }
     } catch (error) {
-      console.error('Failed to save settings:', error);
+
       setToast({ message: 'Failed to save settings', type: 'error' });
     } finally {
       setSaving(false);

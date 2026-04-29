@@ -30,7 +30,7 @@ export const getWishlist = async (): Promise<WishlistResponse> => {
     const response = await api.get('/wishlist', { requiresAuth: true });
     return response;
   } catch (error) {
-    console.error('Error fetching wishlist:', error);
+
     throw error;
   }
 };
@@ -41,7 +41,7 @@ export const toggleWishlistAPI = async (productId: string): Promise<WishlistResp
     const response = await api.post('/wishlist/toggle', { product_id: productId }, { requiresAuth: true });
     return response;
   } catch (error) {
-    console.error('Error toggling wishlist:', error);
+
     throw error;
   }
 };
@@ -52,7 +52,7 @@ export const clearWishlistAPI = async (): Promise<WishlistResponse> => {
     const response = await api.delete('/wishlist', { requiresAuth: true });
     return response;
   } catch (error) {
-    console.error('Error clearing wishlist:', error);
+
     throw error;
   }
 };

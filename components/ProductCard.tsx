@@ -41,14 +41,7 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
     
     // Ensure product ID is a string
     const productId = String(product.id);
-    
-    console.log('[ProductCard] Adding to cart:', {
-      productId,
-      name: product.name,
-      price,
-      isAuthenticated
-    });
-    
+
     if (isAuthenticated) {
       // Use API for authenticated users
       try {
@@ -56,15 +49,15 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
           productId: productId, 
           quantity: 1
         })).unwrap();
-        console.log('[ProductCard] Added to cart via API');
+
         onToast?.('Added to cart!', 'success');
       } catch (error) {
-        console.error('[ProductCard] Failed to add to cart:', error);
+
         onToast?.('Failed to add to cart', 'error');
       }
     } else {
       // Use local storage for guest users
-      console.log('[ProductCard] Adding to guest cart');
+
       dispatch(addToCart({
         id: productId,
         product_id: productId,
@@ -87,27 +80,20 @@ export default function ProductCard({ product, viewMode = 'grid', onToast }: Pro
     
     // Ensure product ID is a string
     const productId = String(product.id);
-    
-    console.log('[ProductCard] Toggling wishlist:', {
-      productId,
-      name: product.name,
-      isInWishlist,
-      isAuthenticated
-    });
-    
+
     if (isAuthenticated) {
       // Use API for authenticated users
       try {
         await dispatch(toggleWishlistAsync(productId)).unwrap();
-        console.log('[ProductCard] Wishlist toggled via API');
+
         onToast?.(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist!', isInWishlist ? 'info' : 'success');
       } catch (error) {
-        console.error('[ProductCard] Failed to toggle wishlist:', error);
+
         onToast?.('Failed to update wishlist', 'error');
       }
     } else {
       // Use local storage for guest users
-      console.log('[ProductCard] Toggling guest wishlist');
+
       if (isInWishlist) {
         dispatch(removeFromWishlist(productId));
         onToast?.('Removed from wishlist', 'info');

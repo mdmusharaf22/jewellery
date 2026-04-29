@@ -76,7 +76,6 @@ export default function CheckoutPage() {
             });
           }
         } catch (error) {
-          console.error('Failed to fetch profile:', error);
         } finally {
           setIsLoadingProfile(false);
         }
@@ -127,10 +126,6 @@ export default function CheckoutPage() {
         // Fallback: convert product name to slug format
         return item.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       }).join(',');
-      
-      console.log('[Checkout] Product slugs:', productSlugs);
-      console.log('[Checkout] Cart items:', items);
-      
       // Create order via API
       const orderResponse = await fetch(`${API}/orders/create`, {
         method: 'POST',
@@ -167,21 +162,11 @@ export default function CheckoutPage() {
         order_id: razorpay_order_id,
         handler: async function (response: any) {
           // Payment successful
-          console.log('=== RAZORPAY PAYMENT SUCCESS ===');
-          console.log('Full Response:', JSON.stringify(response, null, 2));
-          console.log('Order ID:', order_id);
-          console.log('Razorpay Order ID:', response.razorpay_order_id);
-          console.log('Razorpay Payment ID:', response.razorpay_payment_id);
-          console.log('Razorpay Signature:', response.razorpay_signature);
-          console.log('================================');
-          
           // Clear cart
           dispatch(clearCart());
           
           // Redirect to success page with payment details
           const successUrl = `/payment-success?order_id=${order_id}&payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}`;
-          console.log('Redirecting to:', successUrl);
-          
           setTimeout(() => {
             router.push(successUrl);
           }, 500);
@@ -196,17 +181,10 @@ export default function CheckoutPage() {
         },
         modal: {
           ondismiss: function() {
-            console.log('=== RAZORPAY PAYMENT CANCELLED/FAILED ===');
-            console.log('User dismissed the payment modal');
-            console.log('Order ID:', order_id);
-            console.log('Razorpay Order ID:', razorpay_order_id);
-            console.log('=========================================');
             setIsSubmitting(false);
             
             // Redirect to failure page
             const failureUrl = `/payment-failure?order_id=${order_id}&razorpay_order_id=${razorpay_order_id}&error_reason=Payment Cancelled&error_description=You cancelled the payment or closed the payment window.`;
-            console.log('Redirecting to:', failureUrl);
-            
             setTimeout(() => {
               router.push(failureUrl);
             }, 500);
@@ -232,7 +210,6 @@ export default function CheckoutPage() {
       }
       
     } catch (error: any) {
-      console.error('Order submission failed:', error);
       alert(error.message || 'Failed to create order. Please try again.');
       setIsSubmitting(false);
     }

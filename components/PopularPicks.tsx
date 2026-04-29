@@ -36,19 +36,16 @@ export default function PopularPicks() {
     const loadFeaturedProducts = async () => {
       setLoading(true);
       setError(null);
-      console.log('PopularPicks: Starting to fetch featured products...');
-      
+
       try {
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-        console.log('PopularPicks: API_BASE_URL:', API_BASE_URL);
-        
+
         if (!API_BASE_URL) {
-          console.error('PopularPicks: API_BASE_URL is not configured');
+
           throw new Error('API_BASE_URL is not configured');
         }
 
         const url = `${API_BASE_URL}/products/featured`;
-        console.log('PopularPicks: Fetching from URL:', url);
 
         const response = await fetch(url, {
           method: 'GET',
@@ -58,35 +55,30 @@ export default function PopularPicks() {
           mode: 'cors', // Explicitly set CORS mode
         });
 
-        console.log('PopularPicks: Response status:', response.status);
-        console.log('PopularPicks: Response ok:', response.ok);
-
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('PopularPicks: Error response:', errorText);
+
           throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
         }
 
         const data = await response.json();
-        console.log('PopularPicks: API Response:', data);
 
         if (data.success && data.data) {
           const featuredProducts = data.data;
-          console.log('PopularPicks: Featured products count:', featuredProducts.length);
-          console.log('PopularPicks: First product:', featuredProducts[0]);
+
           setProducts(featuredProducts);
         } else {
-          console.warn('PopularPicks: API response indicates failure or no data');
+
           setProducts([]);
         }
       } catch (error) {
-        console.error('PopularPicks: Failed to load featured products:', error);
+
         setError(error instanceof Error ? error.message : 'Unknown error');
         // Fallback to empty array if API fails
         setProducts([]);
       } finally {
         setLoading(false);
-        console.log('PopularPicks: Loading finished');
+
       }
     };
 

@@ -64,8 +64,7 @@ export default function ProductCarousel({
 
     // If unauthorized, try to refresh token
     if (response.status === 401 || response.status === 403) {
-      console.log('ProductCarousel: Token expired or unauthorized, attempting refresh...');
-      
+
       const refreshed = await refreshAccessToken();
       
       if (refreshed) {
@@ -80,14 +79,14 @@ export default function ProductCarousel({
         });
         
         if (response.ok) {
-          console.log('ProductCarousel: Request successful after token refresh');
+
           return response;
         }
       }
       
       // If refresh failed or still unauthorized, redirect to login
       if (response.status === 401 || response.status === 403) {
-        console.log('ProductCarousel: Authentication failed, redirecting to login...');
+
         logout();
         
         // Determine redirect URL based on current path
@@ -115,13 +114,11 @@ export default function ProductCarousel({
         try {
           const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
           if (!API_BASE_URL) {
-            console.error('ProductCarousel: API_BASE_URL is not configured');
+
             setLoading(false);
             return;
           }
 
-          console.log('ProductCarousel: Fetching featured products from API...');
-          
           let response: Response;
           let usedPublicEndpoint = false;
 
@@ -129,8 +126,7 @@ export default function ProductCarousel({
             // Try authenticated featured endpoint first
             response = await makeAuthenticatedRequest(`${API_BASE_URL}/products/featured`);
           } catch (authError) {
-            console.log('ProductCarousel: Authentication failed, trying public products endpoint...');
-            
+
             // Fall back to public products endpoint
             response = await fetch(`${API_BASE_URL}/products`, {
               method: 'GET',
@@ -141,23 +137,20 @@ export default function ProductCarousel({
             usedPublicEndpoint = true;
           }
 
-          console.log('ProductCarousel: Response status:', response.status);
-
           if (!response.ok) {
             const errorText = await response.text();
-            console.error('ProductCarousel: API Error Response:', errorText);
+
             throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
           }
 
           const data = await response.json();
-          console.log('ProductCarousel: API Response:', data);
-          
+
           if (data.success && data.data && data.data.length > 0) {
             // Filter for featured products if we're using the general products endpoint
             let productsToShow = data.data;
             if (usedPublicEndpoint) {
               productsToShow = data.data.filter((product: ApiProduct) => product.is_featured === true);
-              console.log('ProductCarousel: Filtered to', productsToShow.length, 'featured products from', data.data.length, 'total products');
+
             }
 
             if (productsToShow.length > 0) {
@@ -171,18 +164,16 @@ export default function ProductCarousel({
                 slug: product.slug,
                 category: 'featured',
               }));
-              
-              console.log('ProductCarousel: Successfully loaded', transformedItems.length, 'featured products');
+
               setApiItems(transformedItems);
             } else {
-              console.warn('ProductCarousel: No featured products found, using fallback data');
+
             }
           } else {
-            console.warn('ProductCarousel: API returned no products, using fallback data');
+
           }
         } catch (error) {
-          console.error('ProductCarousel: Failed to fetch featured products:', error);
-          console.log('ProductCarousel: Using fallback data due to API error');
+
           // Keep apiItems empty to fall back to provided items
         } finally {
           setLoading(false);

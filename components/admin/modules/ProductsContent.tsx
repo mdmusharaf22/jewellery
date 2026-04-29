@@ -59,10 +59,7 @@ export default function ProductsContent() {
         getCategories(),
         getProducts()
       ]);
-      
-      console.log('Fetched categories:', categoriesData);
-      console.log('Fetched products:', productsData);
-      
+
       setCategories(categoriesData);
       
       // Create a map of category_id to category_name
@@ -79,30 +76,25 @@ export default function ProductsContent() {
         }
       });
       setCategoryMap(map);
-      
-      console.log('Category map (including subcategories):', map);
-      
+
       // Add category_name to each product
       const productsWithCategoryNames = productsData.map(product => {
         const categoryName = product.category_id ? map[product.category_id] : undefined;
         
         if (product.category_id && !categoryName) {
-          console.warn(`⚠️ Product "${product.name}" references non-existent category: ${product.category_id}`);
+
         }
-        
-        console.log('Product:', product.name, 'category_id:', product.category_id, 'mapped name:', categoryName);
+
         return {
           ...product,
           category_name: categoryName || (product.category_id ? 'Unknown Category' : undefined)
         };
       });
-      
-      console.log('Products with category names:', productsWithCategoryNames);
-      
+
       setProducts(productsWithCategoryNames);
       setFilteredProducts(productsWithCategoryNames);
     } catch (error) {
-      console.error('Failed to load data:', error);
+
       showToast('Failed to load products', 'error');
     } finally {
       setLoading(false);
@@ -201,11 +193,11 @@ export default function ProductsContent() {
   const handleModalSubmit = async (data: any) => {
     if (modalMode === 'create') {
       const result = await createProduct(data);
-      console.log('Created product result:', result);
+
       showToast('Product created successfully', 'success');
     } else if (selectedProduct) {
       const result = await updateProduct(selectedProduct.id, data);
-      console.log('Updated product result:', result);
+
       showToast('Product updated successfully', 'success');
     }
     await fetchData();

@@ -48,7 +48,7 @@ export default function MyAccountPage() {
         return parsed.user;
       }
     } catch (e) {
-      console.error('Error parsing auth data:', e);
+
     }
     return null;
   };
@@ -88,7 +88,7 @@ export default function MyAccountPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch profile:', error);
+
     } finally {
       setIsLoadingProfile(false);
     }
@@ -100,32 +100,27 @@ export default function MyAccountPage() {
       try {
         const token = localStorage.getItem('customer_token');
         const authData = localStorage.getItem('auth');
-        
-        console.log('=== My Account Auth Check ===');
-        console.log('Token:', token ? `EXISTS (${token.substring(0, 20)}...)` : 'MISSING');
-        console.log('Auth data:', authData ? `EXISTS` : 'MISSING');
-        
+
         if (authData) {
           try {
             const parsed = JSON.parse(authData);
-            console.log('Parsed auth data:', parsed);
+
           } catch (e) {
-            console.error('Failed to parse auth data:', e);
+
           }
         }
         
         if (!token || !authData) {
-          console.log('Redirecting to login - no auth data');
+
           // Use replace to prevent back button issues
           window.location.replace('/login');
           return;
         }
-        
-        console.log('Auth verified - showing page');
+
         setHasAuth(true);
         setIsAuthChecked(true);
       } catch (error) {
-        console.error('Error in auth check:', error);
+
         window.location.replace('/login');
       }
     };
@@ -194,7 +189,7 @@ export default function MyAccountPage() {
         setToast({ message: data.message || 'Failed to update profile', type: 'error' });
       }
     } catch (error) {
-      console.error('Failed to update profile:', error);
+
       setToast({ message: 'Failed to update profile', type: 'error' });
     } finally {
       setIsSavingProfile(false);
@@ -206,7 +201,7 @@ export default function MyAccountPage() {
       await dispatch(toggleWishlistAsync(productId)).unwrap();
       setToast({ message: 'Removed from wishlist', type: 'info' });
     } catch (error) {
-      console.error('Failed to toggle wishlist:', error);
+
       setToast({ message: 'Failed to update wishlist', type: 'error' });
     }
   };
@@ -221,7 +216,7 @@ export default function MyAccountPage() {
       })).unwrap();
       setToast({ message: 'Added to cart!', type: 'success' });
     } catch (error) {
-      console.error('Failed to add to cart:', error);
+
       setToast({ message: 'Failed to add to cart', type: 'error' });
     }
   };
@@ -232,7 +227,7 @@ export default function MyAccountPage() {
         await dispatch(removeFromCartAsync(item.cart_item_id)).unwrap();
         setToast({ message: 'Removed from cart', type: 'info' });
       } catch (error) {
-        console.error('Failed to remove from cart:', error);
+
         setToast({ message: 'Failed to remove from cart', type: 'error' });
       }
     }
@@ -246,7 +241,7 @@ export default function MyAccountPage() {
           quantity: newQuantity 
         })).unwrap();
       } catch (error) {
-        console.error('Failed to update quantity:', error);
+
         setToast({ message: 'Failed to update quantity', type: 'error' });
       }
     }

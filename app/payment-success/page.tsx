@@ -109,12 +109,10 @@ export default function PaymentSuccessPage() {
       if (data.success && data.data) {
         setInvoiceData(data.data);
       } else {
-        console.error('Failed to fetch invoice:', data.message);
         alert('Failed to load invoice. Please try again.');
         setIsInvoiceModalOpen(false);
       }
     } catch (error) {
-      console.error('Error fetching invoice:', error);
       alert('Failed to load invoice. Please try again.');
       setIsInvoiceModalOpen(false);
     } finally {
@@ -150,7 +148,6 @@ export default function PaymentSuccessPage() {
         setTrackingError(data.message || 'Failed to load tracking information.');
       }
     } catch (error) {
-      console.error('Error fetching tracking:', error);
       setTrackingError('Failed to load tracking information. Please try again.');
     } finally {
       setIsLoadingTracking(false);

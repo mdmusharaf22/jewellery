@@ -50,7 +50,7 @@ export default function CustomersContent() {
         setCustomers(response.data);
       }
     } catch (error) {
-      console.error('Error fetching customers:', error);
+
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ export default function CustomersContent() {
         setShowViewModal(true);
       }
     } catch (error) {
-      console.error('Error fetching customer details:', error);
+
     } finally {
       setViewLoading(false);
     }

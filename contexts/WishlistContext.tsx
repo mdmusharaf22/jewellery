@@ -32,7 +32,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         // Ensure it's an array
         setWishlist(Array.isArray(parsed) ? parsed : []);
       } catch (error) {
-        console.error('Error loading wishlist:', error);
+
         setWishlist([]);
       }
     }

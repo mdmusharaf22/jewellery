@@ -32,7 +32,7 @@ export default function NewsletterPopup() {
     e.preventDefault();
     if (email) {
       // Here you would typically send the email to your backend
-      console.log('Newsletter signup:', email);
+
       setIsSubmitted(true);
       
       setTimeout(() => {

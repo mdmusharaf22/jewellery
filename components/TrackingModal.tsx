@@ -39,7 +39,6 @@ export default function TrackingModal({ isOpen, onClose, trackingData, isLoading
     try {
       productDetails = JSON.parse(trackingData.product_details);
     } catch (e) {
-      console.error('Failed to parse product details:', e);
     }
   }
 

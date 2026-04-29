@@ -61,8 +61,7 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
     fetchCategories();
     
     if (product && mode === 'edit') {
-      console.log('Loading product data:', product);
-      
+
       setName(product.name || '');
       setDescription(product.description || '');
       setShortDescription(product.short_description || '');
@@ -114,19 +113,7 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
           setSubcategories(selectedParent.children);
         }
       }
-      
-      console.log('Loaded values:', {
-        description: product.description,
-        parentCategoryId: product.category_id,
-        subcategoryId: product.subcategory_id,
-        lengthMetric: product.length_metric,
-        seoTitle: product.seo_title,
-        metalType: product.metal_type,
-        ageGroup: product.age_group,
-        gender: product.gender,
-        makingCharges: product.making_charges
-      });
-      
+
       // Features: load key-value pairs correctly
       if (product.features && Array.isArray(product.features) && product.features.length > 0) {
         setFeatures(product.features.map((f: any) => ({
@@ -394,13 +381,13 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
     try {
       // Auto-upload any pending images before submitting
       if (images.length > 0) {
-        console.log('Auto-uploading images...');
+
         await handleUploadImages();
       }
       
       // Auto-upload any pending videos before submitting
       if (videos.length > 0) {
-        console.log('Auto-uploading videos...');
+
         await handleUploadVideos();
       }
       // Build JSON payload to match your API structure exactly
@@ -446,16 +433,9 @@ export default function ProductModal({ isOpen, onClose, onSubmit, product, mode 
       };
       
       // Debug: Log current state
-      console.log('Current state before payload:', {
-        imageUrls: imageUrls,
-        videoUrls: videoUrls,
-        imageUrlsLength: imageUrls.length,
-        videoUrlsLength: videoUrls.length
-      });
-      
+
       // Debug: Log JSON payload
-      console.log('JSON Payload:', JSON.stringify(payload, null, 2));
-      
+
       await onSubmit(payload);
       onClose();
     } catch (err: any) {

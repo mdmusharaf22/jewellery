@@ -35,7 +35,7 @@ const initialState: CartState = {
 const loadCartFromStorage = (): CartState => {
   // Only access storage on client side
   if (typeof window === 'undefined') {
-    console.log('[Cart Storage] Server side, returning initial state');
+
     return initialState;
   }
   
@@ -43,7 +43,7 @@ const loadCartFromStorage = (): CartState => {
     // Try sessionStorage first (for logged-in users)
     const sessionCart = sessionStorage.getItem('cart');
     if (sessionCart) {
-      console.log('[Cart Storage] Found cart in sessionStorage');
+
       const parsed = JSON.parse(sessionCart);
       return {
         items: Array.isArray(parsed.items) ? parsed.items : [],
@@ -57,7 +57,7 @@ const loadCartFromStorage = (): CartState => {
     // Fall back to localStorage (for guests)
     const localCart = localStorage.getItem('guest_cart');
     if (localCart) {
-      console.log('[Cart Storage] Found guest_cart in localStorage');
+
       const parsed = JSON.parse(localCart);
       const cartState = {
         items: Array.isArray(parsed.items) ? parsed.items : [],
@@ -66,17 +66,12 @@ const loadCartFromStorage = (): CartState => {
         error: null,
         synced: false,
       };
-      console.log('[Cart Storage] Loaded guest cart:', {
-        itemCount: cartState.items.length,
-        total: cartState.total,
-        items: cartState.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity }))
-      });
+
       return cartState;
     }
-    
-    console.log('[Cart Storage] No cart found in storage');
+
   } catch (error) {
-    console.error('[Cart Storage] Error loading cart from storage:', error);
+
   }
   
   return initialState;
@@ -128,13 +123,13 @@ export const updateCartItemAsync = createAsyncThunk(
 export const removeFromCartAsync = createAsyncThunk(
   'cart/removeFromCartAsync',
   async (cartItemId: string) => {
-    console.log('[Cart Thunk] removeFromCartAsync called with cart_item_id:', cartItemId);
+
     // Remove the item
     await removeFromCartAPI(cartItemId);
-    console.log('[Cart Thunk] Item removed, fetching updated cart...');
+
     // Fetch the updated cart
     const response = await getCart();
-    console.log('[Cart Thunk] Updated cart fetched:', response.data);
+
     return response.data;
   }
 );
@@ -143,18 +138,10 @@ export const removeFromCartAsync = createAsyncThunk(
 export const syncGuestCartWithAPI = createAsyncThunk(
   'cart/syncGuestCart',
   async (guestItems: CartItem[]) => {
-    console.log('[Cart Sync] ========== STARTING CART SYNC ==========');
-    console.log('[Cart Sync] Guest cart has', guestItems.length, 'items');
-    console.log('[Cart Sync] Guest items:', JSON.stringify(guestItems.map(item => ({
-      id: item.id,
-      product_id: item.product_id,
-      name: item.name,
-      quantity: item.quantity
-    })), null, 2));
-    
+
     // If no guest items, just fetch and return the existing cart
     if (guestItems.length === 0) {
-      console.log('[Cart Sync] No guest items to sync, fetching existing cart');
+
       const response = await getCart();
       return response.data;
     }
@@ -164,15 +151,9 @@ export const syncGuestCartWithAPI = createAsyncThunk(
     try {
       const existingResponse = await getCart();
       existingCart = existingResponse.data;
-      console.log('[Cart Sync] Existing API cart has', existingCart.items.length, 'items');
-      console.log('[Cart Sync] Existing items:', JSON.stringify(existingCart.items.map((item: any) => ({
-        cart_item_id: item.id,
-        product_id: item.product_id,
-        name: item.product?.name,
-        quantity: item.quantity
-      })), null, 2));
+
     } catch (error) {
-      console.log('[Cart Sync] No existing cart found, starting fresh');
+
       existingCart = { items: [] };
     }
     
@@ -186,9 +167,7 @@ export const syncGuestCartWithAPI = createAsyncThunk(
         name: item.name || item.product?.name
       });
     });
-    
-    console.log('[Cart Sync] Existing product IDs in API cart:', Array.from(existingProductMap.keys()));
-    
+
     // Process each guest item
     let addedCount = 0;
     let updatedCount = 0;
@@ -197,50 +176,27 @@ export const syncGuestCartWithAPI = createAsyncThunk(
     for (const item of guestItems) {
       // Normalize product ID to string for comparison
       const productId = String(item.product_id || item.id);
-      
-      console.log('[Cart Sync] ------ Processing item:', item.name, '------');
-      console.log('[Cart Sync] Product ID:', productId);
-      console.log('[Cart Sync] Guest quantity:', item.quantity);
-      
+
       if (existingProductMap.has(productId)) {
         const existingItem = existingProductMap.get(productId);
-        console.log('[Cart Sync] ⚠️  Item already exists in API cart');
-        console.log('[Cart Sync] Existing quantity:', existingItem.quantity);
-        console.log('[Cart Sync] ⏭️  SKIPPING to avoid duplicate');
+
         skippedCount++;
         continue;
       }
-      
-      console.log('[Cart Sync] ➕ Item NOT in API cart, adding...');
-      
+
       try {
         const addResponse = await addToCartAPI(productId, item.quantity);
-        console.log('[Cart Sync] ✅ API response:', addResponse.success ? 'SUCCESS' : 'FAILED');
-        console.log('[Cart Sync] ✅ Item added successfully:', item.name);
+
         addedCount++;
       } catch (error: any) {
-        console.error('[Cart Sync] ❌ Failed to add item:', item.name);
-        console.error('[Cart Sync] ❌ Error:', error.message || error);
+
       }
     }
-    
-    console.log('[Cart Sync] ========== SYNC SUMMARY ==========');
-    console.log('[Cart Sync] ✅ Added:', addedCount, 'items');
-    console.log('[Cart Sync] 🔄 Updated:', updatedCount, 'items');
-    console.log('[Cart Sync] ⏭️  Skipped:', skippedCount, 'duplicates');
-    
+
     // Fetch the final cart from API
-    console.log('[Cart Sync] Fetching final cart state from API...');
+
     const finalResponse = await getCart();
-    console.log('[Cart Sync] ✅ Final cart has', finalResponse.data.items.length, 'items');
-    console.log('[Cart Sync] Final items:', JSON.stringify(finalResponse.data.items.map((item: any) => ({
-      cart_item_id: item.id,
-      product_id: item.product_id,
-      name: item.product?.name,
-      quantity: item.quantity
-    })), null, 2));
-    console.log('[Cart Sync] ========== SYNC COMPLETE ==========');
-    
+
     // Return both the API response and the guest items so we can preserve images
     return {
       apiData: finalResponse.data,
@@ -261,24 +217,13 @@ const cartSlice = createSlice({
     // Hydrate cart from storage (call this on client mount)
     hydrateCart: (state) => {
       if (typeof window !== 'undefined') {
-        console.log('[Cart Hydrate] Starting hydration...');
+
         const loaded = loadCartFromStorage();
-        console.log('[Cart Hydrate] Loaded from storage:', {
-          itemCount: loaded.items.length,
-          total: loaded.total,
-          synced: loaded.synced,
-          items: loaded.items.map(item => ({
-            id: item.id,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price
-          }))
-        });
+
         state.items = loaded.items;
         state.total = loaded.total;
         state.synced = loaded.synced;
-        console.log('[Cart Hydrate] Hydration complete. State now has', state.items.length, 'items');
-        console.log('[Cart Hydrate] Total quantity:', state.items.reduce((sum, item) => sum + item.quantity, 0));
+
       }
     },
     
@@ -291,19 +236,12 @@ const cartSlice = createSlice({
       // Normalize product ID to string
       const productId = String(action.payload.product_id || action.payload.id);
       const existingItem = state.items.find(item => String(item.product_id || item.id) === productId);
-      
-      console.log('[Cart Reducer] Adding to cart:', {
-        productId,
-        name: action.payload.name,
-        existingItem: existingItem ? 'found' : 'not found',
-        currentCartSize: state.items.length
-      });
-      
+
       if (existingItem) {
-        console.log('[Cart Reducer] Updating existing item quantity:', existingItem.quantity, '->', existingItem.quantity + (action.payload.quantity || 1));
+
         existingItem.quantity += action.payload.quantity || 1;
       } else {
-        console.log('[Cart Reducer] Adding new item to cart');
+
         state.items.push({ 
           ...action.payload, 
           quantity: action.payload.quantity || 1,
@@ -313,7 +251,7 @@ const cartSlice = createSlice({
       }
       
       state.total = state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      console.log('[Cart Reducer] Cart updated. Total items:', state.items.length, 'Total price:', state.total);
+
       saveCartToStorage(state, false); // Save to localStorage for guests
     },
     
@@ -385,30 +323,19 @@ const cartSlice = createSlice({
     });
     builder.addCase(fetchCart.fulfilled, (state, action) => {
       state.loading = false;
-      console.log('[Cart] ========== FETCH CART RESPONSE ==========');
-      console.log('[Cart] Full payload:', JSON.stringify(action.payload, null, 2));
-      
+
       // Check if payload exists and has items
       if (!action.payload || !action.payload.items) {
-        console.error('[Cart] Fetch cart response has no items');
+
         state.items = [];
         state.total = 0;
         saveCartToStorage(state, true);
         return;
       }
-      
-      console.log('[Cart] API returned', action.payload.items.length, 'items');
-      
+
       // Transform API items to local format - API returns primary_image directly
       state.items = action.payload.items.map((item: any) => {
-        console.log('[Cart] Processing item from API:', {
-          cart_item_id: item.cart_item_id,
-          product_id: item.product_id,
-          name: item.name,
-          quantity: item.quantity,
-          slug: item.slug
-        });
-        
+
         // API returns primary_image directly, not nested in images array
         const image = item.primary_image || 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600';
         
@@ -423,24 +350,12 @@ const cartSlice = createSlice({
           quantity: item.quantity,
           slug: item.slug, // Include slug from API
         };
-        
-        console.log('[Cart] Transformed to:', {
-          id: transformed.id,
-          cart_item_id: transformed.cart_item_id,
-          name: transformed.name,
-          slug: transformed.slug
-        });
-        
+
         return transformed;
       });
       state.total = action.payload.subtotal || 0;
       state.synced = true;
-      console.log('[Cart] Final state has', state.items.length, 'items');
-      console.log('[Cart] Items with cart_item_id:', state.items.map(i => ({ 
-        name: i.name, 
-        cart_item_id: i.cart_item_id 
-      })));
-      console.log('[Cart] ==========================================');
+
       saveCartToStorage(state, true);
     });
     builder.addCase(fetchCart.rejected, (state, action) => {
@@ -458,13 +373,11 @@ const cartSlice = createSlice({
       
       // Check if payload exists and has items (payload is { items, subtotal } from getCart)
       if (!action.payload || !action.payload.items) {
-        console.error('[Cart] Add to cart response has invalid structure:', action.payload);
+
         state.error = 'Invalid response from server';
         return;
       }
-      
-      console.log('[Cart] Add to cart successful, cart now has', action.payload.items.length, 'items');
-      
+
       // Transform API items to local format - API returns primary_image directly
       state.items = action.payload.items.map((item: any) => {
         // API returns primary_image directly, not nested in images array
@@ -500,7 +413,7 @@ const cartSlice = createSlice({
       
       // Check if payload exists and has items (payload is { items, subtotal } from getCart)
       if (!action.payload || !action.payload.items) {
-        console.error('[Cart] Update cart item response has no items');
+
         return;
       }
       
@@ -538,7 +451,7 @@ const cartSlice = createSlice({
       
       // Check if payload exists and has items (payload is { items, subtotal } from getCart)
       if (!action.payload || !action.payload.items) {
-        console.error('[Cart] Remove cart item response has no items');
+
         state.items = [];
         state.total = 0;
         saveCartToStorage(state, true);
@@ -599,14 +512,7 @@ const cartSlice = createSlice({
           karat: item.karat
         });
       });
-      
-      console.log('[Cart Sync] Guest items map created with', guestItemsMap.size, 'items');
-      console.log('[Cart Sync] Guest items for preservation:', Array.from(guestItemsMap.entries()).map(([id, data]) => ({
-        id,
-        name: data.name,
-        hasImage: !!data.image
-      })));
-      
+
       // Transform API items to local format, preserving guest images where available
       state.items = apiData.items.map((item: any) => {
         const product = item.product || item;
@@ -616,9 +522,9 @@ const cartSlice = createSlice({
         const guestItem = guestItemsMap.get(productId);
         
         if (guestItem) {
-          console.log('[Cart Sync] ✅ Preserving guest data for:', guestItem.name, 'with image:', guestItem.image?.substring(0, 50) + '...');
+
         } else {
-          console.log('[Cart Sync] ⚠️  No guest data found for product:', productId, '- using API data');
+
         }
         
         // If item was in guest cart, use its image; otherwise extract from API

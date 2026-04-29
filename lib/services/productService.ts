@@ -77,7 +77,7 @@ export const getProduct = async (slug: string): Promise<Product> => {
     if (!response.ok) throw new Error(data.message || 'Failed to fetch product');
     return data.data;
   } catch (error) {
-    console.error('Error fetching product:', error);
+
     throw error;
   }
 };
@@ -89,21 +89,20 @@ export const getFeaturedProducts = async (): Promise<Product[]> => {
     const data = await apiRequest('/products/featured', { requiresAuth: true });
     return data.data || [];
   } catch (error) {
-    console.error('Error fetching featured products:', error);
-    
+
     // If authenticated request fails, try public products endpoint as fallback
     try {
-      console.log('Trying public products endpoint as fallback...');
+
       const publicData = await apiRequest('/products', { requiresAuth: false });
       
       if (publicData.success && publicData.data) {
         // Filter for featured products
         const featuredProducts = publicData.data.filter((product: Product) => product.is_featured === true);
-        console.log('Found', featuredProducts.length, 'featured products from public endpoint');
+
         return featuredProducts;
       }
     } catch (fallbackError) {
-      console.error('Fallback to public endpoint also failed:', fallbackError);
+
     }
     
     throw error;
@@ -130,7 +129,7 @@ export const getProducts = async (): Promise<Product[]> => {
     if (!response.ok) throw new Error(data.message || 'Failed to fetch products');
     return data.data || [];
   } catch (error) {
-    console.error('Error fetching products:', error);
+
     throw error;
   }
 };
@@ -141,8 +140,7 @@ export const createProduct = async (payload: any): Promise<Product> => {
     const token = getAccessToken();
     
     // Log the payload being sent
-    console.log('Sending JSON payload:', JSON.stringify(payload, null, 2));
-    
+
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: 'POST',
       headers: {
@@ -159,14 +157,12 @@ export const createProduct = async (payload: any): Promise<Product> => {
 
     // Get response text first to see what we're dealing with
     const responseText = await response.text();
-    console.log('Response status:', response.status);
-    console.log('Response text:', responseText);
 
     let data;
     try {
       data = JSON.parse(responseText);
     } catch (e) {
-      console.error('Failed to parse JSON:', e);
+
       throw new Error(`Invalid response from server: ${responseText.substring(0, 100)}`);
     }
 
@@ -176,7 +172,7 @@ export const createProduct = async (payload: any): Promise<Product> => {
     
     return data.data;
   } catch (error) {
-    console.error('Error creating product:', error);
+
     throw error;
   }
 };
@@ -212,7 +208,7 @@ export const updateProduct = async (id: string, payload: any): Promise<Product> 
     
     return data.data;
   } catch (error) {
-    console.error('Error updating product:', error);
+
     throw error;
   }
 };
@@ -239,7 +235,7 @@ export const deleteProduct = async (id: string): Promise<void> => {
       throw new Error(data.message || 'Failed to delete product');
     }
   } catch (error) {
-    console.error('Error deleting product:', error);
+
     throw error;
   }
 };

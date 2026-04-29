@@ -57,7 +57,7 @@ export default function CategoryCarousel({
           }
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+
       } finally {
         setLoading(false);
       }

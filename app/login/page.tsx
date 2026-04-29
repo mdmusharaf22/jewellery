@@ -26,7 +26,7 @@ export default function LoginPage() {
   useEffect(() => {
     const authFromStorage = checkAuth();
     if (isAuthenticated || authFromStorage) {
-      console.log('[Login] User already authenticated, redirecting to my-account');
+
       router.replace('/my-account');
     }
   }, [isAuthenticated, router]);
@@ -55,7 +55,6 @@ export default function LoginPage() {
       }
 
       // Log response to debug structure
-      console.log('Login API response:', JSON.stringify(data, null, 2));
 
       // Store token first
       if (data.data?.token) {
@@ -78,8 +77,6 @@ export default function LoginPage() {
         phone: customer.phone || customer.phone_number || '',
       };
 
-      console.log('Dispatching login with user data:', userData);
-
       // Dispatch login action
       dispatch(login(userData));
 
@@ -89,11 +86,9 @@ export default function LoginPage() {
       // Verify auth was saved
       const savedAuth = localStorage.getItem('auth');
       const savedToken = localStorage.getItem('customer_token');
-      console.log('After login - Auth in storage:', savedAuth);
-      console.log('After login - Token in storage:', savedToken);
-      
+
       if (!savedAuth || !savedToken) {
-        console.error('ERROR: Auth data not saved to sessionStorage!');
+
         setError('Failed to save login session. Please try again.');
         return;
       }
@@ -103,29 +98,23 @@ export default function LoginPage() {
         // Check if we're already syncing to prevent duplicate calls
         const isSyncing = sessionStorage.getItem('cart_syncing');
         if (isSyncing === 'true') {
-          console.log('Cart sync already in progress, skipping');
+
         } else {
-          console.log('Syncing guest cart with', guestCartItems.length, 'items');
-          console.log('Guest cart items:', guestCartItems.map(item => ({
-            id: item.id,
-            product_id: item.product_id,
-            name: item.name
-          })));
-          
+
           try {
             // Mark that we're syncing to prevent duplicate calls
             sessionStorage.setItem('cart_syncing', 'true');
             await dispatch(syncGuestCartWithAPI(guestCartItems)).unwrap();
             sessionStorage.removeItem('cart_syncing');
-            console.log('Guest cart synced successfully');
+
           } catch (syncError) {
             sessionStorage.removeItem('cart_syncing');
-            console.error('Failed to sync guest cart:', syncError);
+
             // Continue even if sync fails
           }
         }
       } else {
-        console.log('No guest cart items to sync');
+
       }
 
       // Sync guest wishlist with API if there are items
@@ -133,32 +122,25 @@ export default function LoginPage() {
         // Check if we're already syncing to prevent duplicate calls
         const isSyncing = sessionStorage.getItem('wishlist_syncing');
         if (isSyncing === 'true') {
-          console.log('Wishlist sync already in progress, skipping');
+
         } else {
-          console.log('Syncing guest wishlist with', guestWishlistItems.length, 'items');
-          console.log('Guest wishlist items:', guestWishlistItems.map(item => ({
-            id: item.id,
-            product_id: item.product_id,
-            name: item.name
-          })));
-          
+
           try {
             // Mark that we're syncing to prevent duplicate calls
             sessionStorage.setItem('wishlist_syncing', 'true');
             await dispatch(syncGuestWishlistWithAPI(guestWishlistItems)).unwrap();
             sessionStorage.removeItem('wishlist_syncing');
-            console.log('Guest wishlist synced successfully');
+
           } catch (syncError) {
             sessionStorage.removeItem('wishlist_syncing');
-            console.error('Failed to sync guest wishlist:', syncError);
+
             // Continue even if sync fails
           }
         }
       } else {
-        console.log('No guest wishlist items to sync');
+
       }
 
-      console.log('Redirecting to /my-account');
       // Use window.location for hard redirect to ensure state is fresh
       window.location.href = '/my-account';
     } catch (err: any) {

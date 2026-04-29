@@ -9,12 +9,7 @@ export const setupAuthSync = (onAuthChange: (isAuthenticated: boolean) => void) 
       const token = localStorage.getItem('customer_token');
       const authData = localStorage.getItem('auth');
       const isAuthenticated = !!(token && authData);
-      
-      console.log('[Auth Sync] Storage changed in another tab:', {
-        key: e.key,
-        isAuthenticated
-      });
-      
+
       onAuthChange(isAuthenticated);
     }
   };
@@ -48,7 +43,7 @@ export const getUserFromSession = () => {
       return parsed.user;
     }
   } catch (e) {
-    console.error('Error parsing auth data:', e);
+
   }
   
   return null;

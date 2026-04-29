@@ -31,7 +31,7 @@ export default function RegisterPage() {
   useEffect(() => {
     const authFromStorage = checkAuth();
     if (isAuthenticated || authFromStorage) {
-      console.log('[Register] User already authenticated, redirecting to my-account');
+
       router.replace('/my-account');
     }
   }, [isAuthenticated, router]);
@@ -65,7 +65,6 @@ export default function RegisterPage() {
       }
 
       // Log response to debug structure
-      console.log('Register API response:', JSON.stringify(data, null, 2));
 
       // Store token first
       if (data.data?.token) {
@@ -98,9 +97,9 @@ export default function RegisterPage() {
       if (guestCartItems.length > 0) {
         try {
           await dispatch(syncGuestCartWithAPI(guestCartItems)).unwrap();
-          console.log('Guest cart synced successfully');
+
         } catch (syncError) {
-          console.error('Failed to sync guest cart:', syncError);
+
           // Continue even if sync fails
         }
       }
@@ -109,9 +108,9 @@ export default function RegisterPage() {
       if (guestWishlistItems.length > 0) {
         try {
           await dispatch(syncGuestWishlistWithAPI(guestWishlistItems)).unwrap();
-          console.log('Guest wishlist synced successfully');
+
         } catch (syncError) {
-          console.error('Failed to sync guest wishlist:', syncError);
+
           // Continue even if sync fails
         }
       }

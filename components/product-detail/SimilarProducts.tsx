@@ -42,7 +42,7 @@ export default function SimilarProducts({ currentProductSlug }: SimilarProductsP
           setSimilarProducts(response.data);
         }
       } catch (error) {
-        console.error('Failed to fetch similar products:', error);
+
         setSimilarProducts([]);
       } finally {
         setLoading(false);

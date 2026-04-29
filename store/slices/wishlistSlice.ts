@@ -57,7 +57,7 @@ const loadWishlistFromStorage = (): WishlistState => {
       };
     }
   } catch (error) {
-    console.error('Error loading wishlist from storage:', error);
+
   }
   return initialState;
 };
@@ -98,17 +98,10 @@ export const toggleWishlistAsync = createAsyncThunk(
 export const syncGuestWishlistWithAPI = createAsyncThunk(
   'wishlist/syncGuestWishlist',
   async (guestItems: WishlistItem[]) => {
-    console.log('[Wishlist Sync] ========== STARTING WISHLIST SYNC ==========');
-    console.log('[Wishlist Sync] Guest wishlist has', guestItems.length, 'items');
-    console.log('[Wishlist Sync] Guest items:', JSON.stringify(guestItems.map(item => ({
-      id: item.id,
-      product_id: item.product_id,
-      name: item.name
-    })), null, 2));
-    
+
     // If no guest items, just fetch and return the existing wishlist
     if (guestItems.length === 0) {
-      console.log('[Wishlist Sync] No guest items to sync, fetching existing wishlist');
+
       const response = await getWishlist();
       return response.data;
     }
@@ -118,14 +111,9 @@ export const syncGuestWishlistWithAPI = createAsyncThunk(
     try {
       const existingResponse = await getWishlist();
       existingWishlist = existingResponse.data;
-      console.log('[Wishlist Sync] Existing API wishlist has', existingWishlist.length, 'items');
-      console.log('[Wishlist Sync] Existing items:', JSON.stringify(existingWishlist.map((item: any) => ({
-        id: item.id,
-        product_id: item.product_id,
-        name: item.product?.name || item.name
-      })), null, 2));
+
     } catch (error) {
-      console.log('[Wishlist Sync] No existing wishlist found, starting fresh');
+
       existingWishlist = [];
     }
     
@@ -133,9 +121,7 @@ export const syncGuestWishlistWithAPI = createAsyncThunk(
     const existingProductIds = new Set(
       existingWishlist.map((item: any) => String(item.product_id || item.id))
     );
-    
-    console.log('[Wishlist Sync] Existing product IDs in API wishlist:', Array.from(existingProductIds));
-    
+
     // Process each guest item
     let addedCount = 0;
     let skippedCount = 0;
@@ -143,45 +129,26 @@ export const syncGuestWishlistWithAPI = createAsyncThunk(
     for (const item of guestItems) {
       // Normalize product ID to string for comparison
       const productId = String(item.product_id || item.id);
-      
-      console.log('[Wishlist Sync] ------ Processing item:', item.name, '------');
-      console.log('[Wishlist Sync] Product ID:', productId);
-      
+
       if (existingProductIds.has(productId)) {
-        console.log('[Wishlist Sync] ⚠️  Item already exists in API wishlist');
-        console.log('[Wishlist Sync] ⏭️  SKIPPING to avoid duplicate');
+
         skippedCount++;
         continue;
       }
-      
-      console.log('[Wishlist Sync] ➕ Item NOT in API wishlist, adding...');
-      
+
       try {
         const addResponse = await toggleWishlistAPI(productId);
-        console.log('[Wishlist Sync] ✅ API response:', addResponse.success ? 'SUCCESS' : 'FAILED');
-        console.log('[Wishlist Sync] ✅ Item added successfully:', item.name);
+
         addedCount++;
       } catch (error: any) {
-        console.error('[Wishlist Sync] ❌ Failed to add item:', item.name);
-        console.error('[Wishlist Sync] ❌ Error:', error.message || error);
+
       }
     }
-    
-    console.log('[Wishlist Sync] ========== SYNC SUMMARY ==========');
-    console.log('[Wishlist Sync] ✅ Added:', addedCount, 'items');
-    console.log('[Wishlist Sync] ⏭️  Skipped:', skippedCount, 'duplicates');
-    
+
     // Fetch the final wishlist from API
-    console.log('[Wishlist Sync] Fetching final wishlist state from API...');
+
     const finalResponse = await getWishlist();
-    console.log('[Wishlist Sync] ✅ Final wishlist has', finalResponse.data.length, 'items');
-    console.log('[Wishlist Sync] Final items:', JSON.stringify(finalResponse.data.map((item: any) => ({
-      id: item.id,
-      product_id: item.product_id,
-      name: item.product?.name || item.name
-    })), null, 2));
-    console.log('[Wishlist Sync] ========== SYNC COMPLETE ==========');
-    
+
     return finalResponse.data;
   }
 );
@@ -213,26 +180,18 @@ const wishlistSlice = createSlice({
       // Normalize product ID to string
       const productId = String(action.payload.product_id || action.payload.id);
       const exists = state.items.find(item => String(item.product_id || item.id) === productId);
-      
-      console.log('[Wishlist Reducer] Adding to wishlist:', {
-        productId,
-        name: action.payload.name,
-        exists: exists ? 'found' : 'not found',
-        currentWishlistSize: state.items.length
-      });
-      
+
       if (!exists) {
-        console.log('[Wishlist Reducer] Adding new item to wishlist');
+
         state.items.push({
           ...action.payload,
           product_id: productId,
           id: productId
         });
       } else {
-        console.log('[Wishlist Reducer] Item already in wishlist, skipping');
+
       }
-      
-      console.log('[Wishlist Reducer] Wishlist updated. Total items:', state.items.length);
+
       saveWishlistToStorage(state, false); // Save to localStorage for guests
     },
     
@@ -243,8 +202,7 @@ const wishlistSlice = createSlice({
       
       const productId = String(action.payload);
       state.items = state.items.filter(item => String(item.product_id || item.id) !== productId);
-      
-      console.log('[Wishlist Reducer] Removed item. Total items:', state.items.length);
+
       saveWishlistToStorage(state, false); // Save to localStorage for guests
     },
     
@@ -288,28 +246,18 @@ const wishlistSlice = createSlice({
     });
     builder.addCase(fetchWishlist.fulfilled, (state, action) => {
       state.loading = false;
-      console.log('[Wishlist] ========== FETCH WISHLIST RESPONSE ==========');
-      console.log('[Wishlist] Full payload:', JSON.stringify(action.payload, null, 2));
-      
+
       // Check if payload has data
       if (!action.payload || !Array.isArray(action.payload)) {
-        console.error('[Wishlist] Fetch response has invalid data');
+
         state.items = [];
         saveWishlistToStorage(state, true);
         return;
       }
-      
-      console.log('[Wishlist] API returned', action.payload.length, 'items');
-      
+
       // Transform API items to local format
       state.items = action.payload.map((item: any) => {
-        console.log('[Wishlist] Processing item:', {
-          wishlist_item_id: item.wishlist_item_id,
-          id: item.id,
-          product_id: item.product_id,
-          name: item.name
-        });
-        
+
         // API returns primary_image directly, not nested in images array
         const image = item.primary_image || 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600';
         
@@ -322,18 +270,11 @@ const wishlistSlice = createSlice({
           karat: item.metal_type === 'gold' ? '22KT Gold' : 'Silver',
           image: image,
         };
-        
-        console.log('[Wishlist] Transformed to:', {
-          id: transformed.id,
-          wishlist_item_id: transformed.wishlist_item_id,
-          name: transformed.name
-        });
-        
+
         return transformed;
       });
       state.synced = true;
-      console.log('[Wishlist] Final state has', state.items.length, 'items');
-      console.log('[Wishlist] ==========================================');
+
       saveWishlistToStorage(state, true);
     });
     builder.addCase(fetchWishlist.rejected, (state, action) => {
@@ -351,12 +292,10 @@ const wishlistSlice = createSlice({
       
       // Check if payload has data (should be array from getWishlist)
       if (!action.payload || !Array.isArray(action.payload)) {
-        console.error('[Wishlist] Toggle response has invalid data');
+
         return;
       }
-      
-      console.log('[Wishlist] Toggle successful, wishlist now has', action.payload.length, 'items');
-      
+
       // Transform API items to local format
       state.items = action.payload.map((item: any) => {
         // API returns primary_image directly, not nested in images array

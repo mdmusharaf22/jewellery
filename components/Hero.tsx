@@ -6,7 +6,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 
-
 export default function Hero() {
   const pathname = usePathname();
   const swiperRef = useRef<SwiperType | null>(null);

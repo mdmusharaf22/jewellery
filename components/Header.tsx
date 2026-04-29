@@ -40,14 +40,14 @@ export default function Header() {
       const user = getUserFromSession();
       if (user) {
         dispatch(login(user));
-        console.log('[Header] Synced auth from localStorage to Redux');
+
       }
     }
     
     // Listen for storage changes from other tabs
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'customer_token' || e.key === 'auth') {
-        console.log('[Header] Storage changed in another tab:', e.key, e.newValue ? 'set' : 'removed');
+
         const authFromStorage = checkAuth();
         setIsAuthSynced(authFromStorage);
         
@@ -56,11 +56,11 @@ export default function Header() {
           const user = getUserFromSession();
           if (user) {
             dispatch(login(user));
-            console.log('[Header] User logged in on another tab - syncing');
+
           }
         } else {
           // User logged out on another tab
-          console.log('[Header] User logged out on another tab - clearing auth');
+
           // Force page reload to clear all state
           window.location.reload();
         }
@@ -90,11 +90,7 @@ export default function Header() {
 
   // Log cart state whenever it changes
   useEffect(() => {
-    console.log('[Header] Cart state updated:', {
-      itemsLength: cartItems.length,
-      cartCount,
-      items: cartItems.map(item => ({ id: item.id, name: item.name, quantity: item.quantity }))
-    });
+
   }, [cartItems, cartCount]);
 
   // Fetch categories from API
@@ -105,7 +101,7 @@ export default function Header() {
         const data = await getCategories();
         setCategories(data as CategoryWithChildren[]);
       } catch (error) {
-        console.error('Error fetching categories:', error);
+
         // Fallback to empty array on error
         setCategories([]);
       } finally {
@@ -140,16 +136,13 @@ export default function Header() {
               
               setGoldPrice(goldPrice.toLocaleString('en-IN'));
               setSilverPrice(silverPrice.toLocaleString('en-IN'));
-              
-              console.log(`Live prices updated - Gold: ₹${goldPrice}/g, Silver: ₹${silverPrice}/g`);
-              console.log(`Last updated: ${data.data.fetch_date}`);
-              
+
               setPricesLoading(false);
               return;
             }
           }
         } catch (apiError) {
-          console.log('Internal API not available, using live simulation...', apiError);
+
         }
 
         // Simulate live prices with realistic variations
@@ -165,11 +158,9 @@ export default function Header() {
         
         setGoldPrice(newGoldPrice.toLocaleString('en-IN'));
         setSilverPrice(newSilverPrice.toLocaleString('en-IN'));
-        
-        console.log(`Updated prices - Gold: ₹${newGoldPrice}/g, Silver: ₹${newSilverPrice}/g`);
-        
+
       } catch (error) {
-        console.error('Error fetching live prices:', error);
+
         setGoldPrice('7,245');
         setSilverPrice('94');
       } finally {
@@ -199,11 +190,11 @@ export default function Header() {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         stopInterval();
-        console.log('Page hidden - stopping price updates');
+
       } else {
         fetchPrices(); // Fetch immediately when page becomes visible
         startInterval();
-        console.log('Page visible - resuming price updates');
+
       }
     };
 

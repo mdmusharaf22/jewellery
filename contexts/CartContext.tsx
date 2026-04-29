@@ -35,7 +35,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         // Ensure it's an array
         setCart(Array.isArray(parsed) ? parsed : []);
       } catch (error) {
-        console.error('Error loading cart:', error);
+
         setCart([]);
       }
     }

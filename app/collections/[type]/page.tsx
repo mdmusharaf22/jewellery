@@ -98,7 +98,6 @@ export default function CollectionPage() {
           setFilteredProducts(filtered);
         }
       } catch (error) {
-        console.error('Failed to fetch products:', error);
       } finally {
         setLoading(false);
       }

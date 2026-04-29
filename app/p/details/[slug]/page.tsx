@@ -175,7 +175,6 @@ export default function ProductDetailPage() {
           setProduct(transformedProduct);
         }
       } catch (error: any) {
-        console.error('Failed to fetch product:', error);
       } finally {
         setLoading(false);
       }

@@ -223,7 +223,7 @@ export default function CategoryOrProductPage() {
           return;
         }
       } catch (apiError: any) {
-        console.log('API fetch failed:', apiError.message);
+
         setLoading(false);
         return;
       }

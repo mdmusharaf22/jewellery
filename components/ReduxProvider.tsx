@@ -12,13 +12,13 @@ function StoreHydrator() {
   
   useEffect(() => {
     if (!hydrated.current) {
-      console.log('[StoreHydrator] Starting hydration of all slices...');
+
       // Hydrate all slices from storage on client mount
       store.dispatch(hydrateAuth());
       store.dispatch(hydrateCart());
       store.dispatch(hydrateWishlist());
       hydrated.current = true;
-      console.log('[StoreHydrator] Hydration complete');
+
     }
   }, []);
   

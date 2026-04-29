@@ -27,23 +27,22 @@ export default function AdminDashboard() {
       const authenticated = isAuthenticated();
       
       if (!authenticated) {
-        console.log('[Admin Dashboard] Not authenticated, redirecting to login');
+
         router.push('/admin/login');
         return;
       }
 
       // Try to refresh token if needed
-      console.log('[Admin Dashboard] Checking token validity...');
+
       const tokenValid = await ensureValidToken();
       
       if (!tokenValid) {
-        console.log('[Admin Dashboard] Token refresh failed, redirecting to login');
+
         logout();
         router.push('/admin/login');
         return;
       }
 
-      console.log('[Admin Dashboard] Token valid, loading dashboard');
       setIsAuthChecked(true);
 
       // Get admin user info

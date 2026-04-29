@@ -19,41 +19,27 @@ export default function CartPage() {
 
   // Log cart state on mount
   useEffect(() => {
-    console.log('[Cart Page] ========== CART PAGE MOUNTED ==========');
-    console.log('[Cart Page] Cart state:', {
-      itemCount: items.length,
-      total,
-      isAuthenticated,
-      items: items.map(item => ({ 
-        id: item.id, 
-        cart_item_id: item.cart_item_id,
-        name: item.name, 
-        quantity: item.quantity 
-      }))
-    });
-    console.log('[Cart Page] ==========================================');
+
   }, [items, total, isAuthenticated]);
 
   // Fetch cart from API on mount if authenticated
   useEffect(() => {
-    console.log('[Cart Page] ========== FETCH CHECK ==========');
-    console.log('[Cart Page] isAuthenticated:', isAuthenticated);
-    
+
     if (isAuthenticated) {
       // Always fetch cart from API when authenticated to ensure we have cart_item_id
-      console.log('[Cart Page] ✅ Fetching cart from API...');
+
       dispatch(fetchCart())
         .unwrap()
         .then(() => {
-          console.log('[Cart Page] ✅ Cart fetched successfully');
+
         })
         .catch((error) => {
-          console.error('[Cart Page] ❌ Failed to fetch cart:', error);
+
         });
     } else {
-      console.log('[Cart Page] ⚠️  User is guest, using local cart');
+
     }
-    console.log('[Cart Page] ====================================');
+
   }, [isAuthenticated, dispatch]); // Remove initialized from dependencies and don't use it
 
   const handleQuantityChange = async (item: any, newQuantity: number) => {
@@ -66,7 +52,7 @@ export default function CartPage() {
             quantity: newQuantity 
           })).unwrap();
         } catch (error) {
-          console.error('Failed to update quantity:', error);
+
         }
       } else {
         // Use local storage for guest users
@@ -76,25 +62,19 @@ export default function CartPage() {
   };
 
   const handleRemove = async (item: any) => {
-    console.log('[Cart Page] Remove item clicked:', {
-      itemId: item.id,
-      cartItemId: item.cart_item_id,
-      isAuthenticated,
-      name: item.name
-    });
-    
+
     if (isAuthenticated && item.cart_item_id) {
       // Use API for authenticated users
-      console.log('[Cart Page] Removing via API with cart_item_id:', item.cart_item_id);
+
       try {
         await dispatch(removeFromCartAsync(item.cart_item_id)).unwrap();
-        console.log('[Cart Page] Item removed successfully via API');
+
       } catch (error) {
-        console.error('[Cart Page] Failed to remove item:', error);
+
       }
     } else {
       // Use local storage for guest users
-      console.log('[Cart Page] Removing from guest cart with id:', item.id);
+
       dispatch(removeFromCart(item.id));
     }
   };
@@ -125,15 +105,14 @@ export default function CartPage() {
             parsed.user = { ...parsed.user, ...data.data.profile };
             localStorage.setItem('auth', JSON.stringify(parsed));
           }
-          
-          console.log('[Cart] Profile fetched successfully before checkout');
+
         }
       }
       
       // Navigate to checkout
       router.push('/checkout');
     } catch (error) {
-      console.error('[Cart] Failed to fetch profile:', error);
+
       // Still navigate to checkout even if API fails
       router.push('/checkout');
     } finally {

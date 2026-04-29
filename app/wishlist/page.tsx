@@ -20,48 +20,40 @@ export default function WishlistPage() {
 
   // Fetch wishlist from API on mount if authenticated
   useEffect(() => {
-    console.log('[Wishlist Page] ========== FETCH CHECK ==========');
-    console.log('[Wishlist Page] isAuthenticated:', isAuthenticated);
-    
+
     if (isAuthenticated) {
       // Always fetch wishlist from API when authenticated to ensure we have wishlist_item_id
-      console.log('[Wishlist Page] ✅ Fetching wishlist from API...');
+
       dispatch(fetchWishlist())
         .unwrap()
         .then(() => {
-          console.log('[Wishlist Page] ✅ Wishlist fetched successfully');
+
         })
         .catch((error) => {
-          console.error('[Wishlist Page] ❌ Failed to fetch wishlist:', error);
+
         });
     } else {
-      console.log('[Wishlist Page] ⚠️  User is guest, using local wishlist');
+
     }
-    console.log('[Wishlist Page] ====================================');
+
   }, [isAuthenticated, dispatch]);
 
   const handleRemove = async (item: any) => {
-    console.log('[Wishlist Page] Remove item clicked:', {
-      itemId: item.id,
-      wishlistItemId: item.wishlist_item_id,
-      isAuthenticated,
-      name: item.name
-    });
-    
+
     if (isAuthenticated && item.product_id) {
       // Use API for authenticated users - toggle will remove it
-      console.log('[Wishlist Page] Removing via API with product_id:', item.product_id);
+
       try {
         await dispatch(toggleWishlistAsync(item.product_id)).unwrap();
-        console.log('[Wishlist Page] Item removed successfully via API');
+
         setToast({ message: 'Removed from wishlist', type: 'info' });
       } catch (error) {
-        console.error('[Wishlist Page] Failed to remove item:', error);
+
         setToast({ message: 'Failed to remove from wishlist', type: 'error' });
       }
     } else {
       // Use local storage for guest users
-      console.log('[Wishlist Page] Removing from guest wishlist with id:', item.id);
+
       dispatch(removeFromWishlist(item.id));
       setToast({ message: 'Removed from wishlist', type: 'info' });
     }
