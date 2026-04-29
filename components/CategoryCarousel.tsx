@@ -19,6 +19,7 @@ interface CategoryCarouselProps {
   title: string;
   subtitle: string;
   autoplayDelay?: number;
+  metalType?: string; // Filter categories by metal_type (gold/silver)
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -27,6 +28,7 @@ export default function CategoryCarousel({
   title,
   subtitle,
   autoplayDelay = 4000,
+  metalType,
 }: CategoryCarouselProps) {
   const [isClient, setIsClient] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -52,7 +54,15 @@ export default function CategoryCarousel({
           const data = await response.json();
           if (data.success && data.data) {
             // Filter only parent categories (parent_id === null)
-            const parentCategories = data.data.filter((cat: any) => cat.parent_id === null);
+            let parentCategories = data.data.filter((cat: any) => cat.parent_id === null);
+            
+            // If metalType is provided, filter by metal_type
+            if (metalType) {
+              parentCategories = parentCategories.filter((cat: any) => 
+                cat.metal_type && cat.metal_type.toLowerCase() === metalType.toLowerCase()
+              );
+            }
+            
             setCategories(parentCategories);
           }
         }
@@ -64,7 +74,7 @@ export default function CategoryCarousel({
     };
 
     fetchCategories();
-  }, []);
+  }, [metalType]);
 
   // Show blank placeholder if no image
   const getImageUrl = (category: Category) => {

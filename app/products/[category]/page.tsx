@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Hero from '@/components/Hero';
 import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilters from '@/components/products/ProductFilters';
 import TrustBadges from '@/components/product-detail/TrustBadges';
 import Testimonials from '@/components/Testimonials';
+import Craftsmanship from '@/components/Craftsmanship';
+import CategoryCarousel from '@/components/CategoryCarousel';
 import ProductImageGallery from '@/components/product-detail/ProductImageGallery';
 import ProductInfo from '@/components/product-detail/ProductInfo';
 import ProductDetails from '@/components/product-detail/ProductDetails';
@@ -381,7 +384,9 @@ export default function CategoryOrProductPage() {
       
       {/* Hero Banner */}
       <section 
-        className="relative h-[200px] bg-gradient-to-r from-[#2a2420] to-[#3E2723] flex items-center justify-center"
+        className={`relative h-[200px] bg-gradient-to-r from-[#2a2420] to-[#3E2723] flex items-center justify-center ${
+          (category === 'gold' || category === 'silver') ? 'mb-8 md:mb-12' : ''
+        }`}
         style={{
           backgroundImage: 'url(https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=1920&q=80)',
           backgroundSize: 'cover',
@@ -393,6 +398,22 @@ export default function CategoryOrProductPage() {
           <h1 className="text-4xl md:text-5xl font-bold">{categoryName}</h1>
         </div>
       </section>
+
+      {/* Hero Slider - Only for Gold and Silver pages */}
+      {(category === 'gold' || category === 'silver') && <Hero />}
+
+      {/* Shop by Category Section - Only for Gold and Silver pages */}
+      {(category === 'gold' || category === 'silver') && (
+        <div className="py-12 md:py-16 bg-white">
+          <div className="w-[98%] mx-auto">
+            <CategoryCarousel 
+              title={`Shop by ${category.charAt(0).toUpperCase() + category.slice(1)} Category`}
+              subtitle={`Explore our exquisite collection of ${category} jewellery`}
+              metalType={category}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="bg-white">
@@ -449,6 +470,13 @@ export default function CategoryOrProductPage() {
 
       {/* Sections with same spacing as home page */}
       <div className="py-12 md:py-16">
+        {/* Craftsmanship Section - Only for Gold and Silver pages */}
+        {(category === 'gold' || category === 'silver') && (
+          <div className="mb-14 md:mb-18">
+            <Craftsmanship />
+          </div>
+        )}
+
         <div className="w-[98%] mx-auto mb-14 md:mb-18">
           <TrustBadges />
         </div>
