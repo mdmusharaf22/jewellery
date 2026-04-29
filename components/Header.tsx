@@ -263,7 +263,7 @@ export default function Header() {
       items: parent.children && parent.children.length > 0
         ? parent.children.map(child => ({
             name: child.name,
-            href: `/products/${child.slug || child.name.toLowerCase().replace(/\s+/g, '-')}`
+            href: `/c/${child.slug || child.name.toLowerCase().replace(/\s+/g, '-')}`
           }))
         : [{ name: parent.name, href: `/products/${parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-')}` }]
     }));
@@ -276,7 +276,7 @@ export default function Header() {
       items: parent.children && parent.children.length > 0
         ? parent.children.map(child => ({
             name: child.name,
-            href: `/products/${child.slug || child.name.toLowerCase().replace(/\s+/g, '-')}`
+            href: `/c/${child.slug || child.name.toLowerCase().replace(/\s+/g, '-')}`
           }))
         : [{ name: parent.name, href: `/products/${parent.slug || parent.name.toLowerCase().replace(/\s+/g, '-')}` }]
     }));

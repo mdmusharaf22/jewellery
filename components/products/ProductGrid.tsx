@@ -19,6 +19,7 @@ interface ProductGridProps {
   selectedMetalTypes?: string[];
   isCustomizable?: boolean;
   isFeatured?: boolean;
+  subcategoryId?: string; // Add subcategory filter
 }
 
 interface ApiProduct {
@@ -47,6 +48,7 @@ export default function ProductGrid({
   selectedMetalTypes = [],
   isCustomizable = false,
   isFeatured = false,
+  subcategoryId,
 }: ProductGridProps) {
   const gridTopRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -65,8 +67,12 @@ export default function ProductGrid({
         let endpoint = '/products';
         const params = [];
         
-        // Metal type filter takes priority
-        if (selectedMetalTypes && selectedMetalTypes.length > 0) {
+        // Subcategory filter takes highest priority
+        if (subcategoryId) {
+          params.push(`subcategory_id=${subcategoryId}`);
+        }
+        // Metal type filter
+        else if (selectedMetalTypes && selectedMetalTypes.length > 0) {
           // If both gold and silver are selected, don't filter by metal type (show all)
           if (selectedMetalTypes.length === 1) {
             params.push(`metal_type=${selectedMetalTypes[0]}`);
@@ -119,7 +125,7 @@ export default function ProductGrid({
     };
 
     fetchProducts();
-  }, [selectedCategory, selectedMetalTypes]);
+  }, [selectedCategory, selectedMetalTypes, subcategoryId]);
 
   // Scroll to top when page changes
   useEffect(() => {

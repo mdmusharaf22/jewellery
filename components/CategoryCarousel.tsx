@@ -13,6 +13,7 @@ interface Category {
   slug: string;
   image_url: string | null;
   metal_type: string;
+  parent_id: string | null;
 }
 
 interface CategoryCarouselProps {
@@ -53,17 +54,21 @@ export default function CategoryCarousel({
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data) {
-            // Filter only parent categories (parent_id === null)
-            let parentCategories = data.data.filter((cat: any) => cat.parent_id === null);
+            let filteredCategories;
             
-            // If metalType is provided, filter by metal_type
+            // If metalType is provided, show subcategories (parent_id !== null) filtered by metal_type
             if (metalType) {
-              parentCategories = parentCategories.filter((cat: any) => 
-                cat.metal_type && cat.metal_type.toLowerCase() === metalType.toLowerCase()
+              filteredCategories = data.data.filter((cat: any) => 
+                cat.parent_id !== null && 
+                cat.metal_type && 
+                cat.metal_type.toLowerCase() === metalType.toLowerCase()
               );
+            } else {
+              // Otherwise, show only parent categories (parent_id === null)
+              filteredCategories = data.data.filter((cat: any) => cat.parent_id === null);
             }
             
-            setCategories(parentCategories);
+            setCategories(filteredCategories);
           }
         }
       } catch (error) {
@@ -146,9 +151,12 @@ export default function CategoryCarousel({
         >
           {categories.map((category) => {
             const imageUrl = getImageUrl(category);
+            // Determine the link based on whether it's a parent category or subcategory
+            const categoryLink = category.parent_id ? `/c/${category.slug}` : `/products/${category.slug}`;
+            
             return (
               <SwiperSlide key={category.id}>
-                <Link href={`/products/${category.slug}`} className="cursor-pointer group block">
+                <Link href={categoryLink} className="cursor-pointer group block">
                   <div className="relative aspect-[3/4] overflow-hidden mb-4 rounded-t-[170px] transition-shadow duration-300 group-hover:shadow-sm bg-gray-100">
                     {imageUrl ? (
                       <>

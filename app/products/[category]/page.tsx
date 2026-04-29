@@ -214,7 +214,25 @@ export default function CategoryOrProductPage() {
         return;
       }
 
-      // If not a category, try to fetch as a product from API only
+      // Check if it's a subcategory - if so, redirect to /c/[subcategory]
+      try {
+        const categoriesResponse = await api.get('/categories', { requiresAuth: false });
+        if (categoriesResponse && categoriesResponse.success && categoriesResponse.data) {
+          const foundSubcategory = categoriesResponse.data.find(
+            (cat: any) => cat.slug === category && cat.parent_id !== null
+          );
+          
+          if (foundSubcategory) {
+            // It's a subcategory, redirect to /c/[subcategory]
+            window.location.href = `/c/${category}`;
+            return;
+          }
+        }
+      } catch (error) {
+        // Continue to check if it's a product
+      }
+
+      // If not a category or subcategory, try to fetch as a product from API only
       try {
         const response = await api.get(`/products/${category}`, { requiresAuth: false });
         
