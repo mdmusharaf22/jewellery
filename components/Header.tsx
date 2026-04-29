@@ -415,12 +415,15 @@ export default function Header() {
               onMouseEnter={handleGoldEnter}
               onMouseLeave={handleGoldLeave}
             >
-              <button className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4">
+              <Link 
+                href="/products/gold"
+                className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4"
+              >
                 Gold
                 <svg className={`w-3 h-3 transition-transform duration-200 ${goldMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-              </button>
+              </Link>
             </div>
 
             {/* Silver Mega Menu Trigger */}
@@ -429,12 +432,15 @@ export default function Header() {
               onMouseEnter={handleSilverEnter}
               onMouseLeave={handleSilverLeave}
             >
-              <button className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4">
+              <Link 
+                href="/products/silver"
+                className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap flex items-center gap-1 py-4"
+              >
                 Silver
                 <svg className={`w-3 h-3 transition-transform duration-200 ${silverMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-              </button>
+              </Link>
             </div>
 
             <Link href="/collections/mens-collection" className="text-white hover:text-[#FFF8E7] transition font-medium text-sm whitespace-nowrap">

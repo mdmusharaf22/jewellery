@@ -15,6 +15,8 @@ interface ProductFiltersProps {
   onCustomizableChange?: (value: boolean) => void;
   isFeatured?: boolean;
   onFeaturedChange?: (value: boolean) => void;
+  selectedMetalTypes?: string[];
+  onMetalTypesChange?: (metalTypes: string[]) => void;
 }
 
 export default function ProductFilters({ 
@@ -27,13 +29,16 @@ export default function ProductFilters({
   isCustomizable = false,
   onCustomizableChange,
   isFeatured = false,
-  onFeaturedChange
+  onFeaturedChange,
+  selectedMetalTypes = [],
+  onMetalTypesChange
 }: ProductFiltersProps) {
   const router = useRouter();
   const [expandedSections, setExpandedSections] = useState({
     priceRange: true,
     carat: true,
     filters: true,
+    metalType: true,
   });
 
   const [tempPriceRange, setTempPriceRange] = useState(priceRange);
@@ -69,6 +74,62 @@ export default function ProductFilters({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {/* Metal Type Section */}
+        {onMetalTypesChange && (
+          <div className="border-b border-gray-200">
+            <button
+              onClick={() => toggleSection('metalType')}
+              className="w-full px-3 xs:px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-gray-50 transition"
+            >
+              <h3 className="text-base sm:text-lg font-bold text-[#1a1a1a]">Metal Type</h3>
+              {expandedSections.metalType ? (
+                <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              ) : (
+                <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              )}
+            </button>
+            
+            {expandedSections.metalType && (
+              <div className="px-3 xs:px-4 sm:px-6 pb-3 sm:pb-4 space-y-1.5 sm:space-y-2">
+                <label className="flex items-center cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={selectedMetalTypes.includes('gold')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        onMetalTypesChange([...selectedMetalTypes, 'gold']);
+                      } else {
+                        onMetalTypesChange(selectedMetalTypes.filter(t => t !== 'gold'));
+                      }
+                    }}
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B8941E] border-gray-300 rounded focus:ring-[#B8941E]"
+                  />
+                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 group-hover:text-[#B8941E] transition">
+                    Gold
+                  </span>
+                </label>
+                <label className="flex items-center cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={selectedMetalTypes.includes('silver')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        onMetalTypesChange([...selectedMetalTypes, 'silver']);
+                      } else {
+                        onMetalTypesChange(selectedMetalTypes.filter(t => t !== 'silver'));
+                      }
+                    }}
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B8941E] border-gray-300 rounded focus:ring-[#B8941E]"
+                  />
+                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 group-hover:text-[#B8941E] transition">
+                    Silver
+                  </span>
+                </label>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Price Range Section */}
         <div className="border-b border-gray-200">
           <button

@@ -174,7 +174,7 @@ export default function PaymentSuccessPage() {
               <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-600" />
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-              Payment Successful! 🎉
+              Payment Successful!
             </h1>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
               Thank you for your order. Your payment has been processed successfully.

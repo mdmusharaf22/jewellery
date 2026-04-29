@@ -50,6 +50,7 @@ interface Product {
 const VALID_CATEGORIES = new Set([
   'all',
   'gold', 'silver', // Added metal type categories
+  'test', // Test category
   'tali', 'gold-kaapu', 'tali-chain', 'bracelet', 'necklace',
   'gold-jhumkas', 'kalipot', 'gold-dollar', 'dollar-chain',
   'gold-ring', 'stud', 'bangles', 'haram',
@@ -113,6 +114,12 @@ export default function CategoryOrProductPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 500000 });
   const [selectedCarat, setSelectedCarat] = useState('all');
+  // Initialize metal types based on category (gold/silver) or empty array
+  const [selectedMetalTypes, setSelectedMetalTypes] = useState<string[]>(
+    category === 'gold' ? ['gold'] : category === 'silver' ? ['silver'] : []
+  );
+  const [isCustomizable, setIsCustomizable] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
 
   // State for product page
   const [product, setProduct] = useState<Product | null>(null);
@@ -409,6 +416,12 @@ export default function CategoryOrProductPage() {
                 onPriceRangeChange={setPriceRange}
                 selectedCarat={selectedCarat}
                 onCaratChange={setSelectedCarat}
+                selectedMetalTypes={category === 'all' ? selectedMetalTypes : undefined}
+                onMetalTypesChange={category === 'all' ? setSelectedMetalTypes : undefined}
+                isCustomizable={isCustomizable}
+                onCustomizableChange={setIsCustomizable}
+                isFeatured={isFeatured}
+                onFeaturedChange={setIsFeatured}
               />
             </aside>
 
@@ -425,6 +438,9 @@ export default function CategoryOrProductPage() {
                 onPageChange={setCurrentPage}
                 priceRange={priceRange}
                 selectedCarat={selectedCarat}
+                selectedMetalTypes={selectedMetalTypes}
+                isCustomizable={isCustomizable}
+                isFeatured={isFeatured}
               />
             </main>
           </div>

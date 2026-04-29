@@ -7,8 +7,8 @@ export default function ProductsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to /all
-    router.replace('/all');
+    // Redirect to /products/all
+    router.replace('/products/all');
   }, [router]);
 
   return null;

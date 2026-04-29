@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAuthenticated, logout, getAdminUser, ensureValidToken } from '@/lib/auth';
 import DashboardContent from '@/components/admin/modules/DashboardContent';
@@ -71,15 +72,33 @@ export default function AdminDashboard() {
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center justify-between">
             {sidebarOpen ? (
-              <h1 className="text-xl font-bold text-amber-500">SGJ Admin</h1>
+              <div className="flex items-center gap-2 flex-1">
+                <div className="relative h-14 w-40 flex-shrink-0">
+                  <Image
+                    src="/footer-logo.png"
+                    alt="SriGanesh Jewellers Admin"
+                    fill
+                    className="object-contain object-left"
+                    sizes="160px"
+                    priority
+                  />
+                </div>
+              </div>
             ) : (
-              <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center mx-auto">
-                <span className="text-white font-bold text-sm">SG</span>
+              <div className="relative w-12 h-12 mx-auto">
+                <Image
+                  src="/footer-logo.png"
+                  alt="SGJ"
+                  fill
+                  className="object-contain"
+                  sizes="48px"
+                  priority
+                />
               </div>
             )}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-gray-400 hover:text-white transition"
+              className="text-gray-400 hover:text-white transition flex-shrink-0"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

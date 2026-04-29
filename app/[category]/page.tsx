@@ -12,6 +12,8 @@ import Testimonials from '@/components/Testimonials';
 // All valid top-level category slugs
 const VALID_CATEGORIES = new Set([
   'all',
+  'gold', 'silver', // Metal types
+  'test', // Test category
   'tali', 'gold-kaapu', 'tali-chain', 'bracelet', 'necklace',
   'gold-jhumkas', 'kalipot', 'gold-dollar', 'dollar-chain',
   'gold-ring', 'stud', 'bangles', 'haram',
@@ -34,6 +36,12 @@ export default function CategoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 500000 });
   const [selectedCarat, setSelectedCarat] = useState('all');
+  // Initialize metal types based on category (gold/silver) or empty array
+  const [selectedMetalTypes, setSelectedMetalTypes] = useState<string[]>(
+    category === 'gold' ? ['gold'] : category === 'silver' ? ['silver'] : []
+  );
+  const [isCustomizable, setIsCustomizable] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
 
   // Format category name for display
   const categoryName = category === 'all' 
@@ -85,6 +93,12 @@ export default function CategoryPage() {
                 onPriceRangeChange={setPriceRange}
                 selectedCarat={selectedCarat}
                 onCaratChange={setSelectedCarat}
+                selectedMetalTypes={category === 'all' ? selectedMetalTypes : undefined}
+                onMetalTypesChange={category === 'all' ? setSelectedMetalTypes : undefined}
+                isCustomizable={isCustomizable}
+                onCustomizableChange={setIsCustomizable}
+                isFeatured={isFeatured}
+                onFeaturedChange={setIsFeatured}
               />
             </aside>
 
@@ -101,6 +115,9 @@ export default function CategoryPage() {
                 onPageChange={setCurrentPage}
                 priceRange={priceRange}
                 selectedCarat={selectedCarat}
+                selectedMetalTypes={selectedMetalTypes}
+                isCustomizable={isCustomizable}
+                isFeatured={isFeatured}
               />
             </main>
           </div>

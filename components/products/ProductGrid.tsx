@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import Toast from '@/components/Toast';
+import { api } from '@/lib/api';
 
 interface ProductGridProps {
   viewMode: 'grid' | 'list';
@@ -15,6 +16,22 @@ interface ProductGridProps {
   onPageChange: (page: number) => void;
   priceRange: { min: number; max: number };
   selectedCarat: string;
+  selectedMetalTypes?: string[];
+  isCustomizable?: boolean;
+  isFeatured?: boolean;
+}
+
+interface ApiProduct {
+  id: string;
+  name: string;
+  slug: string;
+  cached_price: number | null;
+  dynamic_price: number;
+  metal_type: string;
+  images: { url: string; is_primary: boolean }[];
+  category?: { name: string; slug: string };
+  is_customizable?: number;
+  is_featured?: number;
 }
 
 export default function ProductGrid({
@@ -27,13 +44,82 @@ export default function ProductGrid({
   onPageChange,
   priceRange,
   selectedCarat,
+  selectedMetalTypes = [],
+  isCustomizable = false,
+  isFeatured = false,
 }: ProductGridProps) {
   const gridTopRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleToast = (message: string, type: 'success' | 'error' | 'info') => {
     setToast({ message, type });
   };
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        let endpoint = '/products';
+        const params = [];
+        
+        // Metal type filter takes priority
+        if (selectedMetalTypes && selectedMetalTypes.length > 0) {
+          // If both gold and silver are selected, don't filter by metal type (show all)
+          if (selectedMetalTypes.length === 1) {
+            params.push(`metal_type=${selectedMetalTypes[0]}`);
+          }
+        }
+        // If specific category is selected and not a metal type
+        else if (selectedCategory && selectedCategory !== 'all') {
+          // Check if it's a metal type filter (gold or silver)
+          if (selectedCategory === 'gold' || selectedCategory === 'silver') {
+            params.push(`metal_type=${selectedCategory}`);
+          } else {
+            params.push(`category=${selectedCategory}`);
+          }
+        }
+
+        if (params.length > 0) {
+          endpoint += '?' + params.join('&');
+        }
+
+        const response = await api.get(endpoint, { requiresAuth: false });
+
+        if (response && response.success && response.data) {
+          // Transform API products to match ProductCard interface
+          const transformedProducts = response.data.map((product: ApiProduct) => {
+            const primaryImage = product.images?.find(img => img.is_primary)?.url || product.images?.[0]?.url || '';
+            const karat = product.metal_type === 'gold' ? '22KT Gold' : '925 Silver';
+            
+            return {
+              id: product.id,
+              name: product.name,
+              slug: product.slug,
+              price: product.cached_price || product.dynamic_price || 0,
+              karat,
+              category: product.category?.slug || selectedCategory,
+              image: primaryImage,
+              is_customizable: product.is_customizable || 0,
+              is_featured: product.is_featured || 0,
+            };
+          });
+
+          setProducts(transformedProducts);
+        } else {
+          setProducts([]);
+        }
+      } catch (error) {
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory, selectedMetalTypes]);
 
   // Scroll to top when page changes
   useEffect(() => {
@@ -42,52 +128,8 @@ export default function ProductGrid({
     }
   }, [currentPage]);
 
-  // Sample products data - expanded with more products for each category
-  const allProducts = [
-    // TALI products
-    { id: 1, name: 'Traditional Tali Design', price: 125000, karat: '22KT Gold', category: 'tali', slug: 'traditional-tali-design', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600' },
-    { id: 2, name: 'Modern Tali Pendant', price: 98000, karat: '22KT Gold', category: 'tali', slug: 'modern-tali-pendant', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600' },
-    { id: 3, name: 'Antique Tali', price: 145000, karat: '22KT Gold', category: 'tali', slug: 'antique-tali', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600' },
-    
-    // TALI CHAIN products
-    { id: 4, name: 'Gold Tali Chain', price: 125000, karat: '22KT Gold', category: 'tali-chain', slug: 'gold-tali-chain', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600' },
-    { id: 5, name: 'Designer Tali Chain', price: 135000, karat: '22KT Gold', category: 'tali-chain', slug: 'designer-tali-chain', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600' },
-    
-    // Necklace products
-    { id: 6, name: 'Lakshmi Bridal Choker', price: 218000, karat: '22KT Gold', category: 'necklace', slug: 'lakshmi-bridal-choker', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600' },
-    { id: 7, name: 'Diamond Pendant Set', price: 145000, karat: '18KT Gold', category: 'necklace', slug: 'diamond-pendant-set', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600' },
-    { id: 8, name: 'Temple Necklace', price: 185000, karat: '22KT Gold', category: 'necklace', slug: 'temple-necklace', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600' },
-    
-    // Bangles products
-    { id: 9, name: 'Antique Bangle Set', price: 95000, karat: '22KT Gold', category: 'bangles', slug: 'antique-bangle-set', image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600' },
-    { id: 10, name: 'Designer Bangles', price: 115000, karat: '22KT Gold', category: 'bangles', slug: 'designer-bangles', image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600' },
-    
-    // Stud products
-    { id: 11, name: 'Gold Earrings', price: 55000, karat: '22KT Gold', category: 'stud', slug: 'gold-earrings', image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600' },
-    { id: 12, name: 'Diamond Studs', price: 75000, karat: '18KT Gold', category: 'stud', slug: 'diamond-studs', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600' },
-    
-    // Gold Jhumkas products
-    { id: 13, name: 'Temple Jhumka Pair', price: 86500, karat: '22KT Gold', category: 'gold-jhumkas', slug: 'temple-jhumka-pair', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600' },
-    { id: 14, name: 'Antique Jhumkas', price: 92000, karat: '22KT Gold', category: 'gold-jhumkas', slug: 'antique-jhumkas', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600' },
-    
-    // Gold Ring products
-    { id: 15, name: 'Gold Ring Set', price: 45000, karat: '18KT Gold', category: 'gold-ring', slug: 'gold-ring-set', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600' },
-    { id: 16, name: 'Designer Gold Ring', price: 52000, karat: '22KT Gold', category: 'gold-ring', slug: 'designer-gold-ring', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600' },
-    
-    // Silver products
-    { id: 17, name: 'Silver Pooja Gift Set', price: 14800, karat: '999 Silver', category: 'all', slug: 'silver-pooja-gift-set', image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600' },
-    { id: 18, name: 'Silver Anklet', price: 8500, karat: '925 Silver', category: 'anklet', slug: 'silver-anklet', image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600' },
-    { id: 19, name: 'Silver Bracelet', price: 12000, karat: '925 Silver', category: 'bracelet', slug: 'silver-bracelet', image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=600' },
-    { id: 20, name: 'Silver Ring', price: 6500, karat: '925 Silver', category: 'ring', slug: 'silver-ring', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600' },
-  ];
-
-  // Filter products based on selected category
-  const filteredProducts = selectedCategory === 'all' || selectedCategory === 'gold' || selectedCategory === 'silver'
-    ? allProducts
-    : allProducts.filter(product => product.category === selectedCategory);
-
-  // Apply price filter
-  const priceFilteredProducts = filteredProducts.filter(product => {
+  // Filter products based on price range
+  const priceFilteredProducts = products.filter(product => {
     return product.price >= priceRange.min && product.price <= priceRange.max;
   });
 
@@ -101,11 +143,45 @@ export default function ProductGrid({
         return true;
       });
 
+  // Apply customizable filter
+  const customizableFilteredProducts = isCustomizable
+    ? caratFilteredProducts.filter(product => product.is_customizable === 1)
+    : caratFilteredProducts;
+
+  // Apply featured filter
+  const featuredFilteredProducts = isFeatured
+    ? customizableFilteredProducts.filter(product => product.is_featured === 1)
+    : customizableFilteredProducts;
+
+  const finalFilteredProducts = featuredFilteredProducts;
+
   const itemsPerPage = 9;
-  const totalPages = Math.ceil(caratFilteredProducts.length / itemsPerPage);
+  const totalPages = Math.ceil(finalFilteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentProducts = caratFilteredProducts.slice(startIndex, endIndex);
+  const currentProducts = finalFilteredProducts.slice(startIndex, endIndex);
+
+  // Show loading skeleton
+  if (loading) {
+    const ProductGridSkeleton = require('@/components/skeletons/ProductGridSkeleton').default;
+    return <ProductGridSkeleton />;
+  }
+
+  // Show no results message
+  if (!loading && currentProducts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
+        <p className="text-gray-600 mb-6">Try adjusting your filters or browse all products</p>
+        <a href="/products/all" className="inline-block bg-[#B8941E] text-white px-6 py-2 rounded-lg hover:bg-[#A07D1A] transition">
+          View All Products
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -125,7 +201,7 @@ export default function ProductGrid({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         {/* Results Count */}
         <p className="text-gray-600 text-xs sm:text-sm">
-          Showing <span className="font-semibold">{startIndex + 1}-{Math.min(endIndex, caratFilteredProducts.length)}</span> of <span className="font-semibold">{caratFilteredProducts.length}</span> Results
+          Showing <span className="font-semibold">{startIndex + 1}-{Math.min(endIndex, finalFilteredProducts.length)}</span> of <span className="font-semibold">{finalFilteredProducts.length}</span> Results
         </p>
 
         {/* Sort and View Controls */}
@@ -191,7 +267,7 @@ export default function ProductGrid({
       </div>
 
       {/* Pagination - Footer Style - Only show if more than 9 products */}
-      {caratFilteredProducts.length > 9 && (
+      {finalFilteredProducts.length > 9 && (
         <div className="border-t border-gray-200 pt-8 pb-4">
           <div className="flex items-center justify-center gap-2">
             <button
